@@ -1,6 +1,6 @@
 # Examples
 
-Here you'll find a number of examples and use cases that can assist you for getting started with [helix](github.com/nicklaw5/helix).
+Here you'll find a number of examples and use cases that can assist you for getting started with [helix](https://github.com/nicklaw5/helix).
 
 ## Users
 
