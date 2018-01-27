@@ -40,18 +40,18 @@ It is common for a Twitch API request to simply fail sometimes. Occasionally a r
 
 ```go
 type UsersResponse struct {
-	ResponseCommon
-	Data []User `json:"data"`
+    ResponseCommon
+    Data []User `json:"data"`
 }
 
 type ResponseCommon struct {
     Error              string `json:"error"`
-	ErrorStatus        int    `json:"status"`
-	ErrorMessage       string `json:"message"`
-	RatelimitLimit     int
-	RatelimitRemaining int
-	RatelimitReset     int
-	StatusCode         int
+    ErrorStatus        int    `json:"status"`
+    ErrorMessage       string `json:"message"`
+    RatelimitLimit     int
+    RatelimitRemaining int
+    RatelimitReset     int
+    StatusCode         int
 }
 ```
 
