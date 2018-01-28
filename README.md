@@ -2,6 +2,20 @@
 
 A Twitch Helix API client written in Go.
 
+## Supported Endpoints
+
+- [x] GET /clips
+- [ ] POST /clips
+- [ ] POST /entitlements/upload
+- [ ] GET /games
+- [ ] GET /games/top
+- [ ] GET /streams
+- [ ] GET /streams/metadata
+- [x] GET /users
+- [ ] GET /users/follows
+- [ ] PUT /users
+- [ ] GET /videos
+
 ## Getting Started
 
 It's recommended that you use a dependency management tool such as [Dep](https://github.com/golang/dep). If you are using Dep you can import helix by running:

@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// User (Use Helix Twitch API)
+// User ...
 type User struct {
 	ID              string `json:"id"`
 	Login           string `json:"login"`

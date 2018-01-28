@@ -2,6 +2,24 @@
 
 Here you'll find a number of examples and use cases that can assist you for getting started with [helix](https://github.com/nicklaw5/helix).
 
+## Clips
+
+Get a single clip.
+
+```go
+twitch, err := helix.NewClient("your-client-id", nil)
+if err != nil {
+    // handle error
+}
+
+clip, err := twitch.GetClip("clip-id")
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", clip)
+```
+
 ## Users
 
 Get users *without* an authorization access token:
