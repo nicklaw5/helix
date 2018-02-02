@@ -128,6 +128,8 @@ func newRequest(method, path string) (*http.Request, error) {
 		return nil, err
 	}
 
+	req.URL.RawQuery = req.URL.Query().Encode()
+
 	return req, nil
 }
 
