@@ -15,12 +15,17 @@ var (
 	basePath = "https://api.twitch.tv/helix"
 )
 
+// HTTPClient ...
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // Client ...
 type Client struct {
 	clientID    string
 	accessToken string
 	userAgent   string
-	httpClient  *http.Client
+	httpClient  HTTPClient
 }
 
 // ResponseCommon ...
@@ -35,7 +40,7 @@ type ResponseCommon struct {
 }
 
 // NewClient ... It is concurrecy safe.
-func NewClient(clientID string, httpClient *http.Client) (*Client, error) {
+func NewClient(clientID string, httpClient HTTPClient) (*Client, error) {
 	c := &Client{}
 	c.clientID = clientID
 
