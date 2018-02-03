@@ -4,80 +4,67 @@ A Twitch Helix API client written in Go. If you are looking for a client for Twi
 
 ## Package Status
 
-This project is a work in progress. Below is a list of currently supported endpoints. Happy for others to contribute.
+This project is a work in progress. Below is a list of currently supported endpoints. Until a release is cut, consider this API to be unstable.
 
 ## Supported Endpoints
 
 - [x] GET /clips
 - [ ] POST /clips
 - [ ] POST /entitlements/upload
-- [ ] GET /games
+- [x] GET /games
 - [ ] GET /games/top
 - [ ] GET /streams
 - [ ] GET /streams/metadata
 - [x] GET /users
 - [ ] GET /users/follows
 - [ ] PUT /users
-- [ ] GET /videos
-
-## Getting Started
-
-It's recommended that you use a dependency management tool such as [Dep](https://github.com/golang/dep). If you are using Dep you can import helix by running:
-
-```bash
-dep ensure -add github.com/nicklaw5/helix
-```
-
-Or you can simply import using the Go toolchain:
-
-```bash
-go get -u github.com/nicklaw5/helix
-```
+- [x] GET /videos
 
 ## Usage
 
 This is a quick example of how to get users. Note that you don't need to provide both a list of ids and logins, one or the other will suffice.
 
 ```go
-twitch, err := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient("your-client-id", nil)
 if err != nil {
     // handle error
 }
 
-users := twitch.GetUsers(&helix.UsersRequest{
-    IDs: []string{"1", "2"},
+resp, err := client.GetUsers(&helix.UsersParams{
+    IDs:    []string{"26301881", "18074328"},
     Logins: []string{"summit1g", "lirik"},
 })
-
-fmt.Printf("%+v\n", users)
-```
-
-## Responses & Rate Limits
-
-It is common for a Twitch API request to simply fail sometimes. Occasionally a request gets hung up and eventually fails with a 500 internal server error. It's also possible that an invalid request was sent and Twitch responded with an error. To assist in circumstances such as these, the HTTP status code is returned with each API request, along with any error that may been encountered. For example, notice below that the `UsersResponse` struct, which is returned with the `GetUsers()` method, includes fields from the `ResponseCommon` struct.
-
-```go
-type UsersResponse struct {
-    ResponseCommon
-    Data []User `json:"data"`
+if err != nil {
+    // handle error
 }
 
-type ResponseCommon struct {
-    Error              string `json:"error"`
-    ErrorStatus        int    `json:"status"`
-    ErrorMessage       string `json:"message"`
-    RatelimitLimit     int
-    RatelimitRemaining int
-    RatelimitReset     int
-    StatusCode         int
+fmt.Printf("Status code: %d\n", resp.StatusCode)
+fmt.Printf("Rate limit: %d\n", resp.RatelimitLimit)
+fmt.Printf("Rate limit remaining: %d\n", resp.RatelimitRemaining)
+fmt.Printf("Rate limit reset: %d\n\n", resp.RatelimitReset)
+
+for _, user := range resp.Data.Users {
+    fmt.Printf("ID: %s Name: %s\n", user.ID, user.DisplayName)
 }
 ```
 
-Also note from above that the `ResponseCommon` struct includes the rate limit header results returned with each request. This package makes no attempt to manage the sending of request based on these rate limit values. That is something your application will need to concur on it's own.
+Output:
 
-## Examples
+```txt
+Status code: 200
+Rate limit: 30
+Rate limit remaining: 29
+Rate limit reset: 1517695315
 
-See the [examples](examples) page for other use cases.
+ID: 26301881 Name: sodapoppin Display Name: sodapoppin
+ID: 18074328 Name: destiny Display Name: Destiny
+ID: 26490481 Name: summit1g Display Name: summit1g
+ID: 23161357 Name: lirik Display Name: LIRIK
+```
+
+## Documentation
+
+All documentation for this package can be found [here](docs). If you are looking for generic API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
 
 ## License
 
