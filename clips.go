@@ -16,19 +16,38 @@ type Clip struct {
 	ThumbnailURL  string `json:"thumbnail_url"`
 }
 
+// ManyClips ...
+type ManyClips struct {
+	Clips []Clip `json:"data"`
+}
+
 // ClipsResponse ...
 type ClipsResponse struct {
 	ResponseCommon
-	Data []Clip `json:"data"`
+	Data ManyClips
 }
 
-// GetClip ...
-func (c *Client) GetClip(clipID string) (*ClipsResponse, error) {
-	resp := &ClipsResponse{}
-	err := c.Get("/clips?id="+clipID, resp)
+// ClipsParams ...
+type ClipsParams struct {
+	IDs []string `query:"id"` // Limit 1
+}
+
+// GetClips ...
+func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
+	resp, err := c.get("/clips", &ManyClips{}, params)
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	clips := &ClipsResponse{}
+	clips.StatusCode = resp.StatusCode
+	clips.Error = resp.Error
+	clips.ErrorStatus = resp.ErrorStatus
+	clips.ErrorMessage = resp.ErrorMessage
+	clips.RatelimitLimit = resp.RatelimitLimit
+	clips.RatelimitRemaining = resp.RatelimitRemaining
+	clips.RatelimitReset = resp.RatelimitReset
+	clips.Data.Clips = resp.Data.(*ManyClips).Clips
+
+	return clips, nil
 }

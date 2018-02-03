@@ -1,9 +1,5 @@
 package helix
 
-import (
-	"fmt"
-)
-
 // User ...
 type User struct {
 	ID              string `json:"id"`
@@ -18,37 +14,39 @@ type User struct {
 	Email           string `json:"email"`
 }
 
+// ManyUsers ...
+type ManyUsers struct {
+	Users []User `json:"data"`
+}
+
 // UsersResponse ...
 type UsersResponse struct {
 	ResponseCommon
-	Data []User `json:"data"`
+	Data ManyUsers
 }
 
-// UsersRequest ...
-type UsersRequest struct {
-	IDs    []string
-	Logins []string
+// UsersParams ...
+type UsersParams struct {
+	IDs    []string `query:"id"`    // Limit 100
+	Logins []string `query:"login"` // Limit 100
 }
 
 // GetUsers ...
-func (c *Client) GetUsers(req *UsersRequest) (*UsersResponse, error) {
-	var query string
-
-	if req.IDs != nil {
-		query = fmt.Sprintf("id=%s", concatString(req.IDs, "&id="))
-	}
-	if req.Logins != nil {
-		if query != "" {
-			query += "&"
-		}
-		query = fmt.Sprintf("%slogin=%s", query, concatString(req.Logins, "&login="))
-	}
-
-	resp := &UsersResponse{}
-	err := c.Get("/users?"+query, resp)
+func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
+	resp, err := c.get("/users", &ManyUsers{}, params)
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	users := &UsersResponse{}
+	users.StatusCode = resp.StatusCode
+	users.Error = resp.Error
+	users.ErrorStatus = resp.ErrorStatus
+	users.ErrorMessage = resp.ErrorMessage
+	users.RatelimitLimit = resp.RatelimitLimit
+	users.RatelimitRemaining = resp.RatelimitRemaining
+	users.RatelimitReset = resp.RatelimitReset
+	users.Data.Users = resp.Data.(*ManyUsers).Users
+
+	return users, nil
 }

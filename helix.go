@@ -11,8 +11,10 @@ import (
 	"strings"
 )
 
-var (
-	basePath = "https://api.twitch.tv/helix"
+const (
+	basePath  = "https://api.twitch.tv/helix"
+	methodGet = "GET"
+	queryTag  = "query"
 )
 
 // HTTPClient ...
@@ -30,13 +32,29 @@ type Client struct {
 
 // ResponseCommon ...
 type ResponseCommon struct {
-	Error              string `json:"error"`
-	ErrorStatus        int    `json:"status"`
-	ErrorMessage       string `json:"message"`
+	StatusCode   int
+	Error        string `json:"error"`
+	ErrorStatus  int    `json:"status"`
+	ErrorMessage string `json:"message"`
+	Ratelimit
+}
+
+// Response ...
+type Response struct {
+	ResponseCommon
+	Data interface{}
+}
+
+// Ratelimit ...
+type Ratelimit struct {
 	RatelimitLimit     int
 	RatelimitRemaining int
-	RatelimitReset     int
-	StatusCode         int
+	RatelimitReset     int64
+}
+
+// Pagination ...
+type Pagination struct {
+	Cursor string `json:"cursor"`
 }
 
 // NewClient ... It is concurrecy safe.
@@ -57,38 +75,135 @@ func NewClient(clientID string, httpClient HTTPClient) (*Client, error) {
 	return c, nil
 }
 
-// Get ...
-func (c *Client) Get(path string, v interface{}) error {
-	req, err := newRequest("GET", path)
-	if err != nil {
-		return err
+func (c *Client) get(path string, data, params interface{}) (*Response, error) {
+	resp := &Response{
+		Data: data,
 	}
 
-	err = c.doRequest(req, v)
+	req, err := c.newRequest(methodGet, path, params)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	err = c.doRequest(req, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
-func (c *Client) doRequest(req *http.Request, v interface{}) error {
+func buildQueryString(req *http.Request, v interface{}) (string, error) {
+	isNil, err := isZero(v)
+	if err != nil {
+		return "", err
+	}
+
+	if isNil {
+		return "", nil
+	}
+
+	query := req.URL.Query()
+	t := reflect.TypeOf(v).Elem()
+	val := reflect.ValueOf(v).Elem()
+
+	for i := 0; i < t.NumField(); i++ {
+		var defaultValue string
+
+		field := t.Field(i)
+		tag := field.Tag.Get(queryTag)
+
+		// Get the default value from the struct tag
+		if strings.Contains(tag, ",") {
+			tagSlice := strings.Split(tag, ",")
+
+			tag = tagSlice[0]
+			defaultValue = tagSlice[1]
+		}
+
+		// Get the value assigned to the query param
+		if field.Type.Kind() == reflect.Slice {
+			fieldVal := val.Field(i)
+			for j := 0; j < fieldVal.Len(); j++ {
+				query.Add(tag, fmt.Sprintf("%v", fieldVal.Index(j)))
+			}
+		} else {
+			value := fmt.Sprintf("%v", val.Field(i))
+
+			// If no value was set by the user, use the default
+			// value specified in the struct tag.
+			if value == "" || value == "0" {
+				if defaultValue == "" {
+					continue
+				}
+
+				value = defaultValue
+			}
+
+			query.Add(tag, value)
+		}
+	}
+
+	return query.Encode(), nil
+}
+
+func isZero(v interface{}) (bool, error) {
+	t := reflect.TypeOf(v)
+	if !t.Comparable() {
+		return false, fmt.Errorf("type is not comparable: %v", t)
+	}
+	return v == reflect.Zero(t).Interface(), nil
+}
+
+func (c *Client) newRequest(method, path string, params interface{}) (*http.Request, error) {
+	url := concatString([]string{basePath, path})
+
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if method == methodGet && params != nil {
+		query, err := buildQueryString(req, params)
+		if err != nil {
+			return nil, err
+		}
+
+		req.URL.RawQuery = query
+	}
+
+	return req, nil
+}
+
+func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	c.setRequestHeaders(req)
 
-	resp, err := c.httpClient.Do(req)
+	response, err := c.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("Failed to execute API request: %s", err.Error())
 	}
-	defer resp.Body.Close()
+	defer response.Body.Close()
 
-	setResponseStatusCode(v, "StatusCode", resp.StatusCode)
-	setRatelimitValue(v, "RatelimitLimit", resp.Header.Get("Ratelimit-Limit"))
-	setRatelimitValue(v, "RatelimitRemaining", resp.Header.Get("Ratelimit-Remaining"))
-	setRatelimitValue(v, "RatelimitReset", resp.Header.Get("Ratelimit-Reset"))
+	setResponseStatusCode(resp, "StatusCode", response.StatusCode)
+	setRatelimitValue(resp, "RatelimitLimit", response.Header.Get("Ratelimit-Limit"))
+	setRatelimitValue(resp, "RatelimitRemaining", response.Header.Get("Ratelimit-Remaining"))
+	setRatelimitValue(resp, "RatelimitReset", response.Header.Get("Ratelimit-Reset"))
 
-	err = json.NewDecoder(resp.Body).Decode(&v)
-	if err != nil {
-		return fmt.Errorf("Failed to decode API response: %s", err.Error())
+	// Only attempt to decode the response if JSON was returned
+	if resp.StatusCode < 500 {
+		decoder := json.NewDecoder(response.Body)
+		if resp.StatusCode < 400 {
+			// Successful request
+			err = decoder.Decode(&resp.Data)
+
+		} else {
+			// Failed request
+			err = decoder.Decode(resp)
+		}
+
+		if err != nil {
+			return fmt.Errorf("Failed to decode API response: %s", err.Error())
+		}
 	}
 
 	return nil
@@ -125,17 +240,6 @@ func (c *Client) SetAccessToken(AccessToken string) {
 // SetUserAgent ...
 func (c *Client) SetUserAgent(userAgent string) {
 	c.userAgent = userAgent
-}
-
-func newRequest(method, path string) (*http.Request, error) {
-	req, err := http.NewRequest(method, basePath+path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.URL.RawQuery = req.URL.Query().Encode()
-
-	return req, nil
 }
 
 // concatString concatenates each of the strings provided by
