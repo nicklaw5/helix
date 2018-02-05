@@ -34,7 +34,7 @@ if err != nil {
 }
 ```
 
-If you'd like to pass in your own `http.Client`, you can do so by passing it as the second argument, like so:
+If you'd like to pass in your own `http.Client`, you can do so by passing it through as an option when creating a new client, like so:
 
 ```go
 httpClient := &http.Client{
@@ -45,13 +45,15 @@ httpClient := &http.Client{
     Timeout: 10 * time.Second,
 }
 
-client, err := helix.NewClient("your-client-id", httpClient)
+client, err := helix.NewClient("your-client-id", &helix.Options{
+    HTTPClient: httpClient,
+})
 if err != nil {
     // handle error
 }
 ```
 
-If no `http.Client` is provided, `http.DefaultClient` is used by default.
+If no custom `http.Client` is provided, `http.DefaultClient` is used by default.
 
 ## Responses & Rate Limits
 
@@ -105,7 +107,20 @@ Note that any subsequent API requests will utilize this same access token. So it
 
 ## User-Agent Header
 
-It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each request. You can do so with the `SetUserAgent()` method before sending a request. For example:
+It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each request. You can do so by it through as option when creating a new client, like so:
+
+with the `SetUserAgent()` method before sending a request. For example:
+
+```go
+client, err := helix.NewClient("your-client-id", &helix.Options{
+    UserAgent: "your-user-agent-value",
+})
+if err != nil {
+    // handle error
+}
+```
+
+Alternatively, you can set by calling the `SetUserAgent()` method before sending a request. For example:
 
 ```go
 client, err := helix.NewClient("your-client-id", nil)
@@ -113,7 +128,7 @@ if err != nil {
     // handle error
 }
 
-client.SetUserAgent("my-user-agent-value")
+client.SetUserAgent("your-user-agent-value")
 
 // send API request...
 ```

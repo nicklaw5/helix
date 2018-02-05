@@ -30,6 +30,12 @@ type Client struct {
 	httpClient  HTTPClient
 }
 
+// Options ...
+type Options struct {
+	UserAgent  string
+	HTTPClient HTTPClient
+}
+
 // ResponseCommon ...
 type ResponseCommon struct {
 	StatusCode   int
@@ -58,7 +64,7 @@ type Pagination struct {
 }
 
 // NewClient ... It is concurrecy safe.
-func NewClient(clientID string, httpClient HTTPClient) (*Client, error) {
+func NewClient(clientID string, options *Options) (*Client, error) {
 	c := &Client{}
 	c.clientID = clientID
 
@@ -66,10 +72,20 @@ func NewClient(clientID string, httpClient HTTPClient) (*Client, error) {
 		return nil, errors.New("clientID cannot be an empty string")
 	}
 
-	if httpClient != nil {
-		c.httpClient = httpClient
+	if options == nil {
+		c.httpClient = http.DefaultClient
+
+		return c, nil
+	}
+
+	if options.HTTPClient != nil {
+		c.httpClient = options.HTTPClient
 	} else {
 		c.httpClient = http.DefaultClient
+	}
+
+	if options.UserAgent != "" {
+		c.SetUserAgent(options.UserAgent)
 	}
 
 	return c, nil
