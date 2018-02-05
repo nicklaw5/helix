@@ -44,9 +44,9 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	clips.Error = resp.Error
 	clips.ErrorStatus = resp.ErrorStatus
 	clips.ErrorMessage = resp.ErrorMessage
-	clips.RatelimitLimit = resp.RatelimitLimit
-	clips.RatelimitRemaining = resp.RatelimitRemaining
-	clips.RatelimitReset = resp.RatelimitReset
+	clips.RateLimit.Limit = resp.RateLimit.Limit
+	clips.RateLimit.Remaining = resp.RateLimit.Remaining
+	clips.RateLimit.Reset = resp.RateLimit.Reset
 	clips.Data.Clips = resp.Data.(*ManyClips).Clips
 
 	return clips, nil

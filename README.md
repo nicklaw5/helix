@@ -39,9 +39,9 @@ if err != nil {
 }
 
 fmt.Printf("Status code: %d\n", resp.StatusCode)
-fmt.Printf("Rate limit: %d\n", resp.RatelimitLimit)
-fmt.Printf("Rate limit remaining: %d\n", resp.RatelimitRemaining)
-fmt.Printf("Rate limit reset: %d\n\n", resp.RatelimitReset)
+fmt.Printf("Rate limit: %d\n", resp.RateLimit.Limit)
+fmt.Printf("Rate limit remaining: %d\n", resp.RateLimit.Remaining)
+fmt.Printf("Rate limit reset: %d\n\n", resp.RateLimit.Reset)
 
 for _, user := range resp.Data.Users {
     fmt.Printf("ID: %s Name: %s\n", user.ID, user.DisplayName)

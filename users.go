@@ -43,9 +43,9 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	users.Error = resp.Error
 	users.ErrorStatus = resp.ErrorStatus
 	users.ErrorMessage = resp.ErrorMessage
-	users.RatelimitLimit = resp.RatelimitLimit
-	users.RatelimitRemaining = resp.RatelimitRemaining
-	users.RatelimitReset = resp.RatelimitReset
+	users.RateLimit.Limit = resp.RateLimit.Limit
+	users.RateLimit.Remaining = resp.RateLimit.Remaining
+	users.RateLimit.Reset = resp.RateLimit.Reset
 	users.Data.Users = resp.Data.(*ManyUsers).Users
 
 	return users, nil

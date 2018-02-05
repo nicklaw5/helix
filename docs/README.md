@@ -72,13 +72,13 @@ type ResponseCommon struct {
     Error        string `json:"error"`
     ErrorStatus  int    `json:"status"`
     ErrorMessage string `json:"message"`
-    Ratelimit
+    RateLimit    RateLimit
 }
 
-type Ratelimit struct {
-    RatelimitLimit     int
-    RatelimitRemaining int
-    RatelimitReset     int64
+type RateLimit struct {
+    Limit     int
+    Remaining int
+    Reset     int64
 }
 ```
 

@@ -36,9 +36,9 @@ func (c *Client) GetGames(params *GamesParams) (*GamesResponse, error) {
 	games.Error = resp.Error
 	games.ErrorStatus = resp.ErrorStatus
 	games.ErrorMessage = resp.ErrorMessage
-	games.RatelimitLimit = resp.RatelimitLimit
-	games.RatelimitRemaining = resp.RatelimitRemaining
-	games.RatelimitReset = resp.RatelimitReset
+	games.RateLimit.Limit = resp.RateLimit.Limit
+	games.RateLimit.Remaining = resp.RateLimit.Remaining
+	games.RateLimit.Reset = resp.RateLimit.Reset
 	games.Data.Games = resp.Data.(*ManyGames).Games
 
 	return games, nil

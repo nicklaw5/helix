@@ -36,7 +36,7 @@ type ResponseCommon struct {
 	Error        string `json:"error"`
 	ErrorStatus  int    `json:"status"`
 	ErrorMessage string `json:"message"`
-	Ratelimit
+	RateLimit    RateLimit
 }
 
 // Response ...
@@ -45,11 +45,11 @@ type Response struct {
 	Data interface{}
 }
 
-// Ratelimit ...
-type Ratelimit struct {
-	RatelimitLimit     int
-	RatelimitRemaining int
-	RatelimitReset     int64
+// RateLimit ...
+type RateLimit struct {
+	Limit     int
+	Remaining int
+	Reset     int64
 }
 
 // Pagination ...
@@ -185,9 +185,11 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	defer response.Body.Close()
 
 	setResponseStatusCode(resp, "StatusCode", response.StatusCode)
-	setRatelimitValue(resp, "RatelimitLimit", response.Header.Get("Ratelimit-Limit"))
-	setRatelimitValue(resp, "RatelimitRemaining", response.Header.Get("Ratelimit-Remaining"))
-	setRatelimitValue(resp, "RatelimitReset", response.Header.Get("Ratelimit-Reset"))
+	setRateLimitValue(&resp.RateLimit, "Limit", response.Header.Get("RateLimit-Limit"))
+	setRateLimitValue(&resp.RateLimit, "Remaining", response.Header.Get("RateLimit-Remaining"))
+	setRateLimitValue(&resp.RateLimit, "Reset", response.Header.Get("RateLimit-Reset"))
+
+	c.rateLimit = resp.RateLimit
 
 	// Only attempt to decode the response if JSON was returned
 	if resp.StatusCode < 500 {
@@ -225,7 +227,7 @@ func setResponseStatusCode(v interface{}, fieldName string, code int) {
 	field.SetInt(int64(code))
 }
 
-func setRatelimitValue(v interface{}, fieldName, value string) {
+func setRateLimitValue(v interface{}, fieldName, value string) {
 	s := reflect.ValueOf(v).Elem()
 	field := s.FieldByName(fieldName)
 	intVal, _ := strconv.Atoi(value)
