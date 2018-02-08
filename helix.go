@@ -24,17 +24,23 @@ type HTTPClient interface {
 
 // Client ...
 type Client struct {
-	clientID    string
-	accessToken string
-	userAgent   string
-	httpClient  HTTPClient
+	clientID      string
+	accessToken   string
+	userAgent     string
+	httpClient    HTTPClient
+	lastResponse  *Response
+	rateLimitFunc RateLimitFunc
 }
 
 // Options ...
 type Options struct {
-	UserAgent  string
-	HTTPClient HTTPClient
+	UserAgent     string
+	HTTPClient    HTTPClient
+	RateLimitFunc RateLimitFunc
 }
+
+// RateLimitFunc ...
+type RateLimitFunc func(*Response) error
 
 // ResponseCommon ...
 type ResponseCommon struct {
@@ -86,6 +92,10 @@ func NewClient(clientID string, options *Options) (*Client, error) {
 
 	if options.UserAgent != "" {
 		c.SetUserAgent(options.UserAgent)
+	}
+
+	if options.RateLimitFunc != nil {
+		c.rateLimitFunc = options.RateLimitFunc
 	}
 
 	return c, nil
@@ -194,6 +204,13 @@ func (c *Client) newRequest(method, path string, params interface{}) (*http.Requ
 func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	c.setRequestHeaders(req)
 
+	if c.lastResponse != nil && c.rateLimitFunc != nil {
+		err := c.rateLimitFunc(c.lastResponse)
+		if err != nil {
+			return err
+		}
+	}
+
 	response, err := c.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("Failed to execute API request: %s", err.Error())
@@ -204,8 +221,6 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	setRateLimitValue(&resp.RateLimit, "Limit", response.Header.Get("RateLimit-Limit"))
 	setRateLimitValue(&resp.RateLimit, "Remaining", response.Header.Get("RateLimit-Remaining"))
 	setRateLimitValue(&resp.RateLimit, "Reset", response.Header.Get("RateLimit-Reset"))
-
-	c.rateLimit = resp.RateLimit
 
 	// Only attempt to decode the response if JSON was returned
 	if resp.StatusCode < 500 {
@@ -222,6 +237,10 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		if err != nil {
 			return fmt.Errorf("Failed to decode API response: %s", err.Error())
 		}
+	}
+
+	if c.rateLimitFunc != nil {
+		c.lastResponse = resp
 	}
 
 	return nil

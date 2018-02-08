@@ -55,7 +55,7 @@ if err != nil {
 
 If no custom `http.Client` is provided, `http.DefaultClient` is used by default.
 
-## Responses & Rate Limits
+## Responses
 
 It is common for a Twitch API request to simply fail sometimes. Occasionally a request gets hung up and eventually fails with a 500 internal server error. It's also possible that an invalid request was sent and Twitch responded with an error. To assist in circumstances such as these, the HTTP status code is returned with each API request, along with any error that may been encountered. For example, notice below that the `UsersResponse` struct, which is returned with the `GetUsers()` method, includes fields from the `ResponseCommon` struct.
 
@@ -84,7 +84,44 @@ type RateLimit struct {
 }
 ```
 
-Also note from above that the `ResponseCommon` struct includes the rate limit header results returned with each request. This package makes no attempt to manage the sending of request based on these rate limit values. That is something your application will need to conquer on it's own.
+Also note from above that the `ResponseCommon` struct includes the rate limit header results returned with each request. See below on how you may want to limit your requests based on the rate limit results returned with each request.
+
+## Request Rate Limiting
+
+Twitch enforces strict request rate limits for their API. See [their documentation](https://dev.twitch.tv/docs/api#rate-limits) for the specific rate limit values. At the time of writing this, requests are limited to 30 queries per minute (if a Bearer token is not provided) or 120 queries per minute (if a Bearer token is provided).
+
+This package allows users to provide a rate limit callback that will be executed just before a request is sent. That way you can provide some sort of functionality for limiting the requests sent and prevent spamming Twitch with requests.
+
+The below snippet provides an example of how you might structure your rate limit callback to approach limiting requests. In this example, once we've reached our rate limit, we'll simply wait for the limit to pass before sending the next request.
+
+```go
+func rateLimitCallback(lastResponse *helix.Response) error {
+    if lastResponse.RateLimit.Remaining > 0 {
+        return nil
+    }
+
+    currentTime := time.Now().Unix()
+
+    if currentTime < lastResponse.RateLimit.Reset {
+        timeDiff := time.Duration(lastResponse.RateLimit.Reset - currentTime)
+        if timeDiff > 0 {
+            fmt.Printf("Waiting on rate limit to pass before sending next request (%d seconds)\n", timeDiff)
+            time.Sleep(timeDiff * time.Second)
+        }
+    }
+
+    return nil
+}
+
+client, err := helix.NewClient("your-client-id", &helix.Options{
+    RateLimitFunc: rateLimitCallback,
+})
+if err != nil {
+    // handle error
+}
+```
+
+Note that the rate limit function that you provide will not be called on the very first request of a new client. That's because we have no indication of what the rate limit status is at that point, and require the first request conducted by our client to provide us with that information.
 
 ## Access Token Header
 
