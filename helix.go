@@ -69,36 +69,28 @@ type Pagination struct {
 	Cursor string `json:"cursor"`
 }
 
-// NewClient ... It is concurrecy safe.
-func NewClient(clientID string, options *Options) (*Client, error) {
-	c := &Client{}
-	c.clientID = clientID
-
-	if c.clientID == "" {
-		return nil, errors.New("clientID cannot be an empty string")
+// NewClient returns a new Twicth Helix API client. It panics if
+// clientID is an empty string. It is concurrecy safe.
+func NewClient(clientID string, options *Options) *Client {
+	if clientID == "" {
+		panic(errors.New("clientID cannot be an empty string"))
 	}
 
-	if options == nil {
-		c.httpClient = http.DefaultClient
-
-		return c, nil
+	c := &Client{
+		clientID:   clientID,
+		httpClient: http.DefaultClient,
 	}
 
-	if options.HTTPClient != nil {
-		c.httpClient = options.HTTPClient
-	} else {
-		c.httpClient = http.DefaultClient
-	}
+	if options != nil {
+		if options.HTTPClient != nil {
+			c.httpClient = options.HTTPClient
+		}
 
-	if options.UserAgent != "" {
-		c.SetUserAgent(options.UserAgent)
-	}
-
-	if options.RateLimitFunc != nil {
+		c.userAgent = options.UserAgent
 		c.rateLimitFunc = options.RateLimitFunc
 	}
 
-	return c, nil
+	return c
 }
 
 func (c *Client) get(path string, data, params interface{}) (*Response, error) {
