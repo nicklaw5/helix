@@ -24,19 +24,21 @@ type HTTPClient interface {
 
 // Client ...
 type Client struct {
-	clientID      string
-	accessToken   string
-	userAgent     string
-	httpClient    HTTPClient
-	lastResponse  *Response
-	rateLimitFunc RateLimitFunc
+	clientID                 string
+	accessToken              string
+	userAgent                string
+	httpClient               HTTPClient
+	lastResponse             *Response
+	rateLimitFunc            RateLimitFunc
+	retryRateLimitedRequests bool
 }
 
 // Options ...
 type Options struct {
-	UserAgent     string
-	HTTPClient    HTTPClient
-	RateLimitFunc RateLimitFunc
+	UserAgent                string
+	HTTPClient               HTTPClient
+	RateLimitFunc            RateLimitFunc
+	RetryRateLimitedRequests bool // Defaults to true
 }
 
 // RateLimitFunc ...
@@ -77,8 +79,9 @@ func NewClient(clientID string, options *Options) *Client {
 	}
 
 	c := &Client{
-		clientID:   clientID,
-		httpClient: http.DefaultClient,
+		clientID:                 clientID,
+		httpClient:               http.DefaultClient,
+		retryRateLimitedRequests: true,
 	}
 
 	if options != nil {
@@ -88,6 +91,7 @@ func NewClient(clientID string, options *Options) *Client {
 
 		c.userAgent = options.UserAgent
 		c.rateLimitFunc = options.RateLimitFunc
+		c.retryRateLimitedRequests = options.RetryRateLimitedRequests
 	}
 
 	return c
@@ -196,43 +200,56 @@ func (c *Client) newRequest(method, path string, params interface{}) (*http.Requ
 func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	c.setRequestHeaders(req)
 
-	if c.lastResponse != nil && c.rateLimitFunc != nil {
-		err := c.rateLimitFunc(c.lastResponse)
-		if err != nil {
-			return err
+	for {
+		if c.lastResponse != nil && c.rateLimitFunc != nil {
+			err := c.rateLimitFunc(c.lastResponse)
+			if err != nil {
+				return err
+			}
 		}
-	}
 
-	response, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("Failed to execute API request: %s", err.Error())
-	}
-	defer response.Body.Close()
+		response, err := c.httpClient.Do(req)
+		if err != nil {
+			return fmt.Errorf("Failed to execute API request: %s", err.Error())
+		}
+		defer response.Body.Close()
 
-	setResponseStatusCode(resp, "StatusCode", response.StatusCode)
-	setRateLimitValue(&resp.RateLimit, "Limit", response.Header.Get("RateLimit-Limit"))
-	setRateLimitValue(&resp.RateLimit, "Remaining", response.Header.Get("RateLimit-Remaining"))
-	setRateLimitValue(&resp.RateLimit, "Reset", response.Header.Get("RateLimit-Reset"))
+		setResponseStatusCode(resp, "StatusCode", response.StatusCode)
+		setRateLimitValue(&resp.RateLimit, "Limit", response.Header.Get("RateLimit-Limit"))
+		setRateLimitValue(&resp.RateLimit, "Remaining", response.Header.Get("RateLimit-Remaining"))
+		setRateLimitValue(&resp.RateLimit, "Reset", response.Header.Get("RateLimit-Reset"))
 
-	// Only attempt to decode the response if JSON was returned
-	if resp.StatusCode < 500 {
-		decoder := json.NewDecoder(response.Body)
-		if resp.StatusCode < 400 {
-			// Successful request
-			err = decoder.Decode(&resp.Data)
+		// Only attempt to decode the response if JSON was returned
+		if resp.StatusCode < 500 {
+			decoder := json.NewDecoder(response.Body)
+			if resp.StatusCode < 400 {
+				// Successful request
+				err = decoder.Decode(&resp.Data)
 
+			} else {
+				// Failed request
+				err = decoder.Decode(resp)
+			}
+
+			if err != nil {
+				return fmt.Errorf("Failed to decode API response: %s", err.Error())
+			}
+		}
+
+		if c.rateLimitFunc == nil {
+			break
 		} else {
-			// Failed request
-			err = decoder.Decode(resp)
-		}
+			c.lastResponse = resp
 
-		if err != nil {
-			return fmt.Errorf("Failed to decode API response: %s", err.Error())
-		}
-	}
+			if c.retryRateLimitedRequests &&
+				c.lastResponse.StatusCode == http.StatusTooManyRequests {
+				// Rate limit exceeded,  retry to send request after
+				// applying rate limiter callback
+				continue
+			}
 
-	if c.rateLimitFunc != nil {
-		c.lastResponse = resp
+			break
+		}
 	}
 
 	return nil

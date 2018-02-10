@@ -112,7 +112,7 @@ client := helix.NewClient("your-client-id", &helix.Options{
 })
 ```
 
-Note that the rate limit function that you provide will not be called on the very first request of a new client. That's because we have no indication of what the rate limit status is at that point, and require the first request conducted by our client to provide us with that information.
+If a `RateLimitFunc` is provided, the client will re-attempt to send a failed request if said request received a 429 (Too Many Requests) response. Before retrying the request, the `RateLimitFunc` will be applied. This functionality is enabled by default but can be disabled by setting the `RetryRateLimitedRequests` option to false.
 
 ## Access Token Header
 
