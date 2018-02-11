@@ -7,7 +7,7 @@ Follow the links below to their respective documentation:
 - [Clips](clips_docs.md)
 - [Games](games_docs.md)
 - [Users](users_docs.md)
-- [Videos](viedos_docs.md)
+- [Videos](videos_docs.md)
 
 ## Getting Started
 
