@@ -52,7 +52,7 @@ func TestGetClips(t *testing.T) {
 				t.Errorf("expected error message to be %s, got %s", "clip not found", resp.ErrorMessage)
 			}
 
-			return
+			continue
 		}
 
 		if resp.Data.Clips[0].ID != testCase.slug {
