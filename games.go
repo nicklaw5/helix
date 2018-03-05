@@ -43,3 +43,43 @@ func (c *Client) GetGames(params *GamesParams) (*GamesResponse, error) {
 
 	return games, nil
 }
+
+// ManyGamesWithPagination ...
+type ManyGamesWithPagination struct {
+	ManyGames
+	Pagination Pagination `json:"pagination"`
+}
+
+// TopGamesParams ...
+type TopGamesParams struct {
+	After  string `query:"after"`
+	Before string `query:"before"`
+	First  int    `query:"first,20"`
+}
+
+// TopGamesResponse ...
+type TopGamesResponse struct {
+	ResponseCommon
+	Data ManyGamesWithPagination
+}
+
+// GetTopGames ...
+func (c *Client) GetTopGames(params *TopGamesParams) (*TopGamesResponse, error) {
+	resp, err := c.get("/games/top", &ManyGamesWithPagination{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	games := &TopGamesResponse{}
+	games.StatusCode = resp.StatusCode
+	games.Error = resp.Error
+	games.ErrorStatus = resp.ErrorStatus
+	games.ErrorMessage = resp.ErrorMessage
+	games.RateLimit.Limit = resp.RateLimit.Limit
+	games.RateLimit.Remaining = resp.RateLimit.Remaining
+	games.RateLimit.Reset = resp.RateLimit.Reset
+	games.Data.Games = resp.Data.(*ManyGamesWithPagination).Games
+	games.Data.Pagination = resp.Data.(*ManyGamesWithPagination).Pagination
+
+	return games, nil
+}
