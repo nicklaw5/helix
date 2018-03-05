@@ -11,17 +11,17 @@ This project is a work in progress. Below is a list of currently supported endpo
 
 ## Supported Endpoints
 
-- [x] GET /clips
-- [ ] POST /clips
-- [ ] POST /entitlements/upload
-- [x] GET /games
-- [ ] GET /games/top
-- [ ] GET /streams
-- [ ] GET /streams/metadata
-- [x] GET /users
-- [ ] GET /users/follows
-- [ ] PUT /users
-- [x] GET /videos
+- [x] Get Clip
+- [ ] Create Clip
+- [ ] Create Entitlement Grants Upload URL
+- [x] Get Games
+- [x] Get Top Games
+- [ ] Get Streams
+- [ ] Get Streams Metadata
+- [x] Get Users
+- [ ] Get Users Follows
+- [ ] Update User
+- [x] Get Videos
 
 ## Usage
 
@@ -62,9 +62,9 @@ ID: 26490481 Name: summit1g Display Name: summit1g
 ID: 23161357 Name: lirik Display Name: LIRIK
 ```
 
-## Documentation
+## Documentation & Examples
 
-All documentation for this package can be found [here](docs). If you are looking for generic API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
+All documentation and usage examples for this package can be found [here](docs). If you are looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
 
 ## License
 

@@ -16,3 +16,20 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get Top Games
+
+This is an example of how to get top games.
+
+```go
+client := helix.NewClient("your-client-id", nil)
+
+resp, err := client.GetTopGames(&helix.TopGamesParams{
+    First: 20,
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
