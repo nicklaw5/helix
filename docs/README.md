@@ -1,8 +1,8 @@
-# Docs
+# Documentation
 
-## Endpoints
+## Usage Examples
 
-Follow the links below to their respective documentation:
+Follow the links below to their respective usage examples:
 
 - [Clips](clips_docs.md)
 - [Games](games_docs.md)
@@ -45,6 +45,19 @@ httpClient := &http.Client{
 client := helix.NewClient("your-client-id", &helix.Options{
     HTTPClient: httpClient,
 })
+```
+
+## Options
+
+Below is a list of all available options that can be passed in when creating a new client:
+
+```go
+type Options struct {
+    UserAgent                string         // Default: an empty string
+    HTTPClient               HTTPClient     // Default: http.DefaultClient
+    RateLimitFunc            RateLimitFunc  // Default: nil
+    RetryRateLimitedRequests bool           // Default: true
+}
 ```
 
 If no custom `http.Client` is provided, `http.DefaultClient` is used by default.
