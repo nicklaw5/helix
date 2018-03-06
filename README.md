@@ -16,7 +16,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 - [ ] Create Entitlement Grants Upload URL
 - [x] Get Games
 - [x] Get Top Games
-- [ ] Get Streams
+- [x] Get Streams
 - [ ] Get Streams Metadata
 - [x] Get Users
 - [ ] Get Users Follows

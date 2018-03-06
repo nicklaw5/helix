@@ -116,8 +116,8 @@ func TestGetTopGames(t *testing.T) {
 		// Test Success Response
 		// t.Log(resp.Data)
 		if resp.StatusCode == http.StatusOK {
-			if len(resp.Data.Games) != 3 {
-				t.Errorf("expected %d games, got %d", 3, len(resp.Data.Games))
+			if len(resp.Data.Games) != testCase.First {
+				t.Errorf("expected %d games, got %d", testCase.First, len(resp.Data.Games))
 			}
 
 			gameOne := "Fortnite"

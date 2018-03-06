@@ -6,6 +6,7 @@ Follow the links below to their respective usage examples:
 
 - [Clips](clips_docs.md)
 - [Games](games_docs.md)
+- [Streams](streams_docs.md)
 - [Users](users_docs.md)
 - [Videos](videos_docs.md)
 
