@@ -66,6 +66,10 @@ ID: 23161357 Name: lirik Display Name: LIRIK
 
 All documentation and usage examples for this package can be found [here](docs). If you are looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
 
+## Contributions
+
+PRs are very much welcome. Where possible, please write tests for any code that is introduced by your PRs.
+
 ## License
 
 This package is distributed under the terms of the [MIT](License) License.
