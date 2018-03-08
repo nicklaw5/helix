@@ -1,7 +1,6 @@
 package helix
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -178,7 +177,7 @@ func isZero(v interface{}) (bool, error) {
 }
 
 func (c *Client) newRequest(method, path string, params interface{}) (*http.Request, error) {
-	url := concatString([]string{basePath, path})
+	url := basePath + path
 
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
@@ -286,26 +285,4 @@ func (c *Client) SetAccessToken(AccessToken string) {
 // SetUserAgent ...
 func (c *Client) SetUserAgent(userAgent string) {
 	c.userAgent = userAgent
-}
-
-// concatString concatenates each of the strings provided by
-// strs in the order they are presented. You may also pass in
-// an optional delimiter to be appended along with the strings.
-func concatString(strs []string, delimiter ...string) string {
-	var buffer bytes.Buffer
-	appendDelimiter := len(delimiter) > 0
-
-	for _, str := range strs {
-		s := str
-		if appendDelimiter {
-			s = concatString([]string{s, delimiter[0]})
-		}
-		buffer.Write([]byte(s))
-	}
-
-	if appendDelimiter {
-		return strings.TrimSuffix(buffer.String(), delimiter[0])
-	}
-
-	return buffer.String()
 }
