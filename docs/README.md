@@ -145,7 +145,7 @@ Note that any subsequent API requests will utilize this same access token. So it
 
 ## User-Agent Header
 
-It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each request. You can do so by it through as option when creating a new client, like so:
+It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each request. You can do so by passing it through as an option when creating a new client, like so:
 
 with the `SetUserAgent()` method before sending a request. For example:
 
