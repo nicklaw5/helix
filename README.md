@@ -17,7 +17,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 - [x] Get Games
 - [x] Get Top Games
 - [x] Get Streams
-- [ ] Get Streams Metadata
+- [x] Get Streams Metadata
 - [x] Get Users
 - [ ] Get Users Follows
 - [ ] Update User

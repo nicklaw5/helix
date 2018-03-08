@@ -54,7 +54,7 @@ type ManyGamesWithPagination struct {
 type TopGamesParams struct {
 	After  string `query:"after"`
 	Before string `query:"before"`
-	First  int    `query:"first,20"`
+	First  int    `query:"first,20"` // Limit 100
 }
 
 // TopGamesResponse ...

@@ -49,7 +49,8 @@ type ResponseCommon struct {
 	Error        string `json:"error"`
 	ErrorStatus  int    `json:"status"`
 	ErrorMessage string `json:"message"`
-	RateLimit    RateLimit
+	RateLimit
+	StreamsMetadataRateLimit
 }
 
 // Response ...
@@ -217,6 +218,11 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		setRateLimitValue(&resp.RateLimit, "Limit", response.Header.Get("RateLimit-Limit"))
 		setRateLimitValue(&resp.RateLimit, "Remaining", response.Header.Get("RateLimit-Remaining"))
 		setRateLimitValue(&resp.RateLimit, "Reset", response.Header.Get("RateLimit-Reset"))
+
+		if strings.Contains(req.URL.Path, streamsMetadataPath) {
+			setRateLimitValue(&resp.StreamsMetadataRateLimit, "Limit", response.Header.Get("Ratelimit-Helixstreamsmetadata-Limit"))
+			setRateLimitValue(&resp.StreamsMetadataRateLimit, "Remaining", response.Header.Get("Ratelimit-Helixstreamsmetadata-Remaining"))
+		}
 
 		// Only attempt to decode the response if JSON was returned
 		if resp.StatusCode < 500 {

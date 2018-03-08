@@ -61,3 +61,92 @@ func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 
 	return streams, nil
 }
+
+// HearthstoneHero ...
+type HearthstoneHero struct {
+	Class string `json:"class"`
+	Name  string `json:"name"`
+	Type  string `json:"type"`
+}
+
+// HearthstonePlayerData ...
+type HearthstonePlayerData struct {
+	Hero HearthstoneHero `json:"hero"`
+}
+
+// HearthstoneMetadata ...
+type HearthstoneMetadata struct {
+	Broadcaster HearthstonePlayerData `json:"broadcaster"`
+	Opponent    HearthstonePlayerData `json:"opponent"`
+}
+
+// OverwatchHero ...
+type OverwatchHero struct {
+	Ability string `json:"ability"`
+	Name    string `json:"name"`
+	Role    string `json:"role"`
+}
+
+// OverwatchBroadcaster ...
+type OverwatchBroadcaster struct {
+	Hero OverwatchHero `json:"hero"`
+}
+
+// OverwatchMetadata ...
+type OverwatchMetadata struct {
+	Broadcaster OverwatchBroadcaster `json:"broadcaster"`
+}
+
+// StreamMetadata ...
+type StreamMetadata struct {
+	UserID      string              `json:"user_id"`
+	GameID      string              `json:"game_id"`
+	Hearthstone HearthstoneMetadata `json:"hearthstone"`
+	Overwatch   OverwatchMetadata   `json:"overwatch"`
+}
+
+// ManyStreamsMetadata ...
+type ManyStreamsMetadata struct {
+	Streams    []StreamMetadata `json:"data"`
+	Pagination Pagination       `json:"pagination"`
+}
+
+// StreamsMetadataResponse ...
+type StreamsMetadataResponse struct {
+	ResponseCommon
+	Data ManyStreamsMetadata
+}
+
+// StreamsMetadataRateLimit ...
+type StreamsMetadataRateLimit struct {
+	Limit     int
+	Remaining int
+}
+
+// StreamsMetadataParams ...
+type StreamsMetadataParams StreamsParams
+
+const streamsMetadataPath = "/streams/metadata"
+
+// GetStreamsMetadata ...
+func (c *Client) GetStreamsMetadata(params *StreamsMetadataParams) (*StreamsMetadataResponse, error) {
+	resp, err := c.get(streamsMetadataPath, &ManyStreamsMetadata{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	streams := &StreamsMetadataResponse{}
+	streams.StatusCode = resp.StatusCode
+	streams.Error = resp.Error
+	streams.ErrorStatus = resp.ErrorStatus
+	streams.ErrorMessage = resp.ErrorMessage
+	streams.RateLimit.Limit = resp.RateLimit.Limit
+	streams.RateLimit.Remaining = resp.RateLimit.Remaining
+	streams.RateLimit.Reset = resp.RateLimit.Reset
+	streams.StreamsMetadataRateLimit.Limit = resp.StreamsMetadataRateLimit.Limit
+	streams.StreamsMetadataRateLimit.Remaining = resp.StreamsMetadataRateLimit.Remaining
+	streams.Data.Streams = resp.Data.(*ManyStreamsMetadata).Streams
+	streams.Data.Pagination = resp.Data.(*ManyStreamsMetadata).Pagination
+
+	return streams, nil
+}
