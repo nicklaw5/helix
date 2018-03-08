@@ -32,7 +32,7 @@ func TestGetGames(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody))
+		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetGames(&GamesParams{
 			IDs:   testCase.IDs,
@@ -82,7 +82,7 @@ func TestGetTopGames(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody))
+		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetTopGames(&TopGamesParams{
 			First: testCase.First,

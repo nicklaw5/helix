@@ -17,3 +17,17 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get Streams Metadata
+
+This is an example of how to get streams metadata. Here we are requesting the first two streams from Hearthstone.
+
+```go
+client := helix.NewClient("your-client-id", nil)
+
+resp, _ := client.GetStreamsMetadata(&helix.StreamsMetadataParams{
+    First:   2,
+    GameIDs: []string{"138585"}, // Hearthstone
+})
+fmt.Printf("%+v\n", resp)
+```

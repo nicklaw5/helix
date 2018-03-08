@@ -13,8 +13,14 @@ func newMockClient(clientID string, mockHandler func(http.ResponseWriter, *http.
 	return mc
 }
 
-func newMockHandler(statusCode int, json string) func(http.ResponseWriter, *http.Request) {
+func newMockHandler(statusCode int, json string, headers map[string]string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if headers != nil && len(headers) > 0 {
+			for key, value := range headers {
+				w.Header().Add(key, value)
+			}
+		}
+
 		w.WriteHeader(statusCode)
 		w.Write([]byte(json))
 	}

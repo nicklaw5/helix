@@ -32,7 +32,7 @@ func TestGetUsers(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody))
+		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetUsers(&UsersParams{
 			IDs:    testCase.IDs,
