@@ -23,21 +23,19 @@ type HTTPClient interface {
 
 // Client ...
 type Client struct {
-	clientID                 string
-	accessToken              string
-	userAgent                string
-	httpClient               HTTPClient
-	lastResponse             *Response
-	rateLimitFunc            RateLimitFunc
-	retryRateLimitedRequests bool
+	clientID      string
+	accessToken   string
+	userAgent     string
+	httpClient    HTTPClient
+	lastResponse  *Response
+	rateLimitFunc RateLimitFunc
 }
 
 // Options ...
 type Options struct {
-	UserAgent                string
-	HTTPClient               HTTPClient
-	RateLimitFunc            RateLimitFunc
-	RetryRateLimitedRequests bool // Defaults to true
+	UserAgent     string
+	HTTPClient    HTTPClient
+	RateLimitFunc RateLimitFunc
 }
 
 // RateLimitFunc ...
@@ -79,9 +77,8 @@ func NewClient(clientID string, options *Options) *Client {
 	}
 
 	c := &Client{
-		clientID:                 clientID,
-		httpClient:               http.DefaultClient,
-		retryRateLimitedRequests: true,
+		clientID:   clientID,
+		httpClient: http.DefaultClient,
 	}
 
 	if options != nil {
@@ -91,7 +88,6 @@ func NewClient(clientID string, options *Options) *Client {
 
 		c.userAgent = options.UserAgent
 		c.rateLimitFunc = options.RateLimitFunc
-		c.retryRateLimitedRequests = options.RetryRateLimitedRequests
 	}
 
 	return c
@@ -246,7 +242,7 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		} else {
 			c.lastResponse = resp
 
-			if c.retryRateLimitedRequests &&
+			if c.rateLimitFunc != nil &&
 				c.lastResponse.StatusCode == http.StatusTooManyRequests {
 				// Rate limit exceeded,  retry to send request after
 				// applying rate limiter callback

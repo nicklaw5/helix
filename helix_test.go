@@ -3,7 +3,20 @@ package helix
 import (
 	"net/http"
 	"net/http/httptest"
+	"testing"
 )
+
+type mockHTTPClient struct {
+	mockHandler func(http.ResponseWriter, *http.Request)
+}
+
+func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(mtc.mockHandler)
+	handler.ServeHTTP(rr, req)
+
+	return rr.Result(), nil
+}
 
 func newMockClient(clientID string, mockHandler func(http.ResponseWriter, *http.Request)) *Client {
 	mc := &Client{}
@@ -26,14 +39,70 @@ func newMockHandler(statusCode int, json string, headers map[string]string) func
 	}
 }
 
-type mockHTTPClient struct {
-	mockHandler func(http.ResponseWriter, *http.Request)
+func TestNewClientPanics(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("The code did not panic")
+		}
+	}()
+
+	NewClient("", nil)
 }
 
-func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(mtc.mockHandler)
-	handler.ServeHTTP(rr, req)
+func TestNewClientDefaults(t *testing.T) {
+	t.Parallel()
 
-	return rr.Result(), nil
+	testCases := []struct {
+		clientID string
+		options  *Options
+	}{
+		{"my-client-id", nil},
+		{"my-client-id", &Options{}},
+	}
+
+	for _, testCase := range testCases {
+		client := NewClient(testCase.clientID, testCase.options)
+
+		if client.clientID != testCase.clientID {
+			t.Errorf("expected clientID to be \"%s\", got \"%s\"", testCase.clientID, client.clientID)
+		}
+
+		if client.userAgent != "" {
+			t.Errorf("expected userAgent to be \"%s\", got \"%s\"", "", client.userAgent)
+		}
+
+		if client.accessToken != "" {
+			t.Errorf("expected userAgent to be \"\", got \"%s\"", client.accessToken)
+		}
+
+		if client.httpClient != http.DefaultClient {
+			t.Errorf("expected httpClient to be \"%v\", got \"%v\"", http.DefaultClient, client.httpClient)
+		}
+
+		if client.rateLimitFunc != nil {
+			t.Errorf("expected httpClient to be \"%v\", got \"%v\"", nil, client.rateLimitFunc)
+		}
+	}
+}
+
+func TestSetAccessToken(t *testing.T) {
+	accessToken := "my-access-token"
+
+	client := NewClient("cid", nil)
+	client.SetAccessToken(accessToken)
+
+	if client.accessToken != accessToken {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.accessToken)
+	}
+}
+
+func TestSetUserAgent(t *testing.T) {
+	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
+
+	client := NewClient("cid", nil)
+	client.SetUserAgent(userAgent)
+
+	if client.userAgent != userAgent {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", userAgent, client.accessToken)
+	}
 }
