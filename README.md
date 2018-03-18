@@ -21,7 +21,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 - [x] Get Streams
 - [x] Get Streams Metadata
 - [x] Get Users
-- [ ] Get Users Follows
+- [x] Get Users Follows
 - [ ] Update User
 - [x] Get Videos
 

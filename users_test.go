@@ -72,3 +72,70 @@ func TestGetUsers(t *testing.T) {
 		}
 	}
 }
+
+func TestGetUsersFollows(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		FromID     string
+		First      int
+		respBody   string
+	}{
+		{
+			http.StatusBadRequest,
+			"",
+			2,
+			`{"error":"Bad Request","status":400,"message":"Must provide either from_id or to_id"}`,
+		},
+		{
+			http.StatusOK,
+			"23161357",
+			2,
+			`{"total":89,"data":[{"from_id":"23161357","to_id":"23528098","followed_at":"2017-10-01T03:57:21Z"},{"from_id":"23161357","to_id":"127506955","followed_at":"2017-08-23T15:04:20Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjoiMTUwMzUwMDY2MDYwNzAyNTAwMCJ9"}}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetUsersFollows(&UsersFollowsParams{
+			First:  testCase.First,
+			FromID: testCase.FromID,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "Must provide either from_id or to_id"
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		if len(resp.Data.Follows) != testCase.First {
+			t.Errorf("expected result length to be %d, got %d", testCase.First, len(resp.Data.Follows))
+		}
+
+		for _, follow := range resp.Data.Follows {
+			if follow.FromID != testCase.FromID {
+				t.Errorf("expected from_id to be %s, got %s", testCase.FromID, follow.FromID)
+			}
+		}
+	}
+}

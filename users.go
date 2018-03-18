@@ -1,5 +1,7 @@
 package helix
 
+import "time"
+
 // User ...
 type User struct {
 	ID              string `json:"id"`
@@ -47,6 +49,60 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	users.RateLimit.Remaining = resp.RateLimit.Remaining
 	users.RateLimit.Reset = resp.RateLimit.Reset
 	users.Data.Users = resp.Data.(*ManyUsers).Users
+
+	return users, nil
+}
+
+// UserFollow ...
+type UserFollow struct {
+	FromID     string    `json:"from_id"`
+	ToID       string    `json:"to_id"`
+	FollowedAt time.Time `json:"followed_at"`
+}
+
+// ManyFollows ...
+type ManyFollows struct {
+	Total      int          `json:"total"`
+	Follows    []UserFollow `json:"data"`
+	Pagination Pagination   `json:"pagination"`
+}
+
+// UsersFollowsResponse ...
+type UsersFollowsResponse struct {
+	ResponseCommon
+	Data ManyFollows
+}
+
+// UsersFollowsParams ...
+type UsersFollowsParams struct {
+	After  string `query:"after"`
+	Before string `query:"before"`
+	First  int    `query:"first,20"` // Limit 100
+	FromID string `query:"from_id"`
+	ToID   string `query:"to_id"`
+}
+
+// GetUsersFollows gets information on follow relationships between two Twitch users.
+// Information returned is sorted in order, most recent follow first. This can return
+// information like “who is lirik following,” “who is following lirik,” or “is user X
+// following user Y.”
+func (c *Client) GetUsersFollows(params *UsersFollowsParams) (*UsersFollowsResponse, error) {
+	resp, err := c.get("/users/follows", &ManyFollows{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	users := &UsersFollowsResponse{}
+	users.StatusCode = resp.StatusCode
+	users.Error = resp.Error
+	users.ErrorStatus = resp.ErrorStatus
+	users.ErrorMessage = resp.ErrorMessage
+	users.RateLimit.Limit = resp.RateLimit.Limit
+	users.RateLimit.Remaining = resp.RateLimit.Remaining
+	users.RateLimit.Reset = resp.RateLimit.Reset
+	users.Data.Total = resp.Data.(*ManyFollows).Total
+	users.Data.Follows = resp.Data.(*ManyFollows).Follows
+	users.Data.Pagination = resp.Data.(*ManyFollows).Pagination
 
 	return users, nil
 }
