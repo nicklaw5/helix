@@ -33,6 +33,7 @@ type Client struct {
 
 // Options ...
 type Options struct {
+	AccessToken   string
 	UserAgent     string
 	HTTPClient    HTTPClient
 	RateLimitFunc RateLimitFunc
@@ -86,6 +87,7 @@ func NewClient(clientID string, options *Options) *Client {
 			c.httpClient = options.HTTPClient
 		}
 
+		c.accessToken = options.AccessToken
 		c.userAgent = options.UserAgent
 		c.rateLimitFunc = options.RateLimitFunc
 	}

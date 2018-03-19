@@ -56,8 +56,9 @@ func TestNewClient(t *testing.T) {
 	t.Parallel()
 
 	options := &Options{
-		HTTPClient: &http.Client{},
-		UserAgent:  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+		HTTPClient:  &http.Client{},
+		AccessToken: "my-access-token",
+		UserAgent:   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
 		RateLimitFunc: func(*Response) error {
 			return nil
 		},
@@ -74,7 +75,11 @@ func TestNewClient(t *testing.T) {
 	}
 
 	if client.userAgent != options.UserAgent {
-		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", options.UserAgent, client.accessToken)
+		t.Errorf("expected userAgent to be \"%s\", got \"%s\"", options.UserAgent, client.userAgent)
+	}
+
+	if client.accessToken != options.AccessToken {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", options.AccessToken, client.accessToken)
 	}
 }
 
@@ -101,7 +106,7 @@ func TestNewClientDefaults(t *testing.T) {
 		}
 
 		if client.accessToken != "" {
-			t.Errorf("expected userAgent to be \"\", got \"%s\"", client.accessToken)
+			t.Errorf("expected accesstoken to be \"\", got \"%s\"", client.accessToken)
 		}
 
 		if client.httpClient != http.DefaultClient {
@@ -109,7 +114,7 @@ func TestNewClientDefaults(t *testing.T) {
 		}
 
 		if client.rateLimitFunc != nil {
-			t.Errorf("expected httpClient to be \"%v\", got \"%v\"", nil, client.rateLimitFunc)
+			t.Errorf("expected rateLimitFunc to be \"%v\", got \"%v\"", nil, client.rateLimitFunc)
 		}
 	}
 }

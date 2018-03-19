@@ -54,10 +54,12 @@ Below is a list of all available options that can be passed in when creating a n
 
 ```go
 type Options struct {
-    UserAgent                string         // Default: an empty string
-    HTTPClient               HTTPClient     // Default: http.DefaultClient
-    RateLimitFunc            RateLimitFunc  // Default: nil
+    AccessToken   string        // Default: empty string
+    UserAgent     string        // Default: empty string
+    HTTPClient    HTTPClient    // Default: http.DefaultClient
+    RateLimitFunc RateLimitFunc // Default: nil
 }
+
 ```
 
 If no custom `http.Client` is provided, `http.DefaultClient` is used by default.
@@ -81,7 +83,8 @@ type ResponseCommon struct {
     Error        string `json:"error"`
     ErrorStatus  int    `json:"status"`
     ErrorMessage string `json:"message"`
-    RateLimit    RateLimit
+    RateLimit
+    StreamsMetadataRateLimit
 }
 
 type RateLimit struct {
@@ -131,7 +134,17 @@ If a `RateLimitFunc` is provided, the client will re-attempt to send a failed re
 
 Some endpoints require that you have a valid access token in order to fulfill the request.
 
-In order to set the access token for a request, use the `SetAccessToken` method. For example:
+In order to set the access token for a request, you can either supply it as an option or use the `SetAccessToken` method. For example:
+
+```go
+client := helix.NewClient("your-client-id", &helix.Options{
+    AccessToken: "your-access-token",
+})
+
+// send API request...
+```
+
+Or:
 
 ```go
 client := helix.NewClient("your-client-id", nil)
