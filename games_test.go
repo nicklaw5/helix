@@ -114,7 +114,6 @@ func TestGetTopGames(t *testing.T) {
 		}
 
 		// Test Success Response
-		// t.Log(resp.Data)
 		if resp.StatusCode == http.StatusOK {
 			if len(resp.Data.Games) != testCase.First {
 				t.Errorf("expected %d games, got %d", testCase.First, len(resp.Data.Games))
