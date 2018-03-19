@@ -3,6 +3,7 @@ package helix
 import (
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -40,6 +41,8 @@ func newMockHandler(statusCode int, json string, headers map[string]string) func
 }
 
 func TestNewClientPanics(t *testing.T) {
+	t.Parallel()
+
 	defer func() {
 		if r := recover(); r == nil {
 			t.Errorf("The code did not panic")
@@ -47,6 +50,32 @@ func TestNewClientPanics(t *testing.T) {
 	}()
 
 	NewClient("", nil)
+}
+
+func TestNewClient(t *testing.T) {
+	t.Parallel()
+
+	options := &Options{
+		HTTPClient: &http.Client{},
+		UserAgent:  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+		RateLimitFunc: func(*Response) error {
+			return nil
+		},
+	}
+
+	client := NewClient("my-client-id", options)
+
+	if reflect.TypeOf(client.rateLimitFunc).Kind() != reflect.Func {
+		t.Errorf("expected rateLimitFunc to be a function, got %+v", reflect.TypeOf(client.rateLimitFunc).Kind())
+	}
+
+	if client.httpClient != options.HTTPClient {
+		t.Errorf("expected httpClient to be \"%s\", got \"%s\"", options.HTTPClient, client.httpClient)
+	}
+
+	if client.userAgent != options.UserAgent {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", options.UserAgent, client.accessToken)
+	}
 }
 
 func TestNewClientDefaults(t *testing.T) {
@@ -86,6 +115,8 @@ func TestNewClientDefaults(t *testing.T) {
 }
 
 func TestSetAccessToken(t *testing.T) {
+	t.Parallel()
+
 	accessToken := "my-access-token"
 
 	client := NewClient("cid", nil)
@@ -97,6 +128,8 @@ func TestSetAccessToken(t *testing.T) {
 }
 
 func TestSetUserAgent(t *testing.T) {
+	t.Parallel()
+
 	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
 
 	client := NewClient("cid", nil)
