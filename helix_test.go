@@ -119,6 +119,28 @@ func TestNewClientDefaults(t *testing.T) {
 	}
 }
 
+func TestSetRequestHeaders(t *testing.T) {
+	t.Parallel()
+
+	client := NewClient("cid", &Options{
+		UserAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+	})
+	client.SetAccessToken("my-access-token")
+
+	req, _ := http.NewRequest("GET", "/blah/blah", nil)
+
+	client.setRequestHeaders(req)
+
+	expectedAuthHeader := "Bearer " + client.accessToken
+	if req.Header.Get("Authorization") != expectedAuthHeader {
+		t.Errorf("expected Authorization header to be \"%s\", got \"%s\"", expectedAuthHeader, req.Header.Get("Authorization"))
+	}
+
+	if req.Header.Get("User-Agent") != client.userAgent {
+		t.Errorf("expected User-Agent header to be \"%s\", got \"%s\"", client.userAgent, req.Header.Get("User-Agent"))
+	}
+}
+
 func TestSetAccessToken(t *testing.T) {
 	t.Parallel()
 
