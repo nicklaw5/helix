@@ -5,7 +5,12 @@
 This is an example of how to get games.
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
 
 resp, err := client.GetGames(&helix.GamesParams{
     Names: []string{"Sea of Thieves", "Fortnite"},
@@ -22,7 +27,12 @@ fmt.Printf("%+v\n", resp)
 This is an example of how to get top games.
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
 
 resp, err := client.GetTopGames(&helix.TopGamesParams{
     First: 20,

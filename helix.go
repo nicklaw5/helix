@@ -11,9 +11,11 @@ import (
 )
 
 const (
-	basePath  = "https://api.twitch.tv/helix"
 	methodGet = "GET"
 	queryTag  = "query"
+
+	// APIBaseURL is the base URL for composing API requests.
+	APIBaseURL = "https://api.twitch.tv/helix"
 )
 
 // HTTPClient ...
@@ -24,17 +26,25 @@ type HTTPClient interface {
 // Client ...
 type Client struct {
 	clientID      string
+	clientSecret  string
 	accessToken   string
 	userAgent     string
+	redirectURI   string
+	scopes        []string
 	httpClient    HTTPClient
-	lastResponse  *Response
 	rateLimitFunc RateLimitFunc
+
+	lastResponse *Response
 }
 
 // Options ...
 type Options struct {
+	ClientID      string
+	ClientSecret  string
 	AccessToken   string
 	UserAgent     string
+	RedirectURI   string
+	Scopes        []string
 	HTTPClient    HTTPClient
 	RateLimitFunc RateLimitFunc
 }
@@ -72,27 +82,28 @@ type Pagination struct {
 
 // NewClient returns a new Twicth Helix API client. It panics if
 // clientID is an empty string. It is concurrecy safe.
-func NewClient(clientID string, options *Options) *Client {
-	if clientID == "" {
-		panic(errors.New("clientID cannot be an empty string"))
+func NewClient(options *Options) (*Client, error) {
+	if options.ClientID == "" {
+		return nil, errors.New("A client ID was not provided but is required")
 	}
 
 	c := &Client{
-		clientID:   clientID,
+		clientID:   options.ClientID,
 		httpClient: http.DefaultClient,
 	}
 
-	if options != nil {
-		if options.HTTPClient != nil {
-			c.httpClient = options.HTTPClient
-		}
-
-		c.accessToken = options.AccessToken
-		c.userAgent = options.UserAgent
-		c.rateLimitFunc = options.RateLimitFunc
+	if options.HTTPClient != nil {
+		c.httpClient = options.HTTPClient
 	}
 
-	return c
+	c.clientSecret = options.ClientSecret
+	c.accessToken = options.AccessToken
+	c.userAgent = options.UserAgent
+	c.rateLimitFunc = options.RateLimitFunc
+	c.scopes = options.Scopes
+	c.redirectURI = options.RedirectURI
+
+	return c, nil
 }
 
 func (c *Client) get(path string, data, params interface{}) (*Response, error) {
@@ -176,7 +187,7 @@ func isZero(v interface{}) (bool, error) {
 }
 
 func (c *Client) newRequest(method, path string, params interface{}) (*http.Request, error) {
-	url := basePath + path
+	url := APIBaseURL + path
 
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
@@ -289,4 +300,14 @@ func (c *Client) SetAccessToken(AccessToken string) {
 // SetUserAgent ...
 func (c *Client) SetUserAgent(userAgent string) {
 	c.userAgent = userAgent
+}
+
+// SetScopes ...
+func (c *Client) SetScopes(scopes []string) {
+	c.scopes = scopes
+}
+
+// SetRedirectURI ...
+func (c *Client) SetRedirectURI(uri string) {
+	c.redirectURI = uri
 }

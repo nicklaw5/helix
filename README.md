@@ -7,10 +7,11 @@ A Twitch Helix API client written in Go. If you are looking for a client for Twi
 
 ## Package Status
 
-This project is a work in progress. Below is a list of currently supported endpoints. Until a release is cut, consider this API to be unstable.
+This project is a work in progress. Below is a list of currently supported endpoints and features. Until a release is cut, consider this API to be unstable.
 
 ## Supported Endpoints
 
+- [ ] Authentication
 - [ ] Get Bits Leaderboard
 - [x] Get Clip
 - [ ] Create Clip
@@ -30,7 +31,12 @@ This project is a work in progress. Below is a list of currently supported endpo
 This is a quick example of how to get users. Note that you don't need to provide both a list of ids and logins, one or the other will suffice.
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
 
 resp, err := client.GetUsers(&helix.UsersParams{
     IDs:    []string{"26301881", "18074328"},

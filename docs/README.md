@@ -4,6 +4,7 @@
 
 Follow the links below to their respective usage examples:
 
+- [Authentication](authentication_docs.md)
 - [Clips](clips_docs.md)
 - [Games](games_docs.md)
 - [Streams](streams_docs.md)
@@ -26,13 +27,18 @@ go get -u github.com/nicklaw5/helix
 
 ## Creating A New API Client
 
-The only requirement for creating a new API client is your Twitch Client-ID. See the [Twitch authentication docs](https://dev.twitch.tv/docs/authentication) on how to obtain a Client-ID. Once you have a Client-ID, to create a new client simply pass the Client-ID through as the first argument of the `NewClient` function, like so:
+The only requirement for creating a new API client is your Twitch Client-ID. See the [Twitch authentication docs](https://dev.twitch.tv/docs/authentication) on how to obtain a Client-ID. Once you have a Client-ID, to create a new client simply the `NewClient` function. passing through your client ID as an option. For example:
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
 ```
 
-If you'd like to pass in your own `http.Client`, you can do so by passing it through as an option when creating a new client, like so:
+If you'd like to pass in your own `http.Client`, you can do so like this:
 
 ```go
 httpClient := &http.Client{
@@ -43,9 +49,13 @@ httpClient := &http.Client{
     Timeout: 10 * time.Second,
 }
 
-client := helix.NewClient("your-client-id", &helix.Options{
+client, err := helix.NewClient(&helix.Options{
+    ClientID:   "your-client-id",
     HTTPClient: httpClient,
 })
+if err != nil {
+    // handle error
+}
 ```
 
 ## Options
@@ -54,12 +64,15 @@ Below is a list of all available options that can be passed in when creating a n
 
 ```go
 type Options struct {
-    AccessToken   string        // Default: empty string
-    UserAgent     string        // Default: empty string
-    HTTPClient    HTTPClient    // Default: http.DefaultClient
-    RateLimitFunc RateLimitFunc // Default: nil
+    ClientID      string            // Required
+    ClientSecret  string            // Default: empty string
+    AccessToken   string            // Default: empty string
+    UserAgent     string            // Default: empty string
+    RedirectURI   string            // Default: empty string
+    Scopes        []string          // Default: empty string slice
+    HTTPClient    HTTPClient        // Default: http.DefaultClient
+    RateLimitFunc RateLimitFunc     // Default: nil
 }
-
 ```
 
 If no custom `http.Client` is provided, `http.DefaultClient` is used by default.
@@ -123,9 +136,13 @@ func rateLimitCallback(lastResponse *helix.Response) error {
     return nil
 }
 
-client := helix.NewClient("your-client-id", &helix.Options{
+client, err := helix.NewClient(&helix.Options{
+    ClientID:      "your-client-id",
     RateLimitFunc: rateLimitCallback,
 })
+if err != nil {
+    // handle error
+}
 ```
 
 If a `RateLimitFunc` is provided, the client will re-attempt to send a failed request if said request received a 429 (Too Many Requests) response. Before retrying the request, the `RateLimitFunc` will be applied.
@@ -137,9 +154,13 @@ Some endpoints require that you have a valid access token in order to fulfill th
 In order to set the access token for a request, you can either supply it as an option or use the `SetAccessToken` method. For example:
 
 ```go
-client := helix.NewClient("your-client-id", &helix.Options{
+client, err := helix.NewClient(&helix.Options{
+    ClientID:    "your-client-id",
     AccessToken: "your-access-token",
 })
+if err != nil {
+    // handle error
+}
 
 // send API request...
 ```
@@ -147,7 +168,13 @@ client := helix.NewClient("your-client-id", &helix.Options{
 Or:
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
 client.SetAccessToken("your-access-token")
 
 // send API request...
@@ -162,9 +189,14 @@ It's entirely possible that you may want to set or change the *User-Agent* heade
 with the `SetUserAgent()` method before sending a request. For example:
 
 ```go
-client := helix.NewClient("your-client-id", &helix.Options{
+client, err := helix.NewClient(&helix.Options{
+    ClientID:  "your-client-id",
     UserAgent: "your-user-agent-value",
 })
+if err != nil {
+    // handle error
+}
+
 
 // send API request...
 ```
@@ -172,7 +204,13 @@ client := helix.NewClient("your-client-id", &helix.Options{
 Alternatively, you can set by calling the `SetUserAgent()` method before sending a request. For example:
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID:  "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
 client.SetUserAgent("your-user-agent-value")
 
 // send API request...

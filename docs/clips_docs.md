@@ -5,7 +5,12 @@
 This is an example of how to get a single clip.
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
 
 resp, err := client.GetClips(&helix.ClipsParams{
     IDs: []string{"EncouragingPluckySlothSSSsss"},

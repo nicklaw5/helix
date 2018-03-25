@@ -40,31 +40,32 @@ func newMockHandler(statusCode int, json string, headers map[string]string) func
 	}
 }
 
-func TestNewClientPanics(t *testing.T) {
-	t.Parallel()
-
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-
-	NewClient("", nil)
-}
-
 func TestNewClient(t *testing.T) {
 	t.Parallel()
 
 	options := &Options{
-		HTTPClient:  &http.Client{},
-		AccessToken: "my-access-token",
-		UserAgent:   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
-		RateLimitFunc: func(*Response) error {
-			return nil
-		},
+		ClientID:      "my-client-id",
+		ClientSecret:  "my-client-secret",
+		HTTPClient:    &http.Client{},
+		AccessToken:   "my-access-token",
+		UserAgent:     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+		RateLimitFunc: func(*Response) error { return nil },
+		Scopes:        []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
+		RedirectURI:   "http://localhost/auth/callback",
 	}
 
-	client := NewClient("my-client-id", options)
+	client, err := NewClient(options)
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	if client.clientID != options.ClientID {
+		t.Errorf("expected clientID to be \"%s\", got \"%s\"", options.ClientID, client.clientID)
+	}
+
+	if client.clientSecret != options.ClientSecret {
+		t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", options.ClientSecret, client.clientSecret)
+	}
 
 	if reflect.TypeOf(client.rateLimitFunc).Kind() != reflect.Func {
 		t.Errorf("expected rateLimitFunc to be a function, got %+v", reflect.TypeOf(client.rateLimitFunc).Kind())
@@ -81,50 +82,70 @@ func TestNewClient(t *testing.T) {
 	if client.accessToken != options.AccessToken {
 		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", options.AccessToken, client.accessToken)
 	}
-}
 
-func TestNewClientDefaults(t *testing.T) {
-	t.Parallel()
-
-	testCases := []struct {
-		clientID string
-		options  *Options
-	}{
-		{"my-client-id", nil},
-		{"my-client-id", &Options{}},
+	if len(client.scopes) != len(options.Scopes) {
+		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(options.Scopes), len(client.scopes))
 	}
 
-	for _, testCase := range testCases {
-		client := NewClient(testCase.clientID, testCase.options)
+	if client.redirectURI != options.RedirectURI {
+		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, client.redirectURI)
+	}
+}
 
-		if client.clientID != testCase.clientID {
-			t.Errorf("expected clientID to be \"%s\", got \"%s\"", testCase.clientID, client.clientID)
-		}
+func TestNewClientDefault(t *testing.T) {
+	t.Parallel()
 
-		if client.userAgent != "" {
-			t.Errorf("expected userAgent to be \"%s\", got \"%s\"", "", client.userAgent)
-		}
+	options := &Options{ClientID: "my-client-id"}
 
-		if client.accessToken != "" {
-			t.Errorf("expected accesstoken to be \"\", got \"%s\"", client.accessToken)
-		}
+	client, err := NewClient(options)
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
 
-		if client.httpClient != http.DefaultClient {
-			t.Errorf("expected httpClient to be \"%v\", got \"%v\"", http.DefaultClient, client.httpClient)
-		}
+	if client.clientID != options.ClientID {
+		t.Errorf("expected clientID to be \"%s\", got \"%s\"", options.ClientID, client.clientID)
+	}
 
-		if client.rateLimitFunc != nil {
-			t.Errorf("expected rateLimitFunc to be \"%v\", got \"%v\"", nil, client.rateLimitFunc)
-		}
+	if client.clientSecret != "" {
+		t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", options.ClientSecret, client.clientSecret)
+	}
+
+	if client.userAgent != "" {
+		t.Errorf("expected userAgent to be \"%s\", got \"%s\"", "", client.userAgent)
+	}
+
+	if client.accessToken != "" {
+		t.Errorf("expected accesstoken to be \"\", got \"%s\"", client.accessToken)
+	}
+
+	if client.httpClient != http.DefaultClient {
+		t.Errorf("expected httpClient to be \"%v\", got \"%v\"", http.DefaultClient, client.httpClient)
+	}
+
+	if client.rateLimitFunc != nil {
+		t.Errorf("expected rateLimitFunc to be \"%v\", got \"%v\"", nil, client.rateLimitFunc)
+	}
+
+	if len(client.scopes) != len(options.Scopes) {
+		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(options.Scopes), len(client.scopes))
+	}
+
+	if client.redirectURI != options.RedirectURI {
+		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, client.redirectURI)
 	}
 }
 
 func TestSetRequestHeaders(t *testing.T) {
 	t.Parallel()
 
-	client := NewClient("cid", &Options{
+	client, err := NewClient(&Options{
+		ClientID:  "cid",
 		UserAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
 	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
 	client.SetAccessToken("my-access-token")
 
 	req, _ := http.NewRequest("GET", "/blah/blah", nil)
@@ -146,7 +167,13 @@ func TestSetAccessToken(t *testing.T) {
 
 	accessToken := "my-access-token"
 
-	client := NewClient("cid", nil)
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
 	client.SetAccessToken(accessToken)
 
 	if client.accessToken != accessToken {
@@ -157,12 +184,53 @@ func TestSetAccessToken(t *testing.T) {
 func TestSetUserAgent(t *testing.T) {
 	t.Parallel()
 
-	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
 
-	client := NewClient("cid", nil)
+	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
 	client.SetUserAgent(userAgent)
 
 	if client.userAgent != userAgent {
 		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", userAgent, client.accessToken)
+	}
+}
+
+func TestSetScopes(t *testing.T) {
+	t.Parallel()
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	scopes := []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"}
+	client.SetScopes(scopes)
+
+	if len(client.scopes) != len(scopes) {
+		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(scopes), len(client.scopes))
+	}
+}
+
+func TestSetRedirectURI(t *testing.T) {
+	t.Parallel()
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	redirectURI := "http://localhost/auth/callback"
+	client.SetRedirectURI(redirectURI)
+
+	if client.redirectURI != redirectURI {
+		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", redirectURI, client.redirectURI)
 	}
 }

@@ -5,7 +5,12 @@
 This is an example of how to get videos.
 
 ```go
-client := helix.NewClient("your-client-id", nil)
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
 
 resp, err := client.GetVideos(&helix.VideosParams{
     GameID: "21779",
