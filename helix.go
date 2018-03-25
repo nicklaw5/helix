@@ -16,6 +16,9 @@ const (
 
 	// APIBaseURL is the base URL for composing API requests.
 	APIBaseURL = "https://api.twitch.tv/helix"
+
+	// AuthBaseURL is the base URL for composing authentication requests.
+	AuthBaseURL = "https://id.twitch.tv/oauth2"
 )
 
 // HTTPClient ...
