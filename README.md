@@ -11,7 +11,15 @@ This project is a work in progress. Below is a list of currently supported endpo
 
 ## Supported Endpoints
 
-- [ ] Authentication
+**Authentication:**
+
+- [x] Generate Authorization URL
+- [x] Get Access Tokens (OAuth Authorization Code Flow)
+- [ ] Refresh Access Tokens
+- [ ] Revoke Access Tokens
+
+**API Endpoint:**
+
 - [ ] Get Bits Leaderboard
 - [x] Get Clip
 - [ ] Create Clip

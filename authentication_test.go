@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"net/http"
 	"testing"
 )
 
@@ -45,6 +46,135 @@ func TestGetAuthorizationURL(t *testing.T) {
 
 		if url != testCase.expectedURL {
 			t.Errorf("expected url to be \"%s\", got \"%s\"", testCase.expectedURL, url)
+		}
+	}
+}
+
+func TestGetAccessToken(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		code           string
+		scopes         []string
+		options        *Options
+		respBody       string
+		expectedErrMsg string
+	}{
+		{
+			http.StatusBadRequest,
+			"invalid-auth-code", // invalid auth code
+			[]string{"user:read:email"},
+			&Options{
+				ClientID:     "valid-client-id",
+				ClientSecret: "valid-client-secret",
+				RedirectURI:  "https://example.com/auth/callback",
+			},
+			`{"status":400,"message":"Invalid authorization code"}`,
+			"Invalid authorization code",
+		},
+		{
+			http.StatusBadRequest,
+			"valid-auth-code",
+			[]string{"user:read:email"},
+			&Options{
+				ClientID:     "invalid-client-id", // invalid client id
+				ClientSecret: "valid-client-secret",
+				RedirectURI:  "https://example.com/auth/callback",
+			},
+			`{"status":400,"message":"invalid client"}`,
+			"invalid client",
+		},
+		{
+			http.StatusForbidden,
+			"valid-auth-code",
+			[]string{"user:read:email"},
+			&Options{
+				ClientID:     "valid-client-id",
+				ClientSecret: "invalid-client-secret", // invalid client secret
+				RedirectURI:  "https://example.com/auth/callback",
+			},
+			`{"status":403,"message":"invalid client secret"}`,
+			"invalid client secret",
+		},
+		{
+			http.StatusBadRequest,
+			"valid-auth-code",
+			[]string{"user:read:email"},
+			&Options{
+				ClientID:     "valid-client-id",
+				ClientSecret: "valid-client-secret",
+				RedirectURI:  "https://example.com/invalid/callback", // invalid redirect uri
+			},
+			`{"status":400,"message":"Parameter redirect_uri does not match registeredURI"}`,
+			"Parameter redirect_uri does not match registeredURI",
+		},
+		{
+			http.StatusOK,
+			"valid-auth-code",
+			[]string{}, // no scopes
+			&Options{
+				ClientID:     "valid-client-id",
+				ClientSecret: "valid-client-secret",
+				RedirectURI:  "https://example.com/auth/callback",
+			},
+			`{"access_token":"kagsfkgiuowegfkjsbdcuiwebf","expires_in":14146,"refresh_token":"fiuhgaofohofhohdflhoiwephvlhowiehfoi"}`,
+			"",
+		},
+		{
+			http.StatusOK,
+			"valid-auth-code",
+			[]string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
+			&Options{
+				ClientID:     "valid-client-id",
+				ClientSecret: "valid-client-secret",
+				RedirectURI:  "https://example.com/auth/callback",
+			},
+			`{"access_token":"kagsfkgiuowegfkjsbdcuiwebf","expires_in":14154,"refresh_token":"fiuhgaofohofhohdflhoiwephvlhowiehfoi","scope":["analytics:read:games","bits:read","clips:edit","user:edit","user:read:email"]}`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetAccessToken(testCase.code)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		// Test error cases
+		if resp.StatusCode != http.StatusOK {
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be %d, got %d", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		// Test success cases
+		if resp.Data.AccessToken == "" {
+			t.Errorf("expected an access token but got an empty string")
+		}
+
+		if resp.Data.RefreshToken == "" {
+			t.Errorf("expected a refresh token but got an empty string")
+		}
+
+		if resp.Data.ExpiresIn == 0 {
+			t.Errorf("expected ExpiresIn to not be \"0\"")
+		}
+
+		if len(resp.Data.Scopes) != len(testCase.scopes) {
+			t.Errorf("expected number of scope to be %d, got %d", len(testCase.scopes), len(resp.Data.Scopes))
 		}
 	}
 }

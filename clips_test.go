@@ -44,8 +44,8 @@ func TestGetClips(t *testing.T) {
 				t.Errorf("expected error to be %s, got %s", "Not Found", resp.Error)
 			}
 
-			if resp.ErrorStatus != http.StatusNotFound {
-				t.Errorf("expected error status to be %d, got %d", http.StatusNotFound, resp.ErrorStatus)
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be %d, got %d", testCase.statusCode, resp.ErrorStatus)
 			}
 
 			if resp.ErrorMessage != "clip not found" {
