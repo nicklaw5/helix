@@ -43,52 +43,70 @@ func newMockHandler(statusCode int, json string, headers map[string]string) func
 func TestNewClient(t *testing.T) {
 	t.Parallel()
 
-	options := &Options{
-		ClientID:      "my-client-id",
-		ClientSecret:  "my-client-secret",
-		HTTPClient:    &http.Client{},
-		AccessToken:   "my-access-token",
-		UserAgent:     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
-		RateLimitFunc: func(*Response) error { return nil },
-		Scopes:        []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
-		RedirectURI:   "http://localhost/auth/callback",
+	testCases := []struct {
+		extpectErr bool
+		options    *Options
+	}{
+		{
+			true,
+			&Options{}, // no client id
+		},
+		{
+			false,
+			&Options{
+				ClientID:      "my-client-id",
+				ClientSecret:  "my-client-secret",
+				HTTPClient:    &http.Client{},
+				AccessToken:   "my-access-token",
+				UserAgent:     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+				RateLimitFunc: func(*Response) error { return nil },
+				Scopes:        []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
+				RedirectURI:   "http://localhost/auth/callback",
+			},
+		},
 	}
 
-	client, err := NewClient(options)
-	if err != nil {
-		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
-	}
+	for _, testCase := range testCases {
+		client, err := NewClient(testCase.options)
+		if err != nil && !testCase.extpectErr {
+			t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+		}
 
-	if client.clientID != options.ClientID {
-		t.Errorf("expected clientID to be \"%s\", got \"%s\"", options.ClientID, client.clientID)
-	}
+		if testCase.extpectErr {
+			continue
+		}
 
-	if client.clientSecret != options.ClientSecret {
-		t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", options.ClientSecret, client.clientSecret)
-	}
+		if client.clientID != testCase.options.ClientID {
+			t.Errorf("expected clientID to be \"%s\", got \"%s\"", testCase.options.ClientID, client.clientID)
+		}
 
-	if reflect.TypeOf(client.rateLimitFunc).Kind() != reflect.Func {
-		t.Errorf("expected rateLimitFunc to be a function, got %+v", reflect.TypeOf(client.rateLimitFunc).Kind())
-	}
+		if client.clientSecret != testCase.options.ClientSecret {
+			t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", testCase.options.ClientSecret, client.clientSecret)
+		}
 
-	if client.httpClient != options.HTTPClient {
-		t.Errorf("expected httpClient to be \"%s\", got \"%s\"", options.HTTPClient, client.httpClient)
-	}
+		if reflect.TypeOf(client.rateLimitFunc).Kind() != reflect.Func {
+			t.Errorf("expected rateLimitFunc to be a function, got %+v", reflect.TypeOf(client.rateLimitFunc).Kind())
+		}
 
-	if client.userAgent != options.UserAgent {
-		t.Errorf("expected userAgent to be \"%s\", got \"%s\"", options.UserAgent, client.userAgent)
-	}
+		if client.httpClient != testCase.options.HTTPClient {
+			t.Errorf("expected httpClient to be \"%s\", got \"%s\"", testCase.options.HTTPClient, client.httpClient)
+		}
 
-	if client.accessToken != options.AccessToken {
-		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", options.AccessToken, client.accessToken)
-	}
+		if client.userAgent != testCase.options.UserAgent {
+			t.Errorf("expected userAgent to be \"%s\", got \"%s\"", testCase.options.UserAgent, client.userAgent)
+		}
 
-	if len(client.scopes) != len(options.Scopes) {
-		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(options.Scopes), len(client.scopes))
-	}
+		if client.accessToken != testCase.options.AccessToken {
+			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.AccessToken, client.accessToken)
+		}
 
-	if client.redirectURI != options.RedirectURI {
-		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, client.redirectURI)
+		if len(client.scopes) != len(testCase.options.Scopes) {
+			t.Errorf("expected \"%d\" scopes, got \"%d\"", len(testCase.options.Scopes), len(client.scopes))
+		}
+
+		if client.redirectURI != testCase.options.RedirectURI {
+			t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", testCase.options.RedirectURI, client.redirectURI)
+		}
 	}
 }
 
