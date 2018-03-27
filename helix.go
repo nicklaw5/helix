@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	methodGet = "GET"
-	queryTag  = "query"
+	methodGet  = "GET"
+	methodPost = "POST"
+	queryTag   = "query"
 
 	// APIBaseURL is the base URL for composing API requests.
 	APIBaseURL = "https://api.twitch.tv/helix"
@@ -37,6 +38,7 @@ type Client struct {
 	httpClient    HTTPClient
 	rateLimitFunc RateLimitFunc
 
+	baseURL      string
 	lastResponse *Response
 }
 
@@ -95,10 +97,10 @@ func NewClient(options *Options) (*Client, error) {
 		httpClient: http.DefaultClient,
 	}
 
+	// Set options
 	if options.HTTPClient != nil {
 		c.httpClient = options.HTTPClient
 	}
-
 	c.clientSecret = options.ClientSecret
 	c.accessToken = options.AccessToken
 	c.userAgent = options.UserAgent
@@ -106,15 +108,26 @@ func NewClient(options *Options) (*Client, error) {
 	c.scopes = options.Scopes
 	c.redirectURI = options.RedirectURI
 
+	// Set non-options
+	c.baseURL = APIBaseURL
+
 	return c, nil
 }
 
-func (c *Client) get(path string, data, params interface{}) (*Response, error) {
+func (c *Client) get(path string, respData, reqData interface{}) (*Response, error) {
+	return c.sendRequest(methodGet, path, respData, reqData)
+}
+
+func (c *Client) post(path string, respData, reqData interface{}) (*Response, error) {
+	return c.sendRequest(methodPost, path, respData, reqData)
+}
+
+func (c *Client) sendRequest(method, path string, respData, reqData interface{}) (*Response, error) {
 	resp := &Response{
-		Data: data,
+		Data: respData,
 	}
 
-	req, err := c.newRequest(methodGet, path, params)
+	req, err := c.newRequest(method, path, reqData)
 	if err != nil {
 		return nil, err
 	}
@@ -189,16 +202,16 @@ func isZero(v interface{}) (bool, error) {
 	return v == reflect.Zero(t).Interface(), nil
 }
 
-func (c *Client) newRequest(method, path string, params interface{}) (*http.Request, error) {
-	url := APIBaseURL + path
+func (c *Client) newRequest(method, path string, data interface{}) (*http.Request, error) {
+	url := c.getBaseURL(path) + path
 
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	if method == methodGet && params != nil {
-		query, err := buildQueryString(req, params)
+	if data != nil {
+		query, err := buildQueryString(req, data)
 		if err != nil {
 			return nil, err
 		}
@@ -207,6 +220,16 @@ func (c *Client) newRequest(method, path string, params interface{}) (*http.Requ
 	}
 
 	return req, nil
+}
+
+func (c *Client) getBaseURL(path string) string {
+	for _, authPath := range authPaths {
+		if strings.Contains(path, authPath) {
+			return AuthBaseURL
+		}
+	}
+
+	return APIBaseURL
 }
 
 func (c *Client) doRequest(req *http.Request, resp *Response) error {
