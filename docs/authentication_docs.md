@@ -42,3 +42,27 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Revoke Access Tokens
+
+You can revoke an access token in the following manner:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:     "your-client-id",
+    ClientSecret: "your-client-secret",
+    RedirectURI:  "https://example.com/auth/callback",
+})
+if err != nil {
+    // handle error
+}
+
+accessToken := "your-access-token-to-revoke"
+
+resp, err := client.RevokeAccessToken(accessToken)
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```

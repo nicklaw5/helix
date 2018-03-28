@@ -16,7 +16,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 - [x] Generate Authorization URL
 - [x] Get Access Tokens (OAuth Authorization Code Flow)
 - [ ] Refresh Access Tokens
-- [ ] Revoke Access Tokens
+- [x] Revoke Access Tokens
 
 **API Endpoint:**
 

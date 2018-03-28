@@ -178,3 +178,71 @@ func TestGetAccessToken(t *testing.T) {
 		}
 	}
 }
+
+func TestRevokeAccessToken(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		accessToken    string
+		options        *Options
+		respBody       string
+		expectedErrMsg string
+	}{
+		{
+			http.StatusBadRequest,
+			"valid-access-token",
+			&Options{ClientID: "invalid-client-id"}, // invalid client id
+			`{"status":400,"message":"Invalid client_id: invalid-client-id"}`,
+			"Invalid client_id: invalid-client-id",
+		},
+		{
+			http.StatusBadRequest,
+			"", // no access token
+			&Options{ClientID: "valid-client-id"},
+			`{"status":400,"message":"missing oauth token"}`,
+			"missing oauth token",
+		},
+		{
+			http.StatusOK,
+			"invalid-access-token", // invalid token still returns 200 OK response
+			&Options{ClientID: "valid-client-id"},
+			"",
+			"",
+		},
+		{
+			http.StatusOK,
+			"valid-access-token",
+			&Options{ClientID: "valid-client-id"},
+			"",
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options.ClientID,
+			newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.RevokeAccessToken(testCase.accessToken)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		// Test error cases
+		if resp.StatusCode != http.StatusOK {
+			if testCase.expectedErrMsg != "" && resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.expectedErrMsg, resp.ErrorMessage)
+			}
+
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be %d, got %d", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			continue
+		}
+	}
+}

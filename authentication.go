@@ -6,6 +6,7 @@ import (
 
 var authPaths = map[string]string{
 	"token":  "/token",
+	"revoke": "/revoke",
 }
 
 // GetAuthorizationURL ...
@@ -71,13 +72,45 @@ func (c *Client) GetAccessToken(code string) (*AccessTokenResponse, error) {
 	token.Error = resp.Error
 	token.ErrorStatus = resp.ErrorStatus
 	token.ErrorMessage = resp.ErrorMessage
-	token.RateLimit.Limit = resp.RateLimit.Limit
-	token.RateLimit.Remaining = resp.RateLimit.Remaining
-	token.RateLimit.Reset = resp.RateLimit.Reset
 	token.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
 	token.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
 	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
 	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
 
 	return token, nil
+}
+
+// RevokeAccessTokenResponse ...
+type RevokeAccessTokenResponse struct {
+	ResponseCommon
+}
+
+type revokeAccessTokenRequestData struct {
+	ClientID    string `query:"client_id"`
+	AccessToken string `query:"token"`
+}
+
+// RevokeAccessToken submits a request to Twitch to have an access token revoked.
+//
+// Both successful requests and requests with bad tokens return 200 OK with
+// no body. Requests with bad tokens return the same response, as there is no
+// meaningful action a client can take after sending a bad token.
+func (c *Client) RevokeAccessToken(accessToken string) (*RevokeAccessTokenResponse, error) {
+	data := &revokeAccessTokenRequestData{
+		ClientID:    c.clientID,
+		AccessToken: accessToken,
+	}
+
+	resp, err := c.post(authPaths["revoke"], nil, data)
+	if err != nil {
+		return nil, err
+	}
+
+	revoke := &RevokeAccessTokenResponse{}
+	revoke.StatusCode = resp.StatusCode
+	revoke.Error = resp.Error
+	revoke.ErrorStatus = resp.ErrorStatus
+	revoke.ErrorMessage = resp.ErrorMessage
+
+	return revoke, nil
 }
