@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -123,8 +124,9 @@ func (c *Client) post(path string, respData, reqData interface{}) (*Response, er
 }
 
 func (c *Client) sendRequest(method, path string, respData, reqData interface{}) (*Response, error) {
-	resp := &Response{
-		Data: respData,
+	resp := &Response{}
+	if respData != nil {
+		resp.Data = respData
 	}
 
 	req, err := c.newRequest(method, path, reqData)
@@ -259,16 +261,19 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			setRateLimitValue(&resp.StreamsMetadataRateLimit, "Remaining", response.Header.Get("Ratelimit-Helixstreamsmetadata-Remaining"))
 		}
 
-		// Only attempt to decode the response if JSON was returned
-		if resp.StatusCode < 500 {
-			decoder := json.NewDecoder(response.Body)
-			if resp.StatusCode < 400 {
-				// Successful request
-				err = decoder.Decode(&resp.Data)
+		bodyBytes, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
 
+		// Only attempt to decode the response if we have a response we can handle
+		if len(bodyBytes) > 0 && resp.StatusCode < http.StatusInternalServerError {
+			if resp.Data != nil && resp.StatusCode < http.StatusBadRequest {
+				// Successful request
+				err = json.Unmarshal(bodyBytes, &resp.Data)
 			} else {
 				// Failed request
-				err = decoder.Decode(resp)
+				err = json.Unmarshal(bodyBytes, &resp)
 			}
 
 			if err != nil {
