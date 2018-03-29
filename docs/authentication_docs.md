@@ -43,7 +43,30 @@ if err != nil {
 fmt.Printf("%+v\n", resp)
 ```
 
-## Revoke Access Tokens
+## Refresh Access Token
+
+You can refresh an access token in the following manner:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:     "your-client-id",
+    ClientSecret: "your-client-secret",
+})
+if err != nil {
+    // handle error
+}
+
+refreshToken := "your-refresh-token"
+
+resp, err := client.RefreshAccessToken(refreshToken)
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Revoke Access Token
 
 You can revoke an access token in the following manner:
 

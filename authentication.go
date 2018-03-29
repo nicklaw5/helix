@@ -80,6 +80,49 @@ func (c *Client) GetAccessToken(code string) (*AccessTokenResponse, error) {
 	return token, nil
 }
 
+// RefreshTokenResponse ...
+type RefreshTokenResponse struct {
+	ResponseCommon
+	Data AccessCredentials
+}
+
+type refreshTokenRequestData struct {
+	ClientID     string `query:"client_id"`
+	ClientSecret string `query:"client_secret"`
+	GrantType    string `query:"grant_type"`
+	RefreshToken string `query:"refresh_token"`
+}
+
+// RefreshAccessToken submits a request to have the longevity of an
+// access token extended. Twitch OAuth2 access tokens have expirations.
+// Token-expiration periods vary in length. You should build your applications
+// in such a way that they are resilient to token authentication failures.
+func (c *Client) RefreshAccessToken(refreshToken string) (*RefreshTokenResponse, error) {
+	data := &refreshTokenRequestData{
+		ClientID:     c.clientID,
+		ClientSecret: c.clientSecret,
+		GrantType:    "refresh_token",
+		RefreshToken: refreshToken,
+	}
+
+	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
+	if err != nil {
+		return nil, err
+	}
+
+	refresh := &RefreshTokenResponse{}
+	refresh.StatusCode = resp.StatusCode
+	refresh.Error = resp.Error
+	refresh.ErrorStatus = resp.ErrorStatus
+	refresh.ErrorMessage = resp.ErrorMessage
+	refresh.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
+	refresh.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
+	refresh.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
+	refresh.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
+
+	return refresh, nil
+}
+
 // RevokeAccessTokenResponse ...
 type RevokeAccessTokenResponse struct {
 	ResponseCommon
