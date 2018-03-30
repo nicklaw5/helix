@@ -50,7 +50,81 @@ func TestGetAuthorizationURL(t *testing.T) {
 	}
 }
 
-func TestGetAccessToken(t *testing.T) {
+func TestGetAppAccessToken(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		options        *Options
+		respBody       string
+		expectedErrMsg string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{
+				ClientID:     "invalid-client-id", // invalid client id
+				ClientSecret: "valid-client-secret",
+			},
+			`{"status":400,"message":"invalid client"}`,
+			"invalid client",
+		},
+		{
+			http.StatusForbidden,
+			&Options{
+				ClientID:     "valid-client-id",
+				ClientSecret: "invalid-client-secret", // invalid client secret
+			},
+			`{"status":403,"message":"invalid client secret"}`,
+			"invalid client secret",
+		},
+		{
+			http.StatusOK,
+			&Options{
+				ClientID:     "valid-client-id",
+				ClientSecret: "valid-client-secret",
+			},
+			`{"access_token":"ajsdfloehfoihsdfhoasjfdpoiqh","expires_in":4999199}`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options.ClientID, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetAppAccessToken()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		// Test error cases
+		if resp.StatusCode != http.StatusOK {
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", testCase.expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		// Test success cases
+		if resp.Data.AccessToken == "" {
+			t.Errorf("expected an access token but got an empty string")
+		}
+
+		if resp.Data.ExpiresIn == 0 {
+			t.Errorf("expected ExpiresIn to not be \"0\"")
+		}
+	}
+}
+
+func TestGetUserAccessToken(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -138,7 +212,7 @@ func TestGetAccessToken(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.GetAccessToken(testCase.code)
+		resp, err := c.GetUserAccessToken(testCase.code)
 		if err != nil {
 			t.Error(err)
 		}
@@ -179,7 +253,7 @@ func TestGetAccessToken(t *testing.T) {
 	}
 }
 
-func TestRefreshAccessToken(t *testing.T) {
+func TestRefreshUserAccessToken(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -261,7 +335,7 @@ func TestRefreshAccessToken(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options.ClientID, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.RefreshAccessToken(testCase.refreshToken)
+		resp, err := c.RefreshUserAccessToken(testCase.refreshToken)
 		if err != nil {
 			t.Error(err)
 		}
@@ -302,7 +376,7 @@ func TestRefreshAccessToken(t *testing.T) {
 	}
 }
 
-func TestRevokeAccessToken(t *testing.T) {
+func TestRevokeUserAccessToken(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -346,7 +420,7 @@ func TestRevokeAccessToken(t *testing.T) {
 		c := newMockClient(testCase.options.ClientID,
 			newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.RevokeAccessToken(testCase.accessToken)
+		resp, err := c.RevokeUserAccessToken(testCase.accessToken)
 		if err != nil {
 			t.Error(err)
 		}

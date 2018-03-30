@@ -30,18 +30,62 @@ func (c *Client) GetAuthorizationURL(state string, forceVerify bool) string {
 	return url
 }
 
-// AccessCredentials ...
-type AccessCredentials struct {
+// AppAccessCredentials ...
+type AppAccessCredentials struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+}
+
+// AppAccessTokenResponse ...
+type AppAccessTokenResponse struct {
+	ResponseCommon
+	Data AppAccessCredentials
+}
+
+type appAccessTokenRequestData struct {
+	ClientID     string `query:"client_id"`
+	ClientSecret string `query:"client_secret"`
+	RedirectURI  string `query:"redirect_uri"`
+	GrantType    string `query:"grant_type"`
+}
+
+// GetAppAccessToken ...
+func (c *Client) GetAppAccessToken() (*AppAccessTokenResponse, error) {
+	data := &accessTokenRequestData{
+		ClientID:     c.clientID,
+		ClientSecret: c.clientSecret,
+		RedirectURI:  c.redirectURI,
+		GrantType:    "client_credentials",
+	}
+
+	resp, err := c.post(authPaths["token"], &AppAccessCredentials{}, data)
+	if err != nil {
+		return nil, err
+	}
+
+	token := &AppAccessTokenResponse{}
+	token.StatusCode = resp.StatusCode
+	token.Error = resp.Error
+	token.ErrorStatus = resp.ErrorStatus
+	token.ErrorMessage = resp.ErrorMessage
+	token.Data.AccessToken = resp.Data.(*AppAccessCredentials).AccessToken
+	token.Data.ExpiresIn = resp.Data.(*AppAccessCredentials).ExpiresIn
+
+	return token, nil
+}
+
+// UserAccessCredentials ...
+type UserAccessCredentials struct {
 	AccessToken  string   `json:"access_token"`
 	RefreshToken string   `json:"refresh_token"`
 	ExpiresIn    int      `json:"expires_in"`
 	Scopes       []string `json:"scope"`
 }
 
-// AccessTokenResponse ...
-type AccessTokenResponse struct {
+// UserAccessTokenResponse ...
+type UserAccessTokenResponse struct {
 	ResponseCommon
-	Data AccessCredentials
+	Data UserAccessCredentials
 }
 
 type accessTokenRequestData struct {
@@ -52,30 +96,30 @@ type accessTokenRequestData struct {
 	GrantType    string `query:"grant_type"`
 }
 
-// GetAccessToken ...
-func (c *Client) GetAccessToken(code string) (*AccessTokenResponse, error) {
+// GetUserAccessToken ...
+func (c *Client) GetUserAccessToken(code string) (*UserAccessTokenResponse, error) {
 	data := &accessTokenRequestData{
 		Code:         code,
 		ClientID:     c.clientID,
 		ClientSecret: c.clientSecret,
 		RedirectURI:  c.redirectURI,
-		GrantType:    "authorization_code",
+		GrantType:    "client_credentials",
 	}
 
-	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
+	resp, err := c.post(authPaths["token"], &UserAccessCredentials{}, data)
 	if err != nil {
 		return nil, err
 	}
 
-	token := &AccessTokenResponse{}
+	token := &UserAccessTokenResponse{}
 	token.StatusCode = resp.StatusCode
 	token.Error = resp.Error
 	token.ErrorStatus = resp.ErrorStatus
 	token.ErrorMessage = resp.ErrorMessage
-	token.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
-	token.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
-	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
-	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
+	token.Data.AccessToken = resp.Data.(*UserAccessCredentials).AccessToken
+	token.Data.RefreshToken = resp.Data.(*UserAccessCredentials).RefreshToken
+	token.Data.ExpiresIn = resp.Data.(*UserAccessCredentials).ExpiresIn
+	token.Data.Scopes = resp.Data.(*UserAccessCredentials).Scopes
 
 	return token, nil
 }
@@ -83,7 +127,7 @@ func (c *Client) GetAccessToken(code string) (*AccessTokenResponse, error) {
 // RefreshTokenResponse ...
 type RefreshTokenResponse struct {
 	ResponseCommon
-	Data AccessCredentials
+	Data UserAccessCredentials
 }
 
 type refreshTokenRequestData struct {
@@ -93,11 +137,11 @@ type refreshTokenRequestData struct {
 	RefreshToken string `query:"refresh_token"`
 }
 
-// RefreshAccessToken submits a request to have the longevity of an
+// RefreshUserAccessToken submits a request to have the longevity of an
 // access token extended. Twitch OAuth2 access tokens have expirations.
 // Token-expiration periods vary in length. You should build your applications
 // in such a way that they are resilient to token authentication failures.
-func (c *Client) RefreshAccessToken(refreshToken string) (*RefreshTokenResponse, error) {
+func (c *Client) RefreshUserAccessToken(refreshToken string) (*RefreshTokenResponse, error) {
 	data := &refreshTokenRequestData{
 		ClientID:     c.clientID,
 		ClientSecret: c.clientSecret,
@@ -105,7 +149,7 @@ func (c *Client) RefreshAccessToken(refreshToken string) (*RefreshTokenResponse,
 		RefreshToken: refreshToken,
 	}
 
-	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
+	resp, err := c.post(authPaths["token"], &UserAccessCredentials{}, data)
 	if err != nil {
 		return nil, err
 	}
@@ -115,10 +159,10 @@ func (c *Client) RefreshAccessToken(refreshToken string) (*RefreshTokenResponse,
 	refresh.Error = resp.Error
 	refresh.ErrorStatus = resp.ErrorStatus
 	refresh.ErrorMessage = resp.ErrorMessage
-	refresh.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
-	refresh.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
-	refresh.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
-	refresh.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
+	refresh.Data.AccessToken = resp.Data.(*UserAccessCredentials).AccessToken
+	refresh.Data.RefreshToken = resp.Data.(*UserAccessCredentials).RefreshToken
+	refresh.Data.ExpiresIn = resp.Data.(*UserAccessCredentials).ExpiresIn
+	refresh.Data.Scopes = resp.Data.(*UserAccessCredentials).Scopes
 
 	return refresh, nil
 }
@@ -133,12 +177,12 @@ type revokeAccessTokenRequestData struct {
 	AccessToken string `query:"token"`
 }
 
-// RevokeAccessToken submits a request to Twitch to have an access token revoked.
+// RevokeUserAccessToken submits a request to Twitch to have an access token revoked.
 //
 // Both successful requests and requests with bad tokens return 200 OK with
 // no body. Requests with bad tokens return the same response, as there is no
 // meaningful action a client can take after sending a bad token.
-func (c *Client) RevokeAccessToken(accessToken string) (*RevokeAccessTokenResponse, error) {
+func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenResponse, error) {
 	data := &revokeAccessTokenRequestData{
 		ClientID:    c.clientID,
 		AccessToken: accessToken,

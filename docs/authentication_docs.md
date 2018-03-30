@@ -19,9 +19,30 @@ url := client.GetAuthorizationURL("your-state", true)
 fmt.Printf("%s\n", url)
 ```
 
-## Get Access Token
+## Get App Access Token
 
-After obtaining an authentication code, you can submit a request for a access token which can then be used to submit API requests on behalf of a user. Here's an example of how to retrieve an access token:
+Here's an example of how to create an app access token:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:     "your-client-id",
+    ClientSecret: "your-client-secret",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.GetAppAccessToken()
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Get User Access Token
+
+After obtaining an authentication code, you can submit a request for a user access token which can then be used to submit API requests on behalf of a user. Here's an example of how to create a user access token:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
@@ -35,7 +56,7 @@ if err != nil {
 
 code := "your-authentication-code"
 
-resp, err := client.GetAccessToken(code)
+resp, err := client.GetUserAccessToken(code)
 if err != nil {
     // handle error
 }
@@ -43,9 +64,9 @@ if err != nil {
 fmt.Printf("%+v\n", resp)
 ```
 
-## Refresh Access Token
+## Refresh User Access Token
 
-You can refresh an access token in the following manner:
+You can refresh a user access token in the following manner:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
@@ -58,7 +79,7 @@ if err != nil {
 
 refreshToken := "your-refresh-token"
 
-resp, err := client.RefreshAccessToken(refreshToken)
+resp, err := client.RefreshUserAccessToken(refreshToken)
 if err != nil {
     // handle error
 }
@@ -66,15 +87,13 @@ if err != nil {
 fmt.Printf("%+v\n", resp)
 ```
 
-## Revoke Access Token
+## Revoke User Access Token
 
-You can revoke an access token in the following manner:
+You can revoke a user access token in the following manner:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
     ClientID:     "your-client-id",
-    ClientSecret: "your-client-secret",
-    RedirectURI:  "https://example.com/auth/callback",
 })
 if err != nil {
     // handle error
@@ -82,7 +101,7 @@ if err != nil {
 
 accessToken := "your-access-token-to-revoke"
 
-resp, err := client.RevokeAccessToken(accessToken)
+resp, err := client.RevokeUserAccessToken(accessToken)
 if err != nil {
     // handle error
 }
