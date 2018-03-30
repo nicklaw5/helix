@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -153,13 +154,13 @@ func buildQueryString(req *http.Request, v interface{}) (string, error) {
 	}
 
 	query := req.URL.Query()
-	t := reflect.TypeOf(v).Elem()
-	val := reflect.ValueOf(v).Elem()
+	vType := reflect.TypeOf(v).Elem()
+	vValue := reflect.ValueOf(v).Elem()
 
-	for i := 0; i < t.NumField(); i++ {
+	for i := 0; i < vType.NumField(); i++ {
 		var defaultValue string
 
-		field := t.Field(i)
+		field := vType.Field(i)
 		tag := field.Tag.Get(queryTag)
 
 		// Get the default value from the struct tag
@@ -170,26 +171,43 @@ func buildQueryString(req *http.Request, v interface{}) (string, error) {
 			defaultValue = tagSlice[1]
 		}
 
-		// Get the value assigned to the query param
 		if field.Type.Kind() == reflect.Slice {
-			fieldVal := val.Field(i)
+			// Attach any slices as query params
+			fieldVal := vValue.Field(i)
 			for j := 0; j < fieldVal.Len(); j++ {
 				query.Add(tag, fmt.Sprintf("%v", fieldVal.Index(j)))
 			}
+		} else if isDatetimeTagField(tag) {
+			// Get and correctly format datetime fields, and attach them query params
+			dateStr := fmt.Sprintf("%v", vValue.Field(i))
+
+			if strings.Contains(dateStr, " m=-") {
+				datetimeSplit := strings.Split(dateStr, " m=-")
+				date, err := time.Parse(requestDateTimeFormat, datetimeSplit[0])
+				if err != nil {
+					return "", err
+				}
+
+				// Determine if the date has been set. If it has we'll add it to the query.
+				if !date.IsZero() {
+					query.Add(tag, date.Format(time.RFC3339))
+				}
+			}
 		} else {
-			value := fmt.Sprintf("%v", val.Field(i))
+			// Add any scalar values as query params
+			fieldVal := fmt.Sprintf("%v", vValue.Field(i))
 
 			// If no value was set by the user, use the default
 			// value specified in the struct tag.
-			if value == "" || value == "0" {
+			if fieldVal == "" || fieldVal == "0" {
 				if defaultValue == "" {
 					continue
 				}
 
-				value = defaultValue
+				fieldVal = defaultValue
 			}
 
-			query.Add(tag, value)
+			query.Add(tag, fieldVal)
 		}
 	}
 

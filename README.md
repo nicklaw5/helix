@@ -20,7 +20,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 
 **API Endpoint:**
 
-- [ ] Get Bits Leaderboard
+- [x] Get Bits Leaderboard
 - [x] Get Clip
 - [ ] Create Clip
 - [ ] Create Entitlement Grants Upload URL

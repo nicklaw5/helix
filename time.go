@@ -5,6 +5,14 @@ import (
 	"time"
 )
 
+const (
+	requestDateTimeFormat = "2006-01-02 15:04:05 -0700 MST"
+)
+
+var (
+	datetimeFields = []string{"started_at", "ended_at"}
+)
+
 // Time is our custom time struct.
 type Time struct {
 	time.Time
@@ -26,4 +34,14 @@ func (t *Time) UnmarshalJSON(b []byte) (err error) {
 	t.Time, err = time.Parse(time.RFC3339, timeStr)
 
 	return
+}
+
+func isDatetimeTagField(tag string) bool {
+	for _, tagField := range datetimeFields {
+		if tagField == tag {
+			return true
+		}
+	}
+
+	return false
 }

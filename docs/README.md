@@ -5,6 +5,7 @@
 Follow the links below to their respective usage examples:
 
 - [Authentication](authentication_docs.md)
+- [Bits](bits_docs.md)
 - [Clips](clips_docs.md)
 - [Games](games_docs.md)
 - [Streams](streams_docs.md)
