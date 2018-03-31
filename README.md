@@ -32,7 +32,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 - [x] Get Streams Metadata
 - [x] Get Users
 - [x] Get Users Follows
-- [ ] Update User
+- [x] Update User
 - [x] Get Videos
 
 ## Usage

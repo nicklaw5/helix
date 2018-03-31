@@ -53,6 +53,37 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	return users, nil
 }
 
+type updateUserRequestData struct {
+	Description string `query:"description"`
+}
+
+// UpdateUser updates the description of a user specified
+// by a Bearer token.
+//
+// Required scope: user:edit
+func (c *Client) UpdateUser(description string) (*UsersResponse, error) {
+	data := &updateUserRequestData{
+		Description: description,
+	}
+
+	resp, err := c.put("/users", &ManyUsers{}, data)
+	if err != nil {
+		return nil, err
+	}
+
+	users := &UsersResponse{}
+	users.StatusCode = resp.StatusCode
+	users.Error = resp.Error
+	users.ErrorStatus = resp.ErrorStatus
+	users.ErrorMessage = resp.ErrorMessage
+	users.RateLimit.Limit = resp.RateLimit.Limit
+	users.RateLimit.Remaining = resp.RateLimit.Remaining
+	users.RateLimit.Reset = resp.RateLimit.Reset
+	users.Data.Users = resp.Data.(*ManyUsers).Users
+
+	return users, nil
+}
+
 // UserFollow ...
 type UserFollow struct {
 	FromID     string    `json:"from_id"`

@@ -43,32 +43,87 @@ func TestGetUsers(t *testing.T) {
 		}
 
 		if resp.StatusCode != testCase.statusCode {
-			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
 		}
 
 		if resp.StatusCode == http.StatusBadRequest {
 			if resp.Error != "Bad Request" {
-				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
 			}
 
 			if resp.ErrorStatus != http.StatusBadRequest {
-				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusBadRequest, resp.ErrorStatus)
 			}
 
 			expectedErrMsg := "Must provide an ID, Login or OAuth Token"
 			if resp.ErrorMessage != expectedErrMsg {
-				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
 			}
 
 			continue
 		}
 
 		if resp.Data.Users[0].Login != testCase.expectUsers[0] { // sodapoppin
-			t.Errorf("expected username 1 to be %s, got %s", testCase.expectUsers[0], resp.Data.Users[0].Login)
+			t.Errorf("expected username 1 to be \"%s\", got \"%s\"", testCase.expectUsers[0], resp.Data.Users[0].Login)
 		}
 
 		if resp.Data.Users[1].Login != testCase.expectUsers[1] { // summit1g
-			t.Errorf("expected username 2 to be %s, got %s", testCase.expectUsers[0], resp.Data.Users[0].Login)
+			t.Errorf("expected username 2 to be \"%s\", got \"%s\"", testCase.expectUsers[0], resp.Data.Users[0].Login)
+		}
+	}
+}
+
+func TestUpdateUser(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode  int
+		respBody    string
+		description string
+	}{
+		{
+			http.StatusForbidden,
+			`{"error":"Forbidden","status":403,"message":"Missing user:edit scope"}`,
+			"new description",
+		},
+		{
+			http.StatusOK,
+			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"new description","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823}]}`,
+			"new description",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.UpdateUser(testCase.description)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusForbidden {
+			if resp.Error != "Forbidden" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusForbidden {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusForbidden, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "Missing user:edit scope"
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		if resp.Data.Users[0].Description != testCase.description {
+			t.Errorf("expected description to be \"%s\", got \"%s\"", testCase.description, resp.Data.Users[0].Description)
 		}
 	}
 }
@@ -108,33 +163,33 @@ func TestGetUsersFollows(t *testing.T) {
 		}
 
 		if resp.StatusCode != testCase.statusCode {
-			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
 		}
 
 		if resp.StatusCode == http.StatusBadRequest {
 			if resp.Error != "Bad Request" {
-				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
 			}
 
 			if resp.ErrorStatus != http.StatusBadRequest {
-				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusBadRequest, resp.ErrorStatus)
 			}
 
 			expectedErrMsg := "Must provide either from_id or to_id"
 			if resp.ErrorMessage != expectedErrMsg {
-				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
 			}
 
 			continue
 		}
 
 		if len(resp.Data.Follows) != testCase.First {
-			t.Errorf("expected result length to be %d, got %d", testCase.First, len(resp.Data.Follows))
+			t.Errorf("expected result length to be \"%d\", got \"%d\"", testCase.First, len(resp.Data.Follows))
 		}
 
 		for _, follow := range resp.Data.Follows {
 			if follow.FromID != testCase.FromID {
-				t.Errorf("expected from_id to be %s, got %s", testCase.FromID, follow.FromID)
+				t.Errorf("expected from_id to be \"%s\", got \"%s\"", testCase.FromID, follow.FromID)
 			}
 		}
 	}

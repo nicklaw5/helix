@@ -23,6 +23,29 @@ if err != nil {
 fmt.Printf("%+v\n", resp)
 ```
 
+## Update User
+
+This is an example of how to update a users description:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:        "your-client-id",
+    UserAccessToken: "your-user-access-token",
+})
+if err != nil {
+    // handle error
+}
+
+description := "new description"
+
+resp, err := client.UpdateUser(description)
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
 ## Get Users Follows
 
 This is an example of how to get users follows.
