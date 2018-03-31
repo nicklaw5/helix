@@ -13,9 +13,7 @@ import (
 )
 
 const (
-	methodGet  = "GET"
-	methodPost = "POST"
-	queryTag   = "query"
+	queryTag = "query"
 
 	// APIBaseURL is the base URL for composing API requests.
 	APIBaseURL = "https://api.twitch.tv/helix"
@@ -120,11 +118,15 @@ func NewClient(options *Options) (*Client, error) {
 }
 
 func (c *Client) get(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(methodGet, path, respData, reqData)
+	return c.sendRequest("GET", path, respData, reqData)
 }
 
 func (c *Client) post(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(methodPost, path, respData, reqData)
+	return c.sendRequest("POST", path, respData, reqData)
+}
+
+func (c *Client) put(path string, respData, reqData interface{}) (*Response, error) {
+	return c.sendRequest("PUT", path, respData, reqData)
 }
 
 func (c *Client) sendRequest(method, path string, respData, reqData interface{}) (*Response, error) {
