@@ -24,7 +24,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 - [x] Get Bits Leaderboard
 - [x] Get Clip
 - [ ] Create Clip
-- [ ] Create Entitlement Grants Upload URL
+- [x] Create Entitlement Grants Upload URL
 - [x] Get Games
 - [x] Get Top Games
 - [ ] Get Game Analytics
