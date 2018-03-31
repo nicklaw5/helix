@@ -126,11 +126,11 @@ type StreamsMetadataRateLimit struct {
 // StreamsMetadataParams ...
 type StreamsMetadataParams StreamsParams
 
-const streamsMetadataPath = "/streams/metadata"
+const streamsMetadataEndpoint = "/streams/metadata"
 
 // GetStreamsMetadata ...
 func (c *Client) GetStreamsMetadata(params *StreamsMetadataParams) (*StreamsMetadataResponse, error) {
-	resp, err := c.get(streamsMetadataPath, &ManyStreamsMetadata{}, params)
+	resp, err := c.get(streamsMetadataEndpoint, &ManyStreamsMetadata{}, params)
 	if err != nil {
 		return nil, err
 	}

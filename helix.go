@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	queryTag = "query"
+	queryTag   = "query"
+	methodPOST = "POST"
 
 	// APIBaseURL is the base URL for composing API requests.
 	APIBaseURL = "https://api.twitch.tv/helix"
@@ -67,6 +68,7 @@ type ResponseCommon struct {
 	ErrorMessage string `json:"message"`
 	RateLimit
 	StreamsMetadataRateLimit
+	ClipsCreationRateLimit
 }
 
 // Response ...
@@ -122,7 +124,7 @@ func (c *Client) get(path string, respData, reqData interface{}) (*Response, err
 }
 
 func (c *Client) post(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest("POST", path, respData, reqData)
+	return c.sendRequest(methodPOST, path, respData, reqData)
 }
 
 func (c *Client) put(path string, respData, reqData interface{}) (*Response, error) {
@@ -279,9 +281,14 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		setRateLimitValue(&resp.RateLimit, "Remaining", response.Header.Get("RateLimit-Remaining"))
 		setRateLimitValue(&resp.RateLimit, "Reset", response.Header.Get("RateLimit-Reset"))
 
-		if strings.Contains(req.URL.Path, streamsMetadataPath) {
+		if strings.Contains(req.URL.Path, streamsMetadataEndpoint) {
 			setRateLimitValue(&resp.StreamsMetadataRateLimit, "Limit", response.Header.Get("Ratelimit-Helixstreamsmetadata-Limit"))
 			setRateLimitValue(&resp.StreamsMetadataRateLimit, "Remaining", response.Header.Get("Ratelimit-Helixstreamsmetadata-Remaining"))
+		}
+
+		if req.Method == methodPOST && strings.Contains(req.URL.Path, createClipEndpoint) {
+			setRateLimitValue(&resp.ClipsCreationRateLimit, "Limit", response.Header.Get("Ratelimit-Helixclipscreation-Limit"))
+			setRateLimitValue(&resp.ClipsCreationRateLimit, "Remaining", response.Header.Get("Ratelimit-Helixclipscreation-Remaining"))
 		}
 
 		bodyBytes, err := ioutil.ReadAll(response.Body)

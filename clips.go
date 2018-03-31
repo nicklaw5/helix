@@ -32,7 +32,7 @@ type ClipsParams struct {
 	IDs []string `query:"id"` // Limit 1
 }
 
-// GetClips ...
+// GetClips returns information about a specified clip.
 func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	resp, err := c.get("/clips", &ManyClips{}, params)
 	if err != nil {
@@ -48,6 +48,68 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	clips.RateLimit.Remaining = resp.RateLimit.Remaining
 	clips.RateLimit.Reset = resp.RateLimit.Reset
 	clips.Data.Clips = resp.Data.(*ManyClips).Clips
+
+	return clips, nil
+}
+
+// ClipsCreationRateLimit ...
+type ClipsCreationRateLimit struct {
+	Limit     int
+	Remaining int
+}
+
+// ClipEditURL ...
+type ClipEditURL struct {
+	ID      string `json:"id"`
+	EditURL string `json:"edit_url"`
+}
+
+// ManyClipEditURLs ...
+type ManyClipEditURLs struct {
+	ClipEditURLs []ClipEditURL `json:"data"`
+}
+
+// CreateClipResponse ...
+type CreateClipResponse struct {
+	ResponseCommon
+	Data ManyClipEditURLs
+}
+
+type createClipRequestParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+}
+
+const createClipEndpoint = "/clips"
+
+// CreateClip creates a clip programmatically. This returns both an ID and
+// an edit URL for the new clip. Clip creation takes time. We recommend that
+// you query Get Clip, with the clip ID that is returned here. If Get Clip
+// returns a valid clip, your clip creation was successful. If, after 15 seconds,
+// you still have not gotten back a valid clip from Get Clip, assume that the
+// clip was not created and retry Create Clip.
+//
+// Required scope: clips:edit
+func (c *Client) CreateClip(broadcasterID string) (*CreateClipResponse, error) {
+	params := &createClipRequestParams{
+		BroadcasterID: broadcasterID,
+	}
+
+	resp, err := c.post(createClipEndpoint, &ManyClipEditURLs{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	clips := &CreateClipResponse{}
+	clips.StatusCode = resp.StatusCode
+	clips.Error = resp.Error
+	clips.ErrorStatus = resp.ErrorStatus
+	clips.ErrorMessage = resp.ErrorMessage
+	clips.RateLimit.Limit = resp.RateLimit.Limit
+	clips.RateLimit.Remaining = resp.RateLimit.Remaining
+	clips.RateLimit.Reset = resp.RateLimit.Reset
+	clips.ClipsCreationRateLimit.Limit = resp.ClipsCreationRateLimit.Limit
+	clips.ClipsCreationRateLimit.Remaining = resp.ClipsCreationRateLimit.Remaining
+	clips.Data.ClipEditURLs = resp.Data.(*ManyClipEditURLs).ClipEditURLs
 
 	return clips, nil
 }

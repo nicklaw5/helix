@@ -9,7 +9,7 @@ A Twitch Helix API client written in Go. If you are looking for a client for Twi
 
 This project is a work in progress. Below is a list of currently supported endpoints and features. Until a release is cut, consider this API to be unstable.
 
-## Supported Endpoints
+## Supported Endpoints & Features
 
 **Authentication:**
 
@@ -23,7 +23,7 @@ This project is a work in progress. Below is a list of currently supported endpo
 
 - [x] Get Bits Leaderboard
 - [x] Get Clip
-- [ ] Create Clip
+- [x] Create Clip
 - [x] Create Entitlement Grants Upload URL
 - [x] Get Games
 - [x] Get Top Games
