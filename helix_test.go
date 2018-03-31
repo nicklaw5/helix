@@ -54,14 +54,15 @@ func TestNewClient(t *testing.T) {
 		{
 			false,
 			&Options{
-				ClientID:      "my-client-id",
-				ClientSecret:  "my-client-secret",
-				HTTPClient:    &http.Client{},
-				AccessToken:   "my-access-token",
-				UserAgent:     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
-				RateLimitFunc: func(*Response) error { return nil },
-				Scopes:        []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
-				RedirectURI:   "http://localhost/auth/callback",
+				ClientID:        "my-client-id",
+				ClientSecret:    "my-client-secret",
+				HTTPClient:      &http.Client{},
+				AppAccessToken:  "my-app-access-token",
+				UserAccessToken: "my-user-access-token",
+				UserAgent:       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+				RateLimitFunc:   func(*Response) error { return nil },
+				Scopes:          []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
+				RedirectURI:     "http://localhost/auth/callback",
 			},
 		},
 	}
@@ -96,8 +97,12 @@ func TestNewClient(t *testing.T) {
 			t.Errorf("expected userAgent to be \"%s\", got \"%s\"", testCase.options.UserAgent, client.userAgent)
 		}
 
-		if client.accessToken != testCase.options.AccessToken {
-			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.AccessToken, client.accessToken)
+		if client.appAccessToken != testCase.options.AppAccessToken {
+			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.AppAccessToken, client.appAccessToken)
+		}
+
+		if client.userAccessToken != testCase.options.UserAccessToken {
+			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.UserAccessToken, client.userAccessToken)
 		}
 
 		if len(client.scopes) != len(testCase.options.Scopes) {
@@ -132,8 +137,8 @@ func TestNewClientDefault(t *testing.T) {
 		t.Errorf("expected userAgent to be \"%s\", got \"%s\"", "", client.userAgent)
 	}
 
-	if client.accessToken != "" {
-		t.Errorf("expected accesstoken to be \"\", got \"%s\"", client.accessToken)
+	if client.userAccessToken != "" {
+		t.Errorf("expected accesstoken to be \"\", got \"%s\"", client.userAccessToken)
 	}
 
 	if client.httpClient != http.DefaultClient {
@@ -156,34 +161,45 @@ func TestNewClientDefault(t *testing.T) {
 func TestSetRequestHeaders(t *testing.T) {
 	t.Parallel()
 
-	client, err := NewClient(&Options{
-		ClientID:  "cid",
-		UserAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
-	})
-	if err != nil {
-		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	testCases := []struct {
+		endpoint            string
+		method              string
+		expectedBearerToken string
+	}{
+		{"/users", "GET", "my-user-access-token"},
+		{entitlementUploadEndpoint, "POST", "my-app-access-token"},
 	}
 
-	client.SetAccessToken("my-access-token")
+	for _, testCase := range testCases {
+		client, err := NewClient(&Options{
+			ClientID:        "my-client-id",
+			UserAgent:       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+			AppAccessToken:  "my-app-access-token",
+			UserAccessToken: "my-user-access-token",
+		})
+		if err != nil {
+			t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+		}
 
-	req, _ := http.NewRequest("GET", "/blah/blah", nil)
+		req, _ := http.NewRequest(testCase.method, testCase.endpoint, nil)
 
-	client.setRequestHeaders(req)
+		client.setRequestHeaders(req)
 
-	expectedAuthHeader := "Bearer " + client.accessToken
-	if req.Header.Get("Authorization") != expectedAuthHeader {
-		t.Errorf("expected Authorization header to be \"%s\", got \"%s\"", expectedAuthHeader, req.Header.Get("Authorization"))
-	}
+		expectedAuthHeader := "Bearer " + testCase.expectedBearerToken
+		if req.Header.Get("Authorization") != expectedAuthHeader {
+			t.Errorf("expected Authorization header to be \"%s\", got \"%s\"", expectedAuthHeader, req.Header.Get("Authorization"))
+		}
 
-	if req.Header.Get("User-Agent") != client.userAgent {
-		t.Errorf("expected User-Agent header to be \"%s\", got \"%s\"", client.userAgent, req.Header.Get("User-Agent"))
+		if req.Header.Get("User-Agent") != client.userAgent {
+			t.Errorf("expected User-Agent header to be \"%s\", got \"%s\"", client.userAgent, req.Header.Get("User-Agent"))
+		}
 	}
 }
 
-func TestSetAccessToken(t *testing.T) {
+func TestSetAppAccessToken(t *testing.T) {
 	t.Parallel()
 
-	accessToken := "my-access-token"
+	accessToken := "my-app-access-token"
 
 	client, err := NewClient(&Options{
 		ClientID: "cid",
@@ -192,10 +208,29 @@ func TestSetAccessToken(t *testing.T) {
 		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
 	}
 
-	client.SetAccessToken(accessToken)
+	client.SetAppAccessToken(accessToken)
 
-	if client.accessToken != accessToken {
-		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.accessToken)
+	if client.appAccessToken != accessToken {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.appAccessToken)
+	}
+}
+
+func TestSetUserAccessToken(t *testing.T) {
+	t.Parallel()
+
+	accessToken := "my-user-access-token"
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	client.SetUserAccessToken(accessToken)
+
+	if client.userAccessToken != accessToken {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.userAccessToken)
 	}
 }
 
@@ -213,7 +248,7 @@ func TestSetUserAgent(t *testing.T) {
 	client.SetUserAgent(userAgent)
 
 	if client.userAgent != userAgent {
-		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", userAgent, client.accessToken)
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", userAgent, client.userAccessToken)
 	}
 }
 

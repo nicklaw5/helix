@@ -31,14 +31,15 @@ type HTTPClient interface {
 
 // Client ...
 type Client struct {
-	clientID      string
-	clientSecret  string
-	accessToken   string
-	userAgent     string
-	redirectURI   string
-	scopes        []string
-	httpClient    HTTPClient
-	rateLimitFunc RateLimitFunc
+	clientID        string
+	clientSecret    string
+	appAccessToken  string
+	userAccessToken string
+	userAgent       string
+	redirectURI     string
+	scopes          []string
+	httpClient      HTTPClient
+	rateLimitFunc   RateLimitFunc
 
 	baseURL      string
 	lastResponse *Response
@@ -46,14 +47,15 @@ type Client struct {
 
 // Options ...
 type Options struct {
-	ClientID      string
-	ClientSecret  string
-	AccessToken   string
-	UserAgent     string
-	RedirectURI   string
-	Scopes        []string
-	HTTPClient    HTTPClient
-	RateLimitFunc RateLimitFunc
+	ClientID        string
+	ClientSecret    string
+	AppAccessToken  string
+	UserAccessToken string
+	UserAgent       string
+	RedirectURI     string
+	Scopes          []string
+	HTTPClient      HTTPClient
+	RateLimitFunc   RateLimitFunc
 }
 
 // RateLimitFunc ...
@@ -104,7 +106,8 @@ func NewClient(options *Options) (*Client, error) {
 		c.httpClient = options.HTTPClient
 	}
 	c.clientSecret = options.ClientSecret
-	c.accessToken = options.AccessToken
+	c.appAccessToken = options.AppAccessToken
+	c.userAccessToken = options.UserAccessToken
 	c.userAgent = options.UserAgent
 	c.rateLimitFunc = options.RateLimitFunc
 	c.scopes = options.Scopes
@@ -320,8 +323,13 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 func (c *Client) setRequestHeaders(req *http.Request) {
 	req.Header.Set("Client-ID", c.clientID)
-	if c.accessToken != "" {
-		req.Header.Set("Authorization", "Bearer "+c.accessToken)
+	if c.userAccessToken != "" || c.appAccessToken != "" {
+		oauthToken := c.userAccessToken
+		if strings.Contains(req.URL.Path, entitlementUploadEndpoint) {
+			oauthToken = c.appAccessToken
+		}
+
+		req.Header.Set("Authorization", "Bearer "+oauthToken)
 	}
 	if c.userAgent != "" {
 		req.Header.Set("User-Agent", c.userAgent)
@@ -341,9 +349,14 @@ func setRateLimitValue(v interface{}, fieldName, value string) {
 	field.SetInt(int64(intVal))
 }
 
-// SetAccessToken ...
-func (c *Client) SetAccessToken(AccessToken string) {
-	c.accessToken = AccessToken
+// SetAppAccessToken ...
+func (c *Client) SetAppAccessToken(accessToken string) {
+	c.appAccessToken = accessToken
+}
+
+// SetUserAccessToken ...
+func (c *Client) SetUserAccessToken(accessToken string) {
+	c.userAccessToken = accessToken
 }
 
 // SetUserAgent ...

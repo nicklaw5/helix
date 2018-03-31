@@ -6,8 +6,8 @@ This is an example of how to get the last 20 top bits contributers over the past
 
 ```go
 client, err := helix.NewClient(&helix.Options{
-    ClientID:    "your-client-id",
-    AccessToken: "your-access-token",
+    ClientID:        "your-client-id",
+    UserAccessToken: "your-user-access-token",
 })
 if err != nil {
     // handle error

@@ -93,15 +93,15 @@ You can revoke a user access token in the following manner:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
-    ClientID:     "your-client-id",
+    ClientID: "your-client-id",
 })
 if err != nil {
     // handle error
 }
 
-accessToken := "your-access-token-to-revoke"
+userAccessToken := "your-user-access-token-to-revoke"
 
-resp, err := client.RevokeUserAccessToken(accessToken)
+resp, err := client.RevokeUserAccessToken(userAccessToken)
 if err != nil {
     // handle error
 }

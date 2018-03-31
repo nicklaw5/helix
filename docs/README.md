@@ -65,14 +65,15 @@ Below is a list of all available options that can be passed in when creating a n
 
 ```go
 type Options struct {
-    ClientID      string            // Required
-    ClientSecret  string            // Default: empty string
-    AccessToken   string            // Default: empty string
-    UserAgent     string            // Default: empty string
-    RedirectURI   string            // Default: empty string
-    Scopes        []string          // Default: empty string slice
-    HTTPClient    HTTPClient        // Default: http.DefaultClient
-    RateLimitFunc RateLimitFunc     // Default: nil
+    ClientID        string            // Required
+    ClientSecret    string            // Default: empty string
+    AppAccessToken  string            // Default: empty string
+    UserAccessToken string            // Default: empty string
+    UserAgent       string            // Default: empty string
+    RedirectURI     string            // Default: empty string
+    Scopes          []string          // Default: empty string slice
+    HTTPClient      HTTPClient        // Default: http.DefaultClient
+    RateLimitFunc   RateLimitFunc     // Default: nil
 }
 ```
 
@@ -148,16 +149,21 @@ if err != nil {
 
 If a `RateLimitFunc` is provided, the client will re-attempt to send a failed request if said request received a 429 (Too Many Requests) response. Before retrying the request, the `RateLimitFunc` will be applied.
 
-## Access Token Header
+## Access Tokens
 
-Some endpoints require that you have a valid access token in order to fulfill the request.
+Some API endpoints require that you have a valid access token in order to fulfill the request. There are two types of access tokens: App access tokens and user access tokens.
 
-In order to set the access token for a request, you can either supply it as an option or use the `SetAccessToken` method. For example:
+App access tokens allow game developers to integrate their game into Twitch's viewing experience. [Drops](https://dev.twitch.tv/drops) are an example of this.
+
+User access tokens, on the other hand, are used to interact with the Twitch API on behalf of a registered Twitch user. If you're only looking to consume the standard API, such as getting access to a user's registered email address, user access tokens are all you need.
+
+In order to set the access token for a request, you can either supply it as an option or use the `SetUserAccessToken` or `SetAppAccessToken` methods. For example:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
-    ClientID:    "your-client-id",
-    AccessToken: "your-access-token",
+    ClientID:        "your-client-id",
+    UserAccessToken: "your-user-access-token",
+    AppAccessToken:  "your-app-access-token"
 })
 if err != nil {
     // handle error
@@ -176,12 +182,13 @@ if err != nil {
     // handle error
 }
 
-client.SetAccessToken("your-access-token")
+client.SetUserAccessToken("your-user-access-token")
+client.SetAppAccessToken("your-app-access-token")
 
 // send API request...
 ```
 
-Note that any subsequent API requests will utilize this same access token. So it is necessary to unset the access token when you are finished with it. To do so, simply pass an empty string to the `SetAccessToken` method.
+Note that any subsequent API requests will utilize this same access token. So it is necessary to unset the access token when you are finished with it. To do so, simply pass an empty string to the `SetUserAccessToken` or `SetAppAccessToken` methods.
 
 ## User-Agent Header
 
