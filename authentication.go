@@ -103,7 +103,7 @@ func (c *Client) GetUserAccessToken(code string) (*UserAccessTokenResponse, erro
 		ClientID:     c.clientID,
 		ClientSecret: c.clientSecret,
 		RedirectURI:  c.redirectURI,
-		GrantType:    "client_credentials",
+		GrantType:    "authorization_code",
 	}
 
 	resp, err := c.post(authPaths["token"], &UserAccessCredentials{}, data)
