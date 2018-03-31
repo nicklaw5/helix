@@ -4,6 +4,7 @@
 
 Follow the links below to their respective usage examples:
 
+- [Analytics](analytics_docs.md)
 - [Authentication](authentication_docs.md)
 - [Bits](bits_docs.md)
 - [Clips](clips_docs.md)
