@@ -7,7 +7,7 @@ A Twitch Helix API client written in Go. If you are looking for a client for Twi
 
 ## Package Status
 
-This project is a work in progress. Below is a list of currently supported endpoints and features. Until a release is cut, consider this API to be unstable.
+This project is a work in progress. Twitch has not finished all available endpoints/features for the Helix API, but as these get released they are likely to be implemented in this package.
 
 ## Supported Endpoints & Features
 
