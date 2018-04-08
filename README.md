@@ -1,6 +1,6 @@
 # helix
 
-A Twitch Helix API client written in Go. If you are looking for a client for Twitch's Kraken API, see [kraken](https://github.com/nicklaw5/kraken).
+A Twitch Helix API client written in Go (Golang).
 
 [![Build Status](https://travis-ci.org/nicklaw5/helix.svg?branch=master)](https://travis-ci.org/nicklaw5/helix)
 [![Coverage Status](https://coveralls.io/repos/github/nicklaw5/helix/badge.svg)](https://coveralls.io/github/nicklaw5/helix)
