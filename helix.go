@@ -318,7 +318,7 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 			if c.rateLimitFunc != nil &&
 				c.lastResponse.StatusCode == http.StatusTooManyRequests {
-				// Rate limit exceeded,  retry to send request after
+				// Rate limit exceeded, retry to send request after
 				// applying rate limiter callback
 				continue
 			}

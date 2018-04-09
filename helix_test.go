@@ -1,10 +1,12 @@
 package helix
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 )
 
 type mockHTTPClient struct {
@@ -162,6 +164,62 @@ func TestNewClientDefault(t *testing.T) {
 
 	if client.redirectURI != options.RedirectURI {
 		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, client.redirectURI)
+	}
+}
+
+func TestRatelimitCallback(t *testing.T) {
+	t.Parallel()
+
+	respBody1 := `{"error":"Too Many Requests","status":429,"message":"Request limit exceeded"}`
+	options1 := &Options{
+		ClientID: "my-client-id",
+		RateLimitFunc: func(resp *Response) error {
+			return nil
+		},
+	}
+
+	c := newMockClient(options1, newMockHandler(http.StatusTooManyRequests, respBody1, nil))
+	go func() {
+		_, err := c.GetStreams(&StreamsParams{})
+		if err != nil {
+			t.Errorf("Did not expect error, got \"%s\"", err.Error())
+		}
+	}()
+
+	time.Sleep(5 * time.Millisecond)
+
+	respBody2 := `{"data":[{"id":"EncouragingPluckySlothSSSsss","url":"https://clips.twitch.tv/EncouragingPluckySlothSSSsss","embed_url":"https://clips.twitch.tv/embed?clip=EncouragingPluckySlothSSSsss","broadcaster_id":"26490481","creator_id":"143839181","video_id":"222004532","game_id":"490377","language":"en","title":"summit and fat tim discover how to use maps","view_count":81808,"created_at":"2018-01-25T04:04:15Z","thumbnail_url":"https://clips-media-assets.twitch.tv/182509178-preview-480x272.jpg"}]}`
+	options2 := &Options{
+		ClientID: "my-client-id",
+	}
+
+	c = newMockClient(options2, newMockHandler(http.StatusOK, respBody2, nil))
+	_, err := c.GetStreams(&StreamsParams{})
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err.Error())
+	}
+}
+
+func TestRatelimitCallbackFailsOnError(t *testing.T) {
+	t.Parallel()
+
+	errMsg := "Oops! Your rate limiter funciton is broken :("
+	respBody1 := `{"error":"Too Many Requests","status":429,"message":"Request limit exceeded"}`
+	options1 := &Options{
+		ClientID: "my-client-id",
+		RateLimitFunc: func(resp *Response) error {
+			return errors.New(errMsg)
+		},
+	}
+
+	c := newMockClient(options1, newMockHandler(http.StatusTooManyRequests, respBody1, nil))
+	_, err := c.GetStreams(&StreamsParams{})
+	if err == nil {
+		t.Error("Expected error, got none")
+	}
+
+	if err.Error() != errMsg {
+		t.Errorf("Expected error to be \"%s\", got \"%s\"", errMsg, err.Error())
 	}
 }
 
