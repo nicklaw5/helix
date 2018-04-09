@@ -10,6 +10,7 @@ func TestGetUsers(t *testing.T) {
 
 	testCases := []struct {
 		statusCode  int
+		options     *Options
 		IDs         []string
 		Logins      []string
 		respBody    string
@@ -17,6 +18,7 @@ func TestGetUsers(t *testing.T) {
 	}{
 		{
 			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
 			[]string{},
 			[]string{},
 			`{"error":"Bad Request","status":400,"message":"Must provide an ID, Login or OAuth Token"}`,
@@ -24,6 +26,7 @@ func TestGetUsers(t *testing.T) {
 		},
 		{
 			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
 			[]string{"26301881"},
 			[]string{"summit1g"},
 			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"Wtf do i write here? Click my stream, or i scream.","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823},{"id":"26490481","login":"summit1g","display_name":"summit1g","type":"","broadcaster_type":"partner","description":"I'm a competitive CounterStrike player who likes to play casually now and many other games. You will mostly see me play CS, H1Z1,and single player games at night. There will be many othergames played on this stream in the future as they come out:D","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/200cea12142f2384-profile_image-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/summit1g-channel_offline_image-e2f9a1df9e695ec1-1920x1080.png","view_count":202707885}]}`,
@@ -32,7 +35,7 @@ func TestGetUsers(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetUsers(&UsersParams{
 			IDs:    testCase.IDs,
@@ -78,23 +81,26 @@ func TestUpdateUser(t *testing.T) {
 
 	testCases := []struct {
 		statusCode  int
+		options     *Options
 		respBody    string
 		description string
 	}{
 		{
 			http.StatusForbidden,
-			`{"error":"Forbidden","status":403,"message":"Missing user:edit scope"}`,
+			&Options{ClientID: "my-client-id"},
+			`{"error":"Forbidden","status":403,"message":"Missing user:edit scope"}`, // missing required scope
 			"new description",
 		},
 		{
 			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
 			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"new description","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823}]}`,
 			"new description",
 		},
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.UpdateUser(testCase.description)
 		if err != nil {
@@ -133,18 +139,21 @@ func TestGetUsersFollows(t *testing.T) {
 
 	testCases := []struct {
 		statusCode int
+		options    *Options
 		FromID     string
 		First      int
 		respBody   string
 	}{
 		{
 			http.StatusBadRequest,
-			"",
+			&Options{ClientID: "my-client-id"},
+			"", // missing from_id
 			2,
 			`{"error":"Bad Request","status":400,"message":"Must provide either from_id or to_id"}`,
 		},
 		{
 			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
 			"23161357",
 			2,
 			`{"total":89,"data":[{"from_id":"23161357","to_id":"23528098","followed_at":"2017-10-01T03:57:21Z"},{"from_id":"23161357","to_id":"127506955","followed_at":"2017-08-23T15:04:20Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjoiMTUwMzUwMDY2MDYwNzAyNTAwMCJ9"}}`,
@@ -152,7 +161,7 @@ func TestGetUsersFollows(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetUsersFollows(&UsersFollowsParams{
 			First:  testCase.First,

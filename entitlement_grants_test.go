@@ -64,7 +64,7 @@ func TestCreateEntitlementsUploadURL(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient(testCase.options.ClientID, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.CreateEntitlementsUploadURL(testCase.manifestID, testCase.entitlementType)
 		if err != nil {

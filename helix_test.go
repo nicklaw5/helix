@@ -19,9 +19,16 @@ func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	return rr.Result(), nil
 }
 
-func newMockClient(clientID string, mockHandler func(http.ResponseWriter, *http.Request)) *Client {
+func newMockClient(options *Options, mockHandler func(http.ResponseWriter, *http.Request)) *Client {
 	mc := &Client{}
-	mc.clientID = clientID
+	mc.clientID = options.ClientID
+	mc.clientSecret = options.ClientSecret
+	mc.appAccessToken = options.AppAccessToken
+	mc.userAccessToken = options.UserAccessToken
+	mc.userAgent = options.UserAgent
+	mc.rateLimitFunc = options.RateLimitFunc
+	mc.scopes = options.Scopes
+	mc.redirectURI = options.RedirectURI
 	mc.httpClient = &mockHTTPClient{mockHandler}
 
 	return mc
@@ -86,7 +93,7 @@ func TestNewClient(t *testing.T) {
 		}
 
 		if reflect.TypeOf(client.rateLimitFunc).Kind() != reflect.Func {
-			t.Errorf("expected rateLimitFunc to be a function, got %+v", reflect.TypeOf(client.rateLimitFunc).Kind())
+			t.Errorf("expected rateLimitFunc to be a function, got \"%+v\"", reflect.TypeOf(client.rateLimitFunc).Kind())
 		}
 
 		if client.httpClient != testCase.options.HTTPClient {

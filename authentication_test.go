@@ -89,7 +89,7 @@ func TestGetAppAccessToken(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient(testCase.options.ClientID, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetAppAccessToken()
 		if err != nil {
@@ -210,7 +210,7 @@ func TestGetUserAccessToken(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetUserAccessToken(testCase.code)
 		if err != nil {
@@ -333,7 +333,7 @@ func TestRefreshUserAccessToken(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient(testCase.options.ClientID, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RefreshUserAccessToken(testCase.refreshToken)
 		if err != nil {
@@ -417,8 +417,7 @@ func TestRevokeUserAccessToken(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient(testCase.options.ClientID,
-			newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RevokeUserAccessToken(testCase.accessToken)
 		if err != nil {

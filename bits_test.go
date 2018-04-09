@@ -11,6 +11,7 @@ func TestGetBitsLeaderboard(t *testing.T) {
 
 	testCases := []struct {
 		statusCode int
+		options    *Options
 		count      int
 		period     string
 		startedAt  time.Time
@@ -18,6 +19,7 @@ func TestGetBitsLeaderboard(t *testing.T) {
 	}{
 		{
 			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
 			1,
 			"all",
 			time.Time{},
@@ -25,6 +27,7 @@ func TestGetBitsLeaderboard(t *testing.T) {
 		},
 		{
 			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
 			2,
 			"week",
 			time.Time{},
@@ -32,6 +35,7 @@ func TestGetBitsLeaderboard(t *testing.T) {
 		},
 		{
 			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
 			2,
 			"week",
 			time.Now().Add(-744 * time.Hour),
@@ -40,7 +44,7 @@ func TestGetBitsLeaderboard(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		params := &BitsLeaderboardParams{
 			Count:  testCase.count,
@@ -57,22 +61,22 @@ func TestGetBitsLeaderboard(t *testing.T) {
 		}
 
 		if resp.StatusCode != testCase.statusCode {
-			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
 		}
 
 		// Test error cases
 		if testCase.statusCode != http.StatusOK {
 			if resp.Error != "Bad Request" {
-				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
 			}
 
 			if resp.ErrorStatus != testCase.statusCode {
-				t.Errorf("expected error status to be %d, got %d", testCase.statusCode, resp.ErrorStatus)
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
 			}
 
 			errMsg := "The parameter \"count\" was malformed: the value must be less than or equal to 100"
 			if resp.ErrorMessage != errMsg {
-				t.Errorf("expected error message to be %s, got %s", errMsg, resp.ErrorMessage)
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", errMsg, resp.ErrorMessage)
 			}
 
 			continue

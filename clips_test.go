@@ -11,23 +11,26 @@ func TestGetClips(t *testing.T) {
 
 	testCases := []struct {
 		statusCode int
+		options    *Options
 		slug       string
 		respBody   string
 	}{
 		{
 			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
 			"EncouragingPluckySlothSSSsss",
 			`{"data":[{"id":"EncouragingPluckySlothSSSsss","url":"https://clips.twitch.tv/EncouragingPluckySlothSSSsss","embed_url":"https://clips.twitch.tv/embed?clip=EncouragingPluckySlothSSSsss","broadcaster_id":"26490481","creator_id":"143839181","video_id":"222004532","game_id":"490377","language":"en","title":"summit and fat tim discover how to use maps","view_count":81808,"created_at":"2018-01-25T04:04:15Z","thumbnail_url":"https://clips-media-assets.twitch.tv/182509178-preview-480x272.jpg"}]}`,
 		},
 		{
 			http.StatusNotFound,
+			&Options{ClientID: "my-client-id"},
 			"bad-slug",
 			`{"error":"Not Found","status":404,"message":"clip not found"}`,
 		},
 	}
 
 	for _, testCase := range testCases {
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, nil))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetClips(&ClipsParams{
 			IDs: []string{testCase.slug},
@@ -67,6 +70,7 @@ func TestCreateClip(t *testing.T) {
 
 	testCases := []struct {
 		statusCode      int
+		options         *Options
 		broadcasterID   string
 		respBody        string
 		headerLimit     int
@@ -74,6 +78,7 @@ func TestCreateClip(t *testing.T) {
 	}{
 		{
 			http.StatusAccepted,
+			&Options{ClientID: "my-client-id"},
 			"26490481", // summit1g
 			`{"data":[{"id":"IronicHedonisticOryxSquadGoals","edit_url":"https://clips.twitch.tv/IronicHedonisticOryxSquadGoals/edit"}]}`,
 			600,
@@ -81,6 +86,7 @@ func TestCreateClip(t *testing.T) {
 		},
 		{
 			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id"},
 			"26490481", // summit1g
 			`{"error":"Unauthorized","status":401,"message":"Missing clips:edit scope"}`, // missing required scope
 			600,
@@ -94,7 +100,7 @@ func TestCreateClip(t *testing.T) {
 			"Ratelimit-Helixclipscreation-Remaining": strconv.Itoa(testCase.headerRemaining),
 		}
 
-		c := newMockClient("cid", newMockHandler(testCase.statusCode, testCase.respBody, mockRespHeaders))
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, mockRespHeaders))
 
 		resp, err := c.CreateClip(testCase.broadcasterID)
 		if err != nil {
