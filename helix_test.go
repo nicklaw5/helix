@@ -227,32 +227,48 @@ func TestSetRequestHeaders(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		endpoint            string
-		method              string
-		expectedBearerToken string
+		endpoint        string
+		method          string
+		userBearerToken string
+		appBearerToken  string
 	}{
-		{"/users", "GET", "my-user-access-token"},
-		{entitlementUploadEndpoint, "POST", "my-app-access-token"},
+		{"/users", "GET", "my-user-access-token", "my-app-access-token"},
+		{"/entitlements/upload", "POST", "", "my-app-access-token"},
+		{"/streams", "GET", "", ""},
 	}
 
 	for _, testCase := range testCases {
 		client, err := NewClient(&Options{
 			ClientID:        "my-client-id",
 			UserAgent:       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
-			AppAccessToken:  "my-app-access-token",
-			UserAccessToken: "my-user-access-token",
+			AppAccessToken:  testCase.appBearerToken,
+			UserAccessToken: testCase.userBearerToken,
 		})
 		if err != nil {
 			t.Errorf("Did not expect an error, got \"%s\"", err.Error())
 		}
 
 		req, _ := http.NewRequest(testCase.method, testCase.endpoint, nil)
-
 		client.setRequestHeaders(req)
 
-		expectedAuthHeader := "Bearer " + testCase.expectedBearerToken
-		if req.Header.Get("Authorization") != expectedAuthHeader {
-			t.Errorf("expected Authorization header to be \"%s\", got \"%s\"", expectedAuthHeader, req.Header.Get("Authorization"))
+		if testCase.userBearerToken != "" {
+			expectedAuthHeader := "Bearer " + testCase.userBearerToken
+			if req.Header.Get("Authorization") != expectedAuthHeader {
+				t.Errorf("expected Authorization header to be \"%s\", got \"%s\"", expectedAuthHeader, req.Header.Get("Authorization"))
+			}
+		}
+
+		if testCase.userBearerToken == "" && testCase.appBearerToken != "" {
+			expectedAuthHeader := "Bearer " + testCase.appBearerToken
+			if req.Header.Get("Authorization") != expectedAuthHeader {
+				t.Errorf("expected Authorization header to be \"%s\", got \"%s\"", expectedAuthHeader, req.Header.Get("Authorization"))
+			}
+		}
+
+		if testCase.userBearerToken == "" && testCase.appBearerToken == "" {
+			if req.Header.Get("Authorization") != "" {
+				t.Error("did not expect Authorization header to be set")
+			}
 		}
 
 		if req.Header.Get("User-Agent") != client.userAgent {

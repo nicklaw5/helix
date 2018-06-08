@@ -332,16 +332,21 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 func (c *Client) setRequestHeaders(req *http.Request) {
 	req.Header.Set("Client-ID", c.clientID)
-	if c.userAccessToken != "" || c.appAccessToken != "" {
-		oauthToken := c.userAccessToken
-		if strings.Contains(req.URL.Path, entitlementUploadEndpoint) {
-			oauthToken = c.appAccessToken
-		}
 
-		req.Header.Set("Authorization", "Bearer "+oauthToken)
-	}
 	if c.userAgent != "" {
 		req.Header.Set("User-Agent", c.userAgent)
+	}
+
+	var bearerToken string
+	if c.appAccessToken != "" {
+		bearerToken = c.appAccessToken
+	}
+	if c.userAccessToken != "" {
+		bearerToken = c.userAccessToken
+	}
+
+	if bearerToken != "" {
+		req.Header.Set("Authorization", "Bearer "+bearerToken)
 	}
 }
 

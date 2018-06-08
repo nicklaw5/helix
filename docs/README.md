@@ -153,11 +153,13 @@ If a `RateLimitFunc` is provided, the client will re-attempt to send a failed re
 
 ## Access Tokens
 
-Some API endpoints require that you have a valid access token in order to fulfill the request. There are two types of access tokens: App access tokens and user access tokens.
+Some API endpoints require that you have a valid access token in order to fulfill the request. There are two types of access tokens: app access tokens and user access tokens.
 
 App access tokens allow game developers to integrate their game into Twitch's viewing experience. [Drops](https://dev.twitch.tv/drops) are an example of this.
 
-User access tokens, on the other hand, are used to interact with the Twitch API on behalf of a registered Twitch user. If you're only looking to consume the standard API, such as getting access to a user's registered email address, user access tokens are all you need.
+User access tokens, on the other hand, are used to interact with the Twitch API on behalf of a registered Twitch user. If you're only looking to consume the standard API, such as getting access to a user's registered email address, user access tokens are what you will need.
+
+It is worth noting that both app and user access tokens have the ability to extend the request rate limit enforced by Twitch. However, if you provide both an app and a user token - as is the case in the below example - the app access token will be ignored as user access tokens are prioritized when setting the request _Authorization_ header.
 
 In order to set the access token for a request, you can either supply it as an option or use the `SetUserAccessToken` or `SetAppAccessToken` methods. For example:
 

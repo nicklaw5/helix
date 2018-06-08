@@ -21,8 +21,6 @@ type EntitlementsUploadResponse struct {
 	Data ManyEntitlementsUploadURLs
 }
 
-const entitlementUploadEndpoint = "/entitlements/upload"
-
 // CreateEntitlementsUploadURL return a URL where you can upload a manifest
 // file and notify users that they have an entitlement. Entitlements are digital
 // items that users are entitled to use. Twitch entitlements are granted to users
@@ -33,7 +31,7 @@ func (c *Client) CreateEntitlementsUploadURL(manifestID, entitlementType string)
 		Type:       entitlementType,
 	}
 
-	resp, err := c.post(entitlementUploadEndpoint, &ManyEntitlementsUploadURLs{}, data)
+	resp, err := c.post("/entitlements/upload", &ManyEntitlementsUploadURLs{}, data)
 	if err != nil {
 		return nil, err
 	}
