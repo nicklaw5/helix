@@ -13,9 +13,6 @@ import (
 )
 
 const (
-	queryTag   = "query"
-	methodPOST = "POST"
-
 	// APIBaseURL is the base URL for composing API requests.
 	APIBaseURL = "https://api.twitch.tv/helix"
 
@@ -132,15 +129,15 @@ func NewClient(options *Options) (*Client, error) {
 }
 
 func (c *Client) get(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest("GET", path, respData, reqData)
+	return c.sendRequest(http.MethodGet, path, respData, reqData)
 }
 
 func (c *Client) post(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(methodPOST, path, respData, reqData)
+	return c.sendRequest(http.MethodPost, path, respData, reqData)
 }
 
 func (c *Client) put(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest("PUT", path, respData, reqData)
+	return c.sendRequest(http.MethodPut, path, respData, reqData)
 }
 
 func (c *Client) sendRequest(method, path string, respData, reqData interface{}) (*Response, error) {
@@ -180,7 +177,7 @@ func buildQueryString(req *http.Request, v interface{}) (string, error) {
 		var defaultValue string
 
 		field := vType.Field(i)
-		tag := field.Tag.Get(queryTag)
+		tag := field.Tag.Get("query")
 
 		// Get the default value from the struct tag
 		if strings.Contains(tag, ",") {
@@ -287,7 +284,6 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			return fmt.Errorf("Failed to execute API request: %s", err.Error())
 		}
 		defer response.Body.Close()
-
 
 		resp.Header = response.Header
 
