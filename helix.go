@@ -69,6 +69,27 @@ type ResponseCommon struct {
 	ErrorMessage string `json:"message"`
 }
 
+func (rc *ResponseCommon) convertHeaderToInt(str string) int {
+	i, _ := strconv.Atoi(str)
+
+	return i
+}
+
+// GetRateLimit returns the "RateLimit-Limit" header as an int.
+func (rc *ResponseCommon) GetRateLimit() int {
+	return rc.convertHeaderToInt(rc.Header.Get("RateLimit-Limit"))
+}
+
+// GetRateLimitRemaining returns the "RateLimit-Remaining" header as an int.
+func (rc *ResponseCommon) GetRateLimitRemaining() int {
+	return rc.convertHeaderToInt(rc.Header.Get("RateLimit-Remaining"))
+}
+
+// GetRateLimitReset returns the "RateLimit-Reset" header as an int.
+func (rc *ResponseCommon) GetRateLimitReset() int {
+	return rc.convertHeaderToInt(rc.Header.Get("RateLimit-Reset"))
+}
+
 // Response ...
 type Response struct {
 	ResponseCommon

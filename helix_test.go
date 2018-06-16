@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -273,6 +274,73 @@ func TestSetRequestHeaders(t *testing.T) {
 
 		if req.Header.Get("User-Agent") != client.userAgent {
 			t.Errorf("expected User-Agent header to be \"%s\", got \"%s\"", client.userAgent, req.Header.Get("User-Agent"))
+		}
+	}
+}
+
+func TestGetRateLimitHeaders(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode      int
+		options         *Options
+		Logins          []string
+		respBody        string
+		headerLimit     string
+		headerRemaining string
+		headerReset     string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			[]string{"summit1g"},
+			`{"data":[{"id":"26490481","login":"summit1g","display_name":"summit1g","type":"","broadcaster_type":"partner","description":"I'm a competitive CounterStrike player who likes to play casually now and many other games. You will mostly see me play CS, H1Z1,and single player games at night. There will be many othergames played on this stream in the future as they come out:D","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/200cea12142f2384-profile_image-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/summit1g-channel_offline_image-e2f9a1df9e695ec1-1920x1080.png","view_count":202707885}]}`,
+			"30",
+			"29",
+			"1529183210",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			[]string{"summit1g"},
+			`{"data":[{"id":"26490481","login":"summit1g","display_name":"summit1g","type":"","broadcaster_type":"partner","description":"I'm a competitive CounterStrike player who likes to play casually now and many other games. You will mostly see me play CS, H1Z1,and single player games at night. There will be many othergames played on this stream in the future as they come out:D","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/200cea12142f2384-profile_image-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/summit1g-channel_offline_image-e2f9a1df9e695ec1-1920x1080.png","view_count":202707885}]}`,
+			"",
+			"",
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		mockRespHeaders := make(map[string]string)
+
+		if testCase.headerLimit != "" {
+			mockRespHeaders["Ratelimit-Limit"] = testCase.headerLimit
+			mockRespHeaders["Ratelimit-Remaining"] = testCase.headerRemaining
+			mockRespHeaders["Ratelimit-Reset"] = testCase.headerReset
+		}
+
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, mockRespHeaders))
+
+		resp, err := c.GetUsers(&UsersParams{
+			Logins: testCase.Logins,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		expctedHeaderLimit, _ := strconv.Atoi(testCase.headerLimit)
+		if resp.GetRateLimit() != expctedHeaderLimit {
+			t.Errorf("expeced \"Ratelimit-Limit\" to be \"%d\", got \"%d\"", expctedHeaderLimit, resp.GetRateLimit())
+		}
+
+		expctedHeaderRemaining, _ := strconv.Atoi(testCase.headerRemaining)
+		if resp.GetRateLimitRemaining() != expctedHeaderRemaining {
+			t.Errorf("expeced \"Ratelimit-Remaining\" to be \"%d\", got \"%d\"", expctedHeaderRemaining, resp.GetRateLimitRemaining())
+		}
+
+		expctedHeaderReset, _ := strconv.Atoi(testCase.headerReset)
+		if resp.GetRateLimitReset() != expctedHeaderReset {
+			t.Errorf("expeced \"Ratelimit-Reset\" to be \"%d\", got \"%d\"", expctedHeaderReset, resp.GetRateLimitReset())
 		}
 	}
 }

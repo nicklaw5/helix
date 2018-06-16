@@ -2,7 +2,6 @@ package helix
 
 import (
 	"net/http"
-	"strconv"
 	"testing"
 )
 
@@ -73,31 +72,31 @@ func TestCreateClip(t *testing.T) {
 		options         *Options
 		broadcasterID   string
 		respBody        string
-		headerLimit     int
-		headerRemaining int
+		headerLimit     string
+		headerRemaining string
 	}{
 		{
 			http.StatusAccepted,
 			&Options{ClientID: "my-client-id"},
 			"26490481", // summit1g
 			`{"data":[{"id":"IronicHedonisticOryxSquadGoals","edit_url":"https://clips.twitch.tv/IronicHedonisticOryxSquadGoals/edit"}]}`,
-			600,
-			598,
+			"600",
+			"598",
 		},
 		{
 			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id"},
 			"26490481", // summit1g
 			`{"error":"Unauthorized","status":401,"message":"Missing clips:edit scope"}`, // missing required scope
-			600,
-			597,
+			"600",
+			"597",
 		},
 	}
 
 	for _, testCase := range testCases {
 		mockRespHeaders := map[string]string{
-			"Ratelimit-Helixclipscreation-Limit":     strconv.Itoa(testCase.headerLimit),
-			"Ratelimit-Helixclipscreation-Remaining": strconv.Itoa(testCase.headerRemaining),
+			"Ratelimit-Helixclipscreation-Limit":     testCase.headerLimit,
+			"Ratelimit-Helixclipscreation-Remaining": testCase.headerRemaining,
 		}
 
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, mockRespHeaders))
@@ -135,12 +134,12 @@ func TestCreateClip(t *testing.T) {
 			t.Errorf("expected clip edit url not to be empty, got \"%s\"", resp.Data.ClipEditURLs[0].EditURL)
 		}
 
-		if resp.ClipsCreationRateLimit.Limit < 1 {
-			t.Errorf("expected clip create rate limit limit not to be \"0\", got \"%d\"", resp.ClipsCreationRateLimit.Limit)
+		if resp.GetClipsCreationRateLimit() < 1 {
+			t.Errorf("expected clip create rate limit limit not to be \"0\", got \"%d\"", resp.GetClipsCreationRateLimit())
 		}
 
-		if resp.ClipsCreationRateLimit.Remaining < 1 {
-			t.Errorf("expected clip create rate limit remaining not to be \"0\", got \"%d\"", resp.ClipsCreationRateLimit.Remaining)
+		if resp.GetClipsCreationRateLimitRemaining() < 1 {
+			t.Errorf("expected clip create rate limit remaining not to be \"0\", got \"%d\"", resp.GetClipsCreationRateLimitRemaining())
 		}
 	}
 }

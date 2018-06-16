@@ -67,11 +67,21 @@ type CreateClipResponse struct {
 	Data ManyClipEditURLs
 }
 
+// GetClipsCreationRateLimit returns the "Ratelimit-Helixclipscreation-Limit"
+// header as an int.
+func (ccr *CreateClipResponse) GetClipsCreationRateLimit() int {
+	return ccr.convertHeaderToInt(ccr.Header.Get("Ratelimit-Helixclipscreation-Limit"))
+}
+
+// GetClipsCreationRateLimitRemaining returns the "Ratelimit-Helixclipscreation-Remaining"
+// header as an int.
+func (ccr *CreateClipResponse) GetClipsCreationRateLimitRemaining() int {
+	return ccr.convertHeaderToInt(ccr.Header.Get("Ratelimit-Helixclipscreation-Remaining"))
+}
+
 type createClipRequestParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 }
-
-const createClipEndpoint = "/clips"
 
 // CreateClip creates a clip programmatically. This returns both an ID and
 // an edit URL for the new clip. Clip creation takes time. We recommend that
@@ -86,7 +96,7 @@ func (c *Client) CreateClip(broadcasterID string) (*CreateClipResponse, error) {
 		BroadcasterID: broadcasterID,
 	}
 
-	resp, err := c.post(createClipEndpoint, &ManyClipEditURLs{}, params)
+	resp, err := c.post("/clips", &ManyClipEditURLs{}, params)
 	if err != nil {
 		return nil, err
 	}

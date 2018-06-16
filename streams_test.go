@@ -68,8 +68,8 @@ func TestGetStreamsMetadata(t *testing.T) {
 		respBody            string
 		expectBroadcastHero []string
 		expectOpponentHero  []string
-		headerLimit         int
-		headerRemaining     int
+		headerLimit         string
+		headerRemaining     string
 	}{
 		{
 			http.StatusOK,
@@ -78,8 +78,8 @@ func TestGetStreamsMetadata(t *testing.T) {
 			`{"data":[{"user_id":"43356746","game_id":"138585","overwatch":null,"hearthstone":{"broadcaster":{"hero":{"type":"Alternate hero","class":"Mage","name":"Medivh"}},"opponent":{"hero":{"type":"Classic hero","class":"Warlock","name":"Guldan"}}}}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
 			[]string{"Alternate hero", "Mage", "Medivh"},  // type, class, name
 			[]string{"Classic hero", "Warlock", "Guldan"}, // type, class, name
-			15000,
-			14119,
+			"15000",
+			"14119",
 		},
 		{
 			http.StatusOK,
@@ -88,8 +88,8 @@ func TestGetStreamsMetadata(t *testing.T) {
 			`{"data":[{"user_id":"132395117","game_id":"488552","overwatch":{"broadcaster":{"hero":{"role":"Support","name":"Lucio","ability":"Sonic Amplifier"}}},"hearthstone":null}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
 			[]string{"Support", "Lucio", "Sonic Amplifier"}, // role, name, ability
 			[]string{}, // N/A
-			15000,
-			14119,
+			"15000",
+			"14119",
 		},
 		{
 			http.StatusBadRequest,
@@ -98,15 +98,15 @@ func TestGetStreamsMetadata(t *testing.T) {
 			`{"error":"Bad Request","status":400,"message":"The parameter \"first\" was malformed: the value must be less than or equal to 100"}`,
 			[]string{}, // N/A
 			[]string{}, // N/A
-			0,
-			0,
+			"0",
+			"0",
 		},
 	}
 
 	for _, testCase := range testCases {
 		mockRespHeaders := map[string]string{
-			"Ratelimit-Helixstreamsmetadata-Limit":     strconv.Itoa(testCase.headerLimit),
-			"Ratelimit-Helixstreamsmetadata-Remaining": strconv.Itoa(testCase.headerRemaining),
+			"Ratelimit-Helixstreamsmetadata-Limit":     testCase.headerLimit,
+			"Ratelimit-Helixstreamsmetadata-Remaining": testCase.headerRemaining,
 		}
 
 		mockHandler := newMockHandler(testCase.statusCode, testCase.respBody, mockRespHeaders)
@@ -124,11 +124,13 @@ func TestGetStreamsMetadata(t *testing.T) {
 		}
 
 		// Test metadata headers response
-		if resp.StreamsMetadataRateLimit.Limit != testCase.headerLimit {
-			t.Errorf("expected metadata limit header to be \"%d\", got \"%d\"", testCase.headerLimit, resp.StreamsMetadataRateLimit.Limit)
+		headerLimit, _ := strconv.Atoi(testCase.headerLimit)
+		if resp.GetStreamsMetadataRateLimit() != headerLimit {
+			t.Errorf("expected metadata limit header to be \"%d\", got \"%d\"", headerLimit, resp.GetStreamsMetadataRateLimit())
 		}
-		if resp.StreamsMetadataRateLimit.Remaining != testCase.headerRemaining {
-			t.Errorf("expected metadata remaining header to be \"%d\", got \"%d\"", testCase.headerRemaining, resp.StreamsMetadataRateLimit.Remaining)
+		headerRemaining, _ := strconv.Atoi(testCase.headerRemaining)
+		if resp.GetStreamsMetadataRateLimitRemaining() != headerRemaining {
+			t.Errorf("expected metadata remaining header to be \"%d\", got \"%d\"", headerRemaining, resp.GetStreamsMetadataRateLimitRemaining())
 		}
 
 		// Test Bad Request Responses

@@ -115,6 +115,18 @@ type StreamsMetadataResponse struct {
 	Data ManyStreamsMetadata
 }
 
+// GetStreamsMetadataRateLimit returns the "Ratelimit-Helixstreamsmetadata-Limit"
+// header as an int.
+func (sr *StreamsMetadataResponse) GetStreamsMetadataRateLimit() int {
+	return sr.convertHeaderToInt(sr.Header.Get("Ratelimit-Helixstreamsmetadata-Limit"))
+}
+
+// GetStreamsMetadataRateLimitRemaining returns the "Ratelimit-Helixstreamsmetadata-Remaining"
+// header as an int.
+func (sr *StreamsMetadataResponse) GetStreamsMetadataRateLimitRemaining() int {
+	return sr.convertHeaderToInt(sr.Header.Get("Ratelimit-Helixstreamsmetadata-Remaining"))
+}
+
 // StreamsMetadataParams ...
 type StreamsMetadataParams StreamsParams
 
