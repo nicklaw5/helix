@@ -11,7 +11,7 @@ import (
 )
 
 type mockHTTPClient struct {
-	mockHandler func(http.ResponseWriter, *http.Request)
+	mockHandler http.HandlerFunc
 }
 
 func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
@@ -22,7 +22,7 @@ func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	return rr.Result(), nil
 }
 
-func newMockClient(options *Options, mockHandler func(http.ResponseWriter, *http.Request)) *Client {
+func newMockClient(options *Options, mockHandler http.HandlerFunc) *Client {
 	mc := &Client{}
 	mc.clientID = options.ClientID
 	mc.clientSecret = options.ClientSecret
@@ -37,7 +37,7 @@ func newMockClient(options *Options, mockHandler func(http.ResponseWriter, *http
 	return mc
 }
 
-func newMockHandler(statusCode int, json string, headers map[string]string) func(http.ResponseWriter, *http.Request) {
+func newMockHandler(statusCode int, json string, headers map[string]string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if headers != nil && len(headers) > 0 {
 			for key, value := range headers {
@@ -342,6 +342,53 @@ func TestGetRateLimitHeaders(t *testing.T) {
 		if resp.GetRateLimitReset() != expctedHeaderReset {
 			t.Errorf("expeced \"Ratelimit-Reset\" to be \"%d\", got \"%d\"", expctedHeaderReset, resp.GetRateLimitReset())
 		}
+	}
+}
+
+type badMockHTTPClient struct {
+	mockHandler http.HandlerFunc
+}
+
+func (mtc *badMockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	return nil, errors.New("Oops, that's bad :(")
+}
+
+func TestFailedHTTPClientDoRequest(t *testing.T) {
+	t.Parallel()
+
+	c := &Client{}
+	c.clientID = "my-client-id"
+	c.httpClient = &badMockHTTPClient{
+		newMockHandler(0, "", nil),
+	}
+
+	_, err := c.GetUsers(&UsersParams{
+		Logins: []string{"summit1g"},
+	})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestDecodingBadJSON(t *testing.T) {
+	t.Parallel()
+
+	// Invalid JSON (missing `"d` from the beginning)
+	c := newMockClient(&Options{ClientID: "my-client-id"}, newMockHandler(http.StatusOK, `data":["some":"data"]}`, nil))
+
+	_, err := c.GetUsers(&UsersParams{
+		Logins: []string{"summit1g"},
+	})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to decode API response: invalid character 'd' looking for beginning of value" {
+		t.Error("expected error does match return error")
 	}
 }
 

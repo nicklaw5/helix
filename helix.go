@@ -101,8 +101,8 @@ type Pagination struct {
 	Cursor string `json:"cursor"`
 }
 
-// NewClient returns a new Twicth Helix API client. It panics if
-// clientID is an empty string. It is concurrecy safe.
+// NewClient returns a new Twicth Helix API client. It returns an
+// if clientID is an empty string. It is concurrecy safe.
 func NewClient(options *Options) (*Client, error) {
 	if options.ClientID == "" {
 		return nil, errors.New("A client ID was not provided but is required")
