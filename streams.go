@@ -50,12 +50,10 @@ func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 
 	streams := &StreamsResponse{}
 	streams.StatusCode = resp.StatusCode
+	streams.Header = resp.Header
 	streams.Error = resp.Error
 	streams.ErrorStatus = resp.ErrorStatus
 	streams.ErrorMessage = resp.ErrorMessage
-	streams.RateLimit.Limit = resp.RateLimit.Limit
-	streams.RateLimit.Remaining = resp.RateLimit.Remaining
-	streams.RateLimit.Reset = resp.RateLimit.Reset
 	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
 	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
 
@@ -117,34 +115,22 @@ type StreamsMetadataResponse struct {
 	Data ManyStreamsMetadata
 }
 
-// StreamsMetadataRateLimit ...
-type StreamsMetadataRateLimit struct {
-	Limit     int
-	Remaining int
-}
-
 // StreamsMetadataParams ...
 type StreamsMetadataParams StreamsParams
 
-const streamsMetadataEndpoint = "/streams/metadata"
-
 // GetStreamsMetadata ...
 func (c *Client) GetStreamsMetadata(params *StreamsMetadataParams) (*StreamsMetadataResponse, error) {
-	resp, err := c.get(streamsMetadataEndpoint, &ManyStreamsMetadata{}, params)
+	resp, err := c.get("/streams/metadata", &ManyStreamsMetadata{}, params)
 	if err != nil {
 		return nil, err
 	}
 
 	streams := &StreamsMetadataResponse{}
 	streams.StatusCode = resp.StatusCode
+	streams.Header = resp.Header
 	streams.Error = resp.Error
 	streams.ErrorStatus = resp.ErrorStatus
 	streams.ErrorMessage = resp.ErrorMessage
-	streams.RateLimit.Limit = resp.RateLimit.Limit
-	streams.RateLimit.Remaining = resp.RateLimit.Remaining
-	streams.RateLimit.Reset = resp.RateLimit.Reset
-	streams.StreamsMetadataRateLimit.Limit = resp.StreamsMetadataRateLimit.Limit
-	streams.StreamsMetadataRateLimit.Remaining = resp.StreamsMetadataRateLimit.Remaining
 	streams.Data.Streams = resp.Data.(*ManyStreamsMetadata).Streams
 	streams.Data.Pagination = resp.Data.(*ManyStreamsMetadata).Pagination
 

@@ -35,12 +35,10 @@ func (c *Client) GetGameAnalytics(gameID string) (*GameAnalyticsResponse, error)
 
 	users := &GameAnalyticsResponse{}
 	users.StatusCode = resp.StatusCode
+	users.Header = resp.Header
 	users.Error = resp.Error
 	users.ErrorStatus = resp.ErrorStatus
 	users.ErrorMessage = resp.ErrorMessage
-	users.RateLimit.Limit = resp.RateLimit.Limit
-	users.RateLimit.Remaining = resp.RateLimit.Remaining
-	users.RateLimit.Reset = resp.RateLimit.Reset
 	users.Data.GameAnalytics = resp.Data.(*ManyGameAnalytics).GameAnalytics
 
 	return users, nil

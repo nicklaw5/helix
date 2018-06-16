@@ -63,25 +63,16 @@ type RateLimitFunc func(*Response) error
 // ResponseCommon ...
 type ResponseCommon struct {
 	StatusCode   int
+	Header       http.Header
 	Error        string `json:"error"`
 	ErrorStatus  int    `json:"status"`
 	ErrorMessage string `json:"message"`
-	RateLimit
-	StreamsMetadataRateLimit
-	ClipsCreationRateLimit
 }
 
 // Response ...
 type Response struct {
 	ResponseCommon
 	Data interface{}
-}
-
-// RateLimit ...
-type RateLimit struct {
-	Limit     int
-	Remaining int
-	Reset     int64
 }
 
 // Pagination ...
@@ -276,20 +267,10 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		}
 		defer response.Body.Close()
 
+
+		resp.Header = response.Header
+
 		setResponseStatusCode(resp, "StatusCode", response.StatusCode)
-		setRateLimitValue(&resp.RateLimit, "Limit", response.Header.Get("RateLimit-Limit"))
-		setRateLimitValue(&resp.RateLimit, "Remaining", response.Header.Get("RateLimit-Remaining"))
-		setRateLimitValue(&resp.RateLimit, "Reset", response.Header.Get("RateLimit-Reset"))
-
-		if strings.Contains(req.URL.Path, streamsMetadataEndpoint) {
-			setRateLimitValue(&resp.StreamsMetadataRateLimit, "Limit", response.Header.Get("Ratelimit-Helixstreamsmetadata-Limit"))
-			setRateLimitValue(&resp.StreamsMetadataRateLimit, "Remaining", response.Header.Get("Ratelimit-Helixstreamsmetadata-Remaining"))
-		}
-
-		if req.Method == methodPOST && strings.Contains(req.URL.Path, createClipEndpoint) {
-			setRateLimitValue(&resp.ClipsCreationRateLimit, "Limit", response.Header.Get("Ratelimit-Helixclipscreation-Limit"))
-			setRateLimitValue(&resp.ClipsCreationRateLimit, "Remaining", response.Header.Get("Ratelimit-Helixclipscreation-Remaining"))
-		}
 
 		bodyBytes, err := ioutil.ReadAll(response.Body)
 		if err != nil {
@@ -354,13 +335,6 @@ func setResponseStatusCode(v interface{}, fieldName string, code int) {
 	s := reflect.ValueOf(v).Elem()
 	field := s.FieldByName(fieldName)
 	field.SetInt(int64(code))
-}
-
-func setRateLimitValue(v interface{}, fieldName, value string) {
-	s := reflect.ValueOf(v).Elem()
-	field := s.FieldByName(fieldName)
-	intVal, _ := strconv.Atoi(value)
-	field.SetInt(int64(intVal))
 }
 
 // SetAppAccessToken ...

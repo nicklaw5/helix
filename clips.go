@@ -41,21 +41,13 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 
 	clips := &ClipsResponse{}
 	clips.StatusCode = resp.StatusCode
+	clips.Header = resp.Header
 	clips.Error = resp.Error
 	clips.ErrorStatus = resp.ErrorStatus
 	clips.ErrorMessage = resp.ErrorMessage
-	clips.RateLimit.Limit = resp.RateLimit.Limit
-	clips.RateLimit.Remaining = resp.RateLimit.Remaining
-	clips.RateLimit.Reset = resp.RateLimit.Reset
 	clips.Data.Clips = resp.Data.(*ManyClips).Clips
 
 	return clips, nil
-}
-
-// ClipsCreationRateLimit ...
-type ClipsCreationRateLimit struct {
-	Limit     int
-	Remaining int
 }
 
 // ClipEditURL ...
@@ -101,14 +93,10 @@ func (c *Client) CreateClip(broadcasterID string) (*CreateClipResponse, error) {
 
 	clips := &CreateClipResponse{}
 	clips.StatusCode = resp.StatusCode
+	clips.Header = resp.Header
 	clips.Error = resp.Error
 	clips.ErrorStatus = resp.ErrorStatus
 	clips.ErrorMessage = resp.ErrorMessage
-	clips.RateLimit.Limit = resp.RateLimit.Limit
-	clips.RateLimit.Remaining = resp.RateLimit.Remaining
-	clips.RateLimit.Reset = resp.RateLimit.Reset
-	clips.ClipsCreationRateLimit.Limit = resp.ClipsCreationRateLimit.Limit
-	clips.ClipsCreationRateLimit.Remaining = resp.ClipsCreationRateLimit.Remaining
 	clips.Data.ClipEditURLs = resp.Data.(*ManyClipEditURLs).ClipEditURLs
 
 	return clips, nil
