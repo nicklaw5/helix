@@ -97,40 +97,46 @@ type ManyUsers struct {
 
 type ResponseCommon struct {
     StatusCode   int
+    Header       http.Header
     Error        string `json:"error"`
     ErrorStatus  int    `json:"status"`
     ErrorMessage string `json:"message"`
-    RateLimit
-    StreamsMetadataRateLimit
-}
-
-type RateLimit struct {
-    Limit     int
-    Remaining int
-    Reset     int64
 }
 ```
 
-Also note from above that the `ResponseCommon` struct includes the rate limit header results returned with each request. See below on how you may want to limit your requests based on the rate limit results returned with each request.
+Also note from above that the `ResponseCommon` struct includes the header results returned with each request.
 
 ## Request Rate Limiting
 
 Twitch enforces strict request rate limits for their API. See [their documentation](https://dev.twitch.tv/docs/api#rate-limits) for the specific rate limit values. At the time of writing this, requests are limited to 30 queries per minute (if a Bearer token is not provided) or 120 queries per minute (if a Bearer token is provided).
 
-This package allows users to provide a rate limit callback that will be executed just before a request is sent. That way you can provide some sort of functionality for limiting the requests sent and prevent spamming Twitch with requests.
+There are a number of helper methods on the response object for retrieving rate limit headers are integers. These include:
+
+- `Response.GetRateLimit()`
+- `Response.GetRateLimitRemaining()`
+- `Response.GetRateLimitReset()`
+- `Response.GetClipsCreationRateLimit()` (only available when called `client.CreateClip()`)
+- `Response.GetClipsCreationRateLimitRemaining()` (only available when called `client.CreateClip()`)
+- `Response.GetStreamsMetadataRateLimit()` (only available when called `client.GetStreamsMetadata()`)
+- `Response.GetStreamsMetadataRateLimitRemaining()` (only available when called `client.GetStreamsMetadata()`)
+
+This package also allows users to provide a rate limit callback of their own which will be executed just before a request is sent. That way you can provide some sort of functionality for limiting the requests sent and prevent spamming Twitch with requests.
 
 The below snippet provides an example of how you might structure your rate limit callback to approach limiting requests. In this example, once we've reached our rate limit, we'll simply wait for the limit to pass before sending the next request.
 
 ```go
 func rateLimitCallback(lastResponse *helix.Response) error {
-    if lastResponse.RateLimit.Remaining > 0 {
+    if lastResponse.GetRateLimitRemaining() > 0 {
         return nil
     }
 
+    var reset64 int64
+    reset64 = int64(lastResponse.GetRateLimitReset())
+
     currentTime := time.Now().Unix()
 
-    if currentTime < lastResponse.RateLimit.Reset {
-        timeDiff := time.Duration(lastResponse.RateLimit.Reset - currentTime)
+    if currentTime < reset64 {
+        timeDiff := time.Duration(reset64 - currentTime)
         if timeDiff > 0 {
             fmt.Printf("Waiting on rate limit to pass before sending next request (%d seconds)\n", timeDiff)
             time.Sleep(timeDiff * time.Second)

@@ -42,12 +42,10 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 
 	users := &UsersResponse{}
 	users.StatusCode = resp.StatusCode
+	users.Header = resp.Header
 	users.Error = resp.Error
 	users.ErrorStatus = resp.ErrorStatus
 	users.ErrorMessage = resp.ErrorMessage
-	users.RateLimit.Limit = resp.RateLimit.Limit
-	users.RateLimit.Remaining = resp.RateLimit.Remaining
-	users.RateLimit.Reset = resp.RateLimit.Reset
 	users.Data.Users = resp.Data.(*ManyUsers).Users
 
 	return users, nil
@@ -73,12 +71,10 @@ func (c *Client) UpdateUser(description string) (*UsersResponse, error) {
 
 	users := &UsersResponse{}
 	users.StatusCode = resp.StatusCode
+	users.Header = resp.Header
 	users.Error = resp.Error
 	users.ErrorStatus = resp.ErrorStatus
 	users.ErrorMessage = resp.ErrorMessage
-	users.RateLimit.Limit = resp.RateLimit.Limit
-	users.RateLimit.Remaining = resp.RateLimit.Remaining
-	users.RateLimit.Reset = resp.RateLimit.Reset
 	users.Data.Users = resp.Data.(*ManyUsers).Users
 
 	return users, nil
@@ -125,12 +121,10 @@ func (c *Client) GetUsersFollows(params *UsersFollowsParams) (*UsersFollowsRespo
 
 	users := &UsersFollowsResponse{}
 	users.StatusCode = resp.StatusCode
+	users.Header = resp.Header
 	users.Error = resp.Error
 	users.ErrorStatus = resp.ErrorStatus
 	users.ErrorMessage = resp.ErrorMessage
-	users.RateLimit.Limit = resp.RateLimit.Limit
-	users.RateLimit.Remaining = resp.RateLimit.Remaining
-	users.RateLimit.Reset = resp.RateLimit.Reset
 	users.Data.Total = resp.Data.(*ManyFollows).Total
 	users.Data.Follows = resp.Data.(*ManyFollows).Follows
 	users.Data.Pagination = resp.Data.(*ManyFollows).Pagination

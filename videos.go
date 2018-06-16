@@ -53,12 +53,10 @@ func (c *Client) GetVideos(params *VideosParams) (*VideosResponse, error) {
 
 	videos := &VideosResponse{}
 	videos.StatusCode = resp.StatusCode
+	videos.Header = resp.Header
 	videos.Error = resp.Error
 	videos.ErrorStatus = resp.ErrorStatus
 	videos.ErrorMessage = resp.ErrorMessage
-	videos.RateLimit.Limit = resp.RateLimit.Limit
-	videos.RateLimit.Remaining = resp.RateLimit.Remaining
-	videos.RateLimit.Reset = resp.RateLimit.Reset
 	videos.Data.Videos = resp.Data.(*ManyVideos).Videos
 	videos.Data.Pagination = resp.Data.(*ManyVideos).Pagination
 

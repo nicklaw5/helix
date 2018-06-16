@@ -38,12 +38,10 @@ func (c *Client) CreateEntitlementsUploadURL(manifestID, entitlementType string)
 
 	url := &EntitlementsUploadResponse{}
 	url.StatusCode = resp.StatusCode
+	url.Header = resp.Header
 	url.Error = resp.Error
 	url.ErrorStatus = resp.ErrorStatus
 	url.ErrorMessage = resp.ErrorMessage
-	url.RateLimit.Limit = resp.RateLimit.Limit
-	url.RateLimit.Remaining = resp.RateLimit.Remaining
-	url.RateLimit.Reset = resp.RateLimit.Reset
 	url.Data.URLs = resp.Data.(*ManyEntitlementsUploadURLs).URLs
 
 	return url, nil
