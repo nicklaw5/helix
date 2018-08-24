@@ -34,6 +34,7 @@ This project is a work in progress. Twitch has not finished all available endpoi
 - [x] Get Users Follows
 - [x] Update User
 - [x] Get Videos
+- [x] Get Webhook Subscriptions
 
 ## Usage
 

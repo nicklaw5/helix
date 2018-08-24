@@ -2,7 +2,7 @@
 
 ## Usage Examples
 
-Follow the links below to their respective usage examples:
+Follow the links below to their respective API usage examples:
 
 - [Analytics](analytics_docs.md)
 - [Authentication](authentication_docs.md)
@@ -13,6 +13,7 @@ Follow the links below to their respective usage examples:
 - [Streams](streams_docs.md)
 - [Users](users_docs.md)
 - [Videos](videos_docs.md)
+- [Webhook Subscriptions](webhook_docs.md)
 
 ## Getting Started
 
