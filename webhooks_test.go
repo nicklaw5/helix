@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func GetWebhookSubscriptions(t *testing.T) {
+func TestGetWebhookSubscriptions(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -15,7 +15,7 @@ func GetWebhookSubscriptions(t *testing.T) {
 		respBody   string
 	}{
 		{
-			http.StatusBadRequest,
+			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id"},
 			2,
 			`{"error":"Unauthorized","status":401,"message":"Must provide valid app token."}`,
@@ -42,16 +42,16 @@ func GetWebhookSubscriptions(t *testing.T) {
 			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
 		}
 
-		if resp.StatusCode == http.StatusBadRequest {
-			if resp.Error != "Bad Request" {
+		if resp.StatusCode == http.StatusUnauthorized {
+			if resp.Error != "Unauthorized" {
 				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
 			}
 
-			if resp.ErrorStatus != http.StatusBadRequest {
-				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusBadRequest, resp.ErrorStatus)
+			if resp.ErrorStatus != http.StatusUnauthorized {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusUnauthorized, resp.ErrorStatus)
 			}
 
-			expectedErrMsg := "Must provide either from_id or to_id"
+			expectedErrMsg := "Must provide valid app token."
 			if resp.ErrorMessage != expectedErrMsg {
 				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
 			}
