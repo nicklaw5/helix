@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -39,6 +40,10 @@ type Client struct {
 
 	baseURL      string
 	lastResponse *Response
+
+	// Logging
+	Debug  bool
+	Logger *log.Logger
 }
 
 // Options ...
@@ -52,6 +57,9 @@ type Options struct {
 	Scopes          []string
 	HTTPClient      HTTPClient
 	RateLimitFunc   RateLimitFunc
+
+	Debug			bool
+	Logger			*log.Logger
 }
 
 // RateLimitFunc ...
@@ -108,9 +116,18 @@ func NewClient(options *Options) (*Client, error) {
 	c := &Client{
 		clientID:   options.ClientID,
 		httpClient: http.DefaultClient,
+
+		Logger: 	options.Logger,
+		Debug:		options.Debug,
 	}
 
 	// Set options
+
+	// Use the default logger, if none was set by the user.
+	if options.Logger == nil {
+		c.Logger = &log.Logger{}
+	}
+
 	if options.HTTPClient != nil {
 		c.httpClient = options.HTTPClient
 	}
@@ -151,9 +168,17 @@ func (c *Client) sendRequest(method, path string, respData, reqData interface{})
 		return nil, err
 	}
 
+	if c.Debug == true {
+		c.Logger.Printf("%+v\n", req)
+	}
+
 	err = c.doRequest(req, resp)
 	if err != nil {
 		return nil, err
+	}
+
+	if c.Debug == true {
+		c.Logger.Printf("%+v\n", resp)
 	}
 
 	return resp, nil
