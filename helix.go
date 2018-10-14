@@ -124,7 +124,7 @@ func NewClient(options *Options) (*Client, error) {
 
 	// Use the default logger, if none was set by the user.
 	if options.Logger == nil {
-		c.Logger = &log.Logger{}
+		c.logger = &log.Logger{}
 	}
 
 	if options.HTTPClient != nil {
