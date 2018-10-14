@@ -42,8 +42,8 @@ type Client struct {
 	lastResponse *Response
 
 	// Logging
-	Debug  bool
-	Logger *log.Logger
+	debug  bool
+	logger *log.Logger
 }
 
 // Options ...
@@ -117,8 +117,8 @@ func NewClient(options *Options) (*Client, error) {
 		clientID:   options.ClientID,
 		httpClient: http.DefaultClient,
 
-		Logger: 	options.Logger,
-		Debug:		options.Debug,
+		logger: 	options.Logger,
+		debug:		options.Debug,
 	}
 
 	// Set options
@@ -168,8 +168,8 @@ func (c *Client) sendRequest(method, path string, respData, reqData interface{})
 		return nil, err
 	}
 
-	if c.Debug == true {
-		c.Logger.Printf("%+v\n", req)
+	if c.debug {
+		c.logger.Printf("%+v\n", req)
 	}
 
 	err = c.doRequest(req, resp)
@@ -177,8 +177,8 @@ func (c *Client) sendRequest(method, path string, respData, reqData interface{})
 		return nil, err
 	}
 
-	if c.Debug == true {
-		c.Logger.Printf("%+v\n", resp)
+	if c.debug {
+		c.logger.Printf("%+v\n", resp)
 	}
 
 	return resp, nil
