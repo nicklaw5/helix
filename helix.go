@@ -57,7 +57,6 @@ type Options struct {
 	Scopes          []string
 	HTTPClient      HTTPClient
 	RateLimitFunc   RateLimitFunc
-
 	Debug			bool
 	Logger			*log.Logger
 }
@@ -116,7 +115,6 @@ func NewClient(options *Options) (*Client, error) {
 	c := &Client{
 		clientID:   options.ClientID,
 		httpClient: http.DefaultClient,
-
 		logger: 	options.Logger,
 		debug:		options.Debug,
 	}
