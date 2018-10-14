@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"reflect"
 	"strconv"
 	"strings"
@@ -302,11 +303,29 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			}
 		}
 
+		// Dump request on debug.
+		if c.debug {
+			bodyBytes, err := httputil.DumpRequest(req, true)
+			if err != nil {
+				return fmt.Errorf("Failed to dump API request: %s", err.Error())
+			}
+			c.logger.Println(string(bodyBytes))
+		}
+
 		response, err := c.httpClient.Do(req)
 		if err != nil {
 			return fmt.Errorf("Failed to execute API request: %s", err.Error())
 		}
 		defer response.Body.Close()
+
+		// Dump response on debug.
+		if c.debug {
+			bodyBytes, err := httputil.DumpResponse(response, true)
+			if err != nil {
+				return fmt.Errorf("Failed to dump API response: %s", err.Error())
+			}
+			c.logger.Println(string(bodyBytes))
+		}
 
 		resp.Header = response.Header
 
