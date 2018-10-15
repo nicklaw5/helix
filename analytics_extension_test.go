@@ -11,7 +11,7 @@ func TestGetExtensionAnalytics(t *testing.T) {
 	testCases := []struct {
 		statusCode     int
 		options        *Options
-		extensionID         string
+		extensionID    string
 		respBody       string
 		expectedErrMsg string
 	}{
@@ -34,7 +34,11 @@ func TestGetExtensionAnalytics(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.GetExtensionAnalytics(testCase.extensionID)
+		resp, err := c.GetExtensionAnalytics(&ExtensionAnalyticsParams{
+			ExtensionID: testCase.extensionID,
+			First:       1,
+			Type:        "overview_v1",
+		})
 		if err != nil {
 			t.Error(err)
 		}
