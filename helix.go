@@ -124,7 +124,7 @@ func NewClient(options *Options) (*Client, error) {
 
 	// Use the default logger, if none was set by the user.
 	if options.Logger == nil {
-		c.logger = &log.Logger{}
+		c.logger = log.New(os.Stdout, "Helix: ", log.LstdFlags)
 	}
 
 	if options.HTTPClient != nil {
