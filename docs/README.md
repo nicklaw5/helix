@@ -10,7 +10,6 @@ Follow the links below to their respective API usage examples:
 - [Clips](clips_docs.md)
 - [Entitlement Grants](entitlement_grants_docs.md)
 - [Games](games_docs.md)
-- [Logging](logging_docs.md)
 - [Streams](streams_docs.md)
 - [Users](users_docs.md)
 - [Videos](videos_docs.md)
