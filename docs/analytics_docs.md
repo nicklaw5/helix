@@ -33,7 +33,7 @@ if err != nil {
     // handle error
 }
 
-params := ExtensionAnalyticsParams{
+params := helix.ExtensionAnalyticsParams{
     ExtensionID: "abcd",
     Type:        "overview_v1",
 }
