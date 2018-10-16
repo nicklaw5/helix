@@ -9,6 +9,10 @@ A Twitch Helix API client written in Go (Golang).
 
 This project is a work in progress. Twitch has not finished all available endpoints/features for the Helix API, but as these get released they are likely to be implemented in this package.
 
+## Documentation & Examples
+
+All documentation and usage examples for this package can be found in the [docs directory](docs). If you are looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
+
 ## Supported Endpoints & Features
 
 **Authentication:**
@@ -79,10 +83,6 @@ ID: 18074328 Name: destiny Display Name: Destiny
 ID: 26490481 Name: summit1g Display Name: summit1g
 ID: 23161357 Name: lirik Display Name: LIRIK
 ```
-
-## Documentation & Examples
-
-All documentation and usage examples for this package can be found in the [docs directory](docs). If you are looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
 
 ## Contributions
 
