@@ -22,3 +22,26 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+## Get Extensions Analytics
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:        "your-client-id",
+    UserAccessToken: "your-user-access-token",
+})
+if err != nil {
+    // handle error
+}
+
+params := helix.ExtensionAnalyticsParams{
+    ExtensionID: "abcd",
+    Type:        "overview_v1",
+}
+
+resp, err := client.GetExtensionAnalytics(&params)
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
