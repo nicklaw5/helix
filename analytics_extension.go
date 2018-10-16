@@ -17,6 +17,7 @@ type DateRange struct {
 // ManyExtensionAnalytics ...
 type ManyExtensionAnalytics struct {
 	ExtensionAnalytics []ExtensionAnalytic `json:"data"`
+	Pagenation         string              `json:"pagenation"`
 }
 
 // ExtensionAnalyticsResponse ...
@@ -49,6 +50,6 @@ func (c *Client) GetExtensionAnalytics(params *ExtensionAnalyticsParams) (*Exten
 	users.ErrorStatus = resp.ErrorStatus
 	users.ErrorMessage = resp.ErrorMessage
 	users.Data.ExtensionAnalytics = resp.Data.(*ManyExtensionAnalytics).ExtensionAnalytics
-
+	users.Data.Pagenation = resp.Data.(*ManyExtensionAnalytics).Pagenation
 	return users, nil
 }
