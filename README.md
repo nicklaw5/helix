@@ -88,6 +88,12 @@ ID: 23161357 Name: lirik Display Name: LIRIK
 
 PRs are very much welcome. Where possible, please write tests for any code that is introduced by your PRs.
 
+## Contributors
+
+Thanks to all of the following people (ordered alphabetically) for contributing their time for improving this library:
+
+- Y.Horie ([@u5surf](https://github.com/u5surf))
+
 ## License
 
 This package is distributed under the terms of the [MIT](License) License.
