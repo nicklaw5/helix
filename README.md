@@ -40,7 +40,7 @@ All documentation and usage examples for this package can be found in the [docs 
 - [x] Get Videos
 - [x] Get Webhook Subscriptions
 
-## Usage
+## Quick Usage Example
 
 This is a quick example of how to get users. Note that you don't need to provide both a list of ids and logins, one or the other will suffice.
 
