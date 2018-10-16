@@ -17,7 +17,7 @@ type DateRange struct {
 // ManyExtensionAnalytics ...
 type ManyExtensionAnalytics struct {
 	ExtensionAnalytics []ExtensionAnalytic `json:"data"`
-	Pagenation         string              `json:"pagenation"`
+	Pagination         Pagination          `json:"pagination"`
 }
 
 // ExtensionAnalyticsResponse ...
@@ -30,8 +30,8 @@ type ExtensionAnalyticsParams struct {
 	ExtensionID string `query:"extension_id"`
 	First       int    `query:"first,20"`
 	After       string `query:"after"`
-	StartedAt   Time `query:"started_at"`
-	EndedAt     Time `query:"ended_at"`
+	StartedAt   Time   `query:"started_at"`
+	EndedAt     Time   `query:"ended_at"`
 	Type        string `query:"type"`
 }
 
@@ -50,6 +50,6 @@ func (c *Client) GetExtensionAnalytics(params *ExtensionAnalyticsParams) (*Exten
 	users.ErrorStatus = resp.ErrorStatus
 	users.ErrorMessage = resp.ErrorMessage
 	users.Data.ExtensionAnalytics = resp.Data.(*ManyExtensionAnalytics).ExtensionAnalytics
-	users.Data.Pagenation = resp.Data.(*ManyExtensionAnalytics).Pagenation
+	users.Data.Pagination = resp.Data.(*ManyExtensionAnalytics).Pagination
 	return users, nil
 }
