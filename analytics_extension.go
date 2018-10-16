@@ -5,13 +5,13 @@ type ExtensionAnalytic struct {
 	ExtensionID string    `json:"extension_id"`
 	URL         string    `json:"URL"`
 	Type        string    `json:"type"`
-	dateRange   DateRange `json:"date_range"`
+	DateRange   DateRange `json:"date_range"`
 }
 
 // DateRange ...
 type DateRange struct {
-	StartedAt string `json:"started_at"`
-	EndedAt   string `json:"ended_at"`
+	StartedAt Time `json:"started_at"`
+	EndedAt   Time `json:"ended_at"`
 }
 
 // ManyExtensionAnalytics ...
@@ -27,10 +27,10 @@ type ExtensionAnalyticsResponse struct {
 
 type ExtensionAnalyticsParams struct {
 	ExtensionID string `query:"extension_id"`
-	First       int    `query:"first"`
+	First       int    `query:"first,20"`
 	After       string `query:"after"`
-	StartedAt   string `query:"started_at"`
-	EndedAt     string `query:"ended_at"`
+	StartedAt   Time `query:"started_at"`
+	EndedAt     Time `query:"ended_at"`
 	Type        string `query:"type"`
 }
 
