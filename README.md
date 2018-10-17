@@ -9,6 +9,10 @@ A Twitch Helix API client written in Go (Golang).
 
 This project is a work in progress. Twitch has not finished all available endpoints/features for the Helix API, but as these get released they are likely to be implemented in this package.
 
+## Documentation & Examples
+
+All documentation and usage examples for this package can be found in the [docs directory](docs). If you are looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
+
 ## Supported Endpoints & Features
 
 **Authentication:**
@@ -27,6 +31,7 @@ This project is a work in progress. Twitch has not finished all available endpoi
 - [x] Create Entitlement Grants Upload URL
 - [x] Get Games
 - [x] Get Top Games
+- [x] Get Extension Analytics
 - [x] Get Game Analytics
 - [x] Get Streams
 - [x] Get Streams Metadata
@@ -36,7 +41,7 @@ This project is a work in progress. Twitch has not finished all available endpoi
 - [x] Get Videos
 - [x] Get Webhook Subscriptions
 
-## Usage
+## Quick Usage Example
 
 This is a quick example of how to get users. Note that you don't need to provide both a list of ids and logins, one or the other will suffice.
 
@@ -80,13 +85,15 @@ ID: 26490481 Name: summit1g Display Name: summit1g
 ID: 23161357 Name: lirik Display Name: LIRIK
 ```
 
-## Documentation & Examples
-
-All documentation and usage examples for this package can be found in the [docs directory](docs). If you are looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
-
 ## Contributions
 
 PRs are very much welcome. Where possible, please write tests for any code that is introduced by your PRs.
+
+## Contributors
+
+Thanks to all of the following people (ordered alphabetically) for contributing their time for improving this library:
+
+- Y.Horie ([@u5surf](https://github.com/u5surf))
 
 ## License
 
