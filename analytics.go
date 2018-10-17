@@ -3,7 +3,7 @@ package helix
 // GameAnalytic ...
 type GameAnalytic struct {
 	GameID    string    `json:"game_id"`
-	URL       string    `json:"url"`
+	URL       string    `json:"URL"`
 	Type      string    `json:"type"`
 	DateRange DateRange `json:"date_range"`
 }
@@ -20,7 +20,7 @@ type GameAnalyticsResponse struct {
 	Data ManyGameAnalytics
 }
 
-type gameAnalyticsParams struct {
+type GameAnalyticsParams struct {
 	GameID    string `query:"game_id"`
 	First     int    `query:"first,20"`
 	After     string `query:"after"`
@@ -30,11 +30,8 @@ type gameAnalyticsParams struct {
 }
 
 // GetGameAnalytics returns a URL to the downloadable CSV file
-// containing analytics data for the specified game. Valid for 1 minute.
-func (c *Client) GetGameAnalytics(gameID string) (*GameAnalyticsResponse, error) {
-	params := &gameAnalyticsParams{
-		GameID: gameID,
-	}
+// containing analytics data for the specified game. Valid for 5 minutes.
+func (c *Client) GetGameAnalytics(params *GameAnalyticsParams) (*GameAnalyticsResponse, error) {
 
 	resp, err := c.get("/analytics/games", &ManyGameAnalytics{}, params)
 	if err != nil {
