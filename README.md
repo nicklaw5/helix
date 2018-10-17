@@ -31,6 +31,7 @@ All documentation and usage examples for this package can be found in the [docs 
 - [x] Create Entitlement Grants Upload URL
 - [x] Get Games
 - [x] Get Top Games
+- [x] Get Extension Analytics
 - [x] Get Game Analytics
 - [x] Get Streams
 - [x] Get Streams Metadata
