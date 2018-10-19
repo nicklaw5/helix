@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,6 +28,7 @@ type HTTPClient interface {
 
 // Client ...
 type Client struct {
+	mu              sync.RWMutex
 	clientID        string
 	clientSecret    string
 	appAccessToken  string
@@ -312,7 +314,9 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		if c.rateLimitFunc == nil {
 			break
 		} else {
+			c.mu.Lock()
 			c.lastResponse = resp
+			c.mu.Unlock()
 
 			if c.rateLimitFunc != nil &&
 				c.lastResponse.StatusCode == http.StatusTooManyRequests {
@@ -356,25 +360,35 @@ func setResponseStatusCode(v interface{}, fieldName string, code int) {
 
 // SetAppAccessToken ...
 func (c *Client) SetAppAccessToken(accessToken string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.appAccessToken = accessToken
 }
 
 // SetUserAccessToken ...
 func (c *Client) SetUserAccessToken(accessToken string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.userAccessToken = accessToken
 }
 
 // SetUserAgent ...
 func (c *Client) SetUserAgent(userAgent string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.userAgent = userAgent
 }
 
 // SetScopes ...
 func (c *Client) SetScopes(scopes []string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.scopes = scopes
 }
 
 // SetRedirectURI ...
 func (c *Client) SetRedirectURI(uri string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.redirectURI = uri
 }
