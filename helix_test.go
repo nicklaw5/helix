@@ -23,18 +23,8 @@ func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 func newMockClient(options *Options, mockHandler http.HandlerFunc) *Client {
-	mc := &Client{}
-	mc.clientID = options.ClientID
-	mc.clientSecret = options.ClientSecret
-	mc.appAccessToken = options.AppAccessToken
-	mc.userAccessToken = options.UserAccessToken
-	mc.userAgent = options.UserAgent
-	mc.rateLimitFunc = options.RateLimitFunc
-	mc.scopes = options.Scopes
-	mc.redirectURI = options.RedirectURI
-	mc.httpClient = &mockHTTPClient{mockHandler}
-
-	return mc
+	options.HTTPClient = &mockHTTPClient{mockHandler}
+	return &Client{opts: options}
 }
 
 func newMockHandler(statusCode int, json string, headers map[string]string) http.HandlerFunc {
@@ -87,40 +77,42 @@ func TestNewClient(t *testing.T) {
 			continue
 		}
 
-		if client.clientID != testCase.options.ClientID {
-			t.Errorf("expected clientID to be \"%s\", got \"%s\"", testCase.options.ClientID, client.clientID)
+		opts := client.opts
+
+		if opts.ClientID != testCase.options.ClientID {
+			t.Errorf("expected clientID to be \"%s\", got \"%s\"", testCase.options.ClientID, opts.ClientID)
 		}
 
-		if client.clientSecret != testCase.options.ClientSecret {
-			t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", testCase.options.ClientSecret, client.clientSecret)
+		if opts.ClientSecret != testCase.options.ClientSecret {
+			t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", testCase.options.ClientSecret, opts.ClientSecret)
 		}
 
-		if reflect.TypeOf(client.rateLimitFunc).Kind() != reflect.Func {
-			t.Errorf("expected rateLimitFunc to be a function, got \"%+v\"", reflect.TypeOf(client.rateLimitFunc).Kind())
+		if reflect.TypeOf(opts.RateLimitFunc).Kind() != reflect.Func {
+			t.Errorf("expected rateLimitFunc to be a function, got \"%+v\"", reflect.TypeOf(opts.RateLimitFunc).Kind())
 		}
 
-		if client.httpClient != testCase.options.HTTPClient {
-			t.Errorf("expected httpClient to be \"%s\", got \"%s\"", testCase.options.HTTPClient, client.httpClient)
+		if opts.HTTPClient != testCase.options.HTTPClient {
+			t.Errorf("expected httpClient to be \"%s\", got \"%s\"", testCase.options.HTTPClient, opts.HTTPClient)
 		}
 
-		if client.userAgent != testCase.options.UserAgent {
-			t.Errorf("expected userAgent to be \"%s\", got \"%s\"", testCase.options.UserAgent, client.userAgent)
+		if opts.UserAgent != testCase.options.UserAgent {
+			t.Errorf("expected userAgent to be \"%s\", got \"%s\"", testCase.options.UserAgent, opts.UserAgent)
 		}
 
-		if client.appAccessToken != testCase.options.AppAccessToken {
-			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.AppAccessToken, client.appAccessToken)
+		if opts.AppAccessToken != testCase.options.AppAccessToken {
+			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.AppAccessToken, opts.AppAccessToken)
 		}
 
-		if client.userAccessToken != testCase.options.UserAccessToken {
-			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.UserAccessToken, client.userAccessToken)
+		if opts.UserAccessToken != testCase.options.UserAccessToken {
+			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.UserAccessToken, opts.UserAccessToken)
 		}
 
-		if len(client.scopes) != len(testCase.options.Scopes) {
-			t.Errorf("expected \"%d\" scopes, got \"%d\"", len(testCase.options.Scopes), len(client.scopes))
+		if len(opts.Scopes) != len(testCase.options.Scopes) {
+			t.Errorf("expected \"%d\" scopes, got \"%d\"", len(testCase.options.Scopes), len(opts.Scopes))
 		}
 
-		if client.redirectURI != testCase.options.RedirectURI {
-			t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", testCase.options.RedirectURI, client.redirectURI)
+		if opts.RedirectURI != testCase.options.RedirectURI {
+			t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", testCase.options.RedirectURI, opts.RedirectURI)
 		}
 	}
 }
@@ -135,36 +127,38 @@ func TestNewClientDefault(t *testing.T) {
 		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
 	}
 
-	if client.clientID != options.ClientID {
-		t.Errorf("expected clientID to be \"%s\", got \"%s\"", options.ClientID, client.clientID)
+	opts := client.opts
+
+	if opts.ClientID != options.ClientID {
+		t.Errorf("expected clientID to be \"%s\", got \"%s\"", options.ClientID, opts.ClientID)
 	}
 
-	if client.clientSecret != "" {
-		t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", options.ClientSecret, client.clientSecret)
+	if opts.ClientSecret != "" {
+		t.Errorf("expected clientSecret to be \"%s\", got \"%s\"", options.ClientSecret, opts.ClientSecret)
 	}
 
-	if client.userAgent != "" {
-		t.Errorf("expected userAgent to be \"%s\", got \"%s\"", "", client.userAgent)
+	if opts.UserAgent != "" {
+		t.Errorf("expected userAgent to be \"%s\", got \"%s\"", "", opts.UserAgent)
 	}
 
-	if client.userAccessToken != "" {
-		t.Errorf("expected accesstoken to be \"\", got \"%s\"", client.userAccessToken)
+	if opts.UserAccessToken != "" {
+		t.Errorf("expected accesstoken to be \"\", got \"%s\"", opts.UserAccessToken)
 	}
 
-	if client.httpClient != http.DefaultClient {
-		t.Errorf("expected httpClient to be \"%v\", got \"%v\"", http.DefaultClient, client.httpClient)
+	if opts.HTTPClient != http.DefaultClient {
+		t.Errorf("expected httpClient to be \"%v\", got \"%v\"", http.DefaultClient, opts.HTTPClient)
 	}
 
-	if client.rateLimitFunc != nil {
-		t.Errorf("expected rateLimitFunc to be \"%v\", got \"%v\"", nil, client.rateLimitFunc)
+	if opts.RateLimitFunc != nil {
+		t.Errorf("expected rateLimitFunc to be \"%v\", got \"%v\"", nil, opts.RateLimitFunc)
 	}
 
-	if len(client.scopes) != len(options.Scopes) {
-		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(options.Scopes), len(client.scopes))
+	if len(opts.Scopes) != len(options.Scopes) {
+		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(options.Scopes), len(opts.Scopes))
 	}
 
-	if client.redirectURI != options.RedirectURI {
-		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, client.redirectURI)
+	if opts.RedirectURI != options.RedirectURI {
+		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, opts.RedirectURI)
 	}
 }
 
@@ -272,8 +266,8 @@ func TestSetRequestHeaders(t *testing.T) {
 			}
 		}
 
-		if req.Header.Get("User-Agent") != client.userAgent {
-			t.Errorf("expected User-Agent header to be \"%s\", got \"%s\"", client.userAgent, req.Header.Get("User-Agent"))
+		if req.Header.Get("User-Agent") != client.opts.UserAgent {
+			t.Errorf("expected User-Agent header to be \"%s\", got \"%s\"", client.opts.UserAgent, req.Header.Get("User-Agent"))
 		}
 	}
 }
@@ -356,10 +350,15 @@ func (mtc *badMockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 func TestFailedHTTPClientDoRequest(t *testing.T) {
 	t.Parallel()
 
-	c := &Client{}
-	c.clientID = "my-client-id"
-	c.httpClient = &badMockHTTPClient{
-		newMockHandler(0, "", nil),
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+
+	c := &Client{
+		opts: options,
 	}
 
 	_, err := c.GetUsers(&UsersParams{
@@ -377,7 +376,7 @@ func TestFailedHTTPClientDoRequest(t *testing.T) {
 func TestDecodingBadJSON(t *testing.T) {
 	t.Parallel()
 
-	// Invalid JSON (missing `"d` from the beginning)
+	// Invalid JSON (missing `"` from the beginning)
 	c := newMockClient(&Options{ClientID: "my-client-id"}, newMockHandler(http.StatusOK, `data":["some":"data"]}`, nil))
 
 	_, err := c.GetUsers(&UsersParams{
@@ -406,8 +405,8 @@ func TestSetAppAccessToken(t *testing.T) {
 
 	client.SetAppAccessToken(accessToken)
 
-	if client.appAccessToken != accessToken {
-		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.appAccessToken)
+	if client.opts.AppAccessToken != accessToken {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.opts.AppAccessToken)
 	}
 }
 
@@ -425,8 +424,8 @@ func TestSetUserAccessToken(t *testing.T) {
 
 	client.SetUserAccessToken(accessToken)
 
-	if client.userAccessToken != accessToken {
-		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.userAccessToken)
+	if client.opts.UserAccessToken != accessToken {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.opts.UserAccessToken)
 	}
 }
 
@@ -443,8 +442,8 @@ func TestSetUserAgent(t *testing.T) {
 	userAgent := "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36"
 	client.SetUserAgent(userAgent)
 
-	if client.userAgent != userAgent {
-		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", userAgent, client.userAccessToken)
+	if client.opts.UserAgent != userAgent {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", userAgent, client.opts.UserAgent)
 	}
 }
 
@@ -461,8 +460,8 @@ func TestSetScopes(t *testing.T) {
 	scopes := []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"}
 	client.SetScopes(scopes)
 
-	if len(client.scopes) != len(scopes) {
-		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(scopes), len(client.scopes))
+	if len(client.opts.Scopes) != len(scopes) {
+		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(scopes), len(client.opts.Scopes))
 	}
 }
 
@@ -479,7 +478,7 @@ func TestSetRedirectURI(t *testing.T) {
 	redirectURI := "http://localhost/auth/callback"
 	client.SetRedirectURI(redirectURI)
 
-	if client.redirectURI != redirectURI {
-		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", redirectURI, client.redirectURI)
+	if client.opts.RedirectURI != redirectURI {
+		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", redirectURI, client.opts.RedirectURI)
 	}
 }
