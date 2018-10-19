@@ -28,17 +28,8 @@ type HTTPClient interface {
 
 // Client ...
 type Client struct {
-	mu              sync.RWMutex
-	clientID        string
-	clientSecret    string
-	appAccessToken  string
-	userAccessToken string
-	userAgent       string
-	redirectURI     string
-	scopes          []string
-	httpClient      HTTPClient
-	rateLimitFunc   RateLimitFunc
-
+	mu           sync.RWMutex
+	opts         *Options
 	baseURL      string
 	lastResponse *Response
 }
@@ -107,27 +98,16 @@ func NewClient(options *Options) (*Client, error) {
 		return nil, errors.New("A client ID was not provided but is required")
 	}
 
-	c := &Client{
-		clientID:   options.ClientID,
-		httpClient: http.DefaultClient,
+	if options.HTTPClient == nil {
+		options.HTTPClient = http.DefaultClient
 	}
 
-	// Set options
-	if options.HTTPClient != nil {
-		c.httpClient = options.HTTPClient
+	client := &Client{
+		opts:    options,
+		baseURL: APIBaseURL,
 	}
-	c.clientSecret = options.ClientSecret
-	c.appAccessToken = options.AppAccessToken
-	c.userAccessToken = options.UserAccessToken
-	c.userAgent = options.UserAgent
-	c.rateLimitFunc = options.RateLimitFunc
-	c.scopes = options.Scopes
-	c.redirectURI = options.RedirectURI
 
-	// Set non-options
-	c.baseURL = APIBaseURL
-
-	return c, nil
+	return client, nil
 }
 
 func (c *Client) get(path string, respData, reqData interface{}) (*Response, error) {
@@ -273,15 +253,17 @@ func (c *Client) getBaseURL(path string) string {
 func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	c.setRequestHeaders(req)
 
+	rateLimitFunc := c.opts.RateLimitFunc
+
 	for {
-		if c.lastResponse != nil && c.rateLimitFunc != nil {
-			err := c.rateLimitFunc(c.lastResponse)
+		if c.lastResponse != nil && rateLimitFunc != nil {
+			err := rateLimitFunc(c.lastResponse)
 			if err != nil {
 				return err
 			}
 		}
 
-		response, err := c.httpClient.Do(req)
+		response, err := c.opts.HTTPClient.Do(req)
 		if err != nil {
 			return fmt.Errorf("Failed to execute API request: %s", err.Error())
 		}
@@ -311,14 +293,14 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			}
 		}
 
-		if c.rateLimitFunc == nil {
+		if rateLimitFunc == nil {
 			break
 		} else {
 			c.mu.Lock()
 			c.lastResponse = resp
 			c.mu.Unlock()
 
-			if c.rateLimitFunc != nil &&
+			if rateLimitFunc != nil &&
 				c.lastResponse.StatusCode == http.StatusTooManyRequests {
 				// Rate limit exceeded, retry to send request after
 				// applying rate limiter callback
@@ -333,18 +315,20 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 }
 
 func (c *Client) setRequestHeaders(req *http.Request) {
-	req.Header.Set("Client-ID", c.clientID)
+	opts := c.opts
 
-	if c.userAgent != "" {
-		req.Header.Set("User-Agent", c.userAgent)
+	req.Header.Set("Client-ID", opts.ClientID)
+
+	if opts.UserAgent != "" {
+		req.Header.Set("User-Agent", opts.UserAgent)
 	}
 
 	var bearerToken string
-	if c.appAccessToken != "" {
-		bearerToken = c.appAccessToken
+	if opts.AppAccessToken != "" {
+		bearerToken = opts.AppAccessToken
 	}
-	if c.userAccessToken != "" {
-		bearerToken = c.userAccessToken
+	if opts.UserAccessToken != "" {
+		bearerToken = opts.UserAccessToken
 	}
 
 	if bearerToken != "" {
@@ -362,33 +346,33 @@ func setResponseStatusCode(v interface{}, fieldName string, code int) {
 func (c *Client) SetAppAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.appAccessToken = accessToken
+	c.opts.AppAccessToken = accessToken
 }
 
 // SetUserAccessToken ...
 func (c *Client) SetUserAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.userAccessToken = accessToken
+	c.opts.UserAccessToken = accessToken
 }
 
 // SetUserAgent ...
 func (c *Client) SetUserAgent(userAgent string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.userAgent = userAgent
+	c.opts.UserAgent = userAgent
 }
 
 // SetScopes ...
 func (c *Client) SetScopes(scopes []string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.scopes = scopes
+	c.opts.Scopes = scopes
 }
 
 // SetRedirectURI ...
 func (c *Client) SetRedirectURI(uri string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.redirectURI = uri
+	c.opts.RedirectURI = uri
 }

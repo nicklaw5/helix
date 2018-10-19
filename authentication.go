@@ -11,9 +11,11 @@ var authPaths = map[string]string{
 
 // GetAuthorizationURL ...
 func (c *Client) GetAuthorizationURL(state string, forceVerify bool) string {
+	opts := c.opts
+
 	url := AuthBaseURL + "/authorize?response_type=code"
-	url += "&client_id=" + c.clientID
-	url += "&redirect_uri=" + c.redirectURI
+	url += "&client_id=" + opts.ClientID
+	url += "&redirect_uri=" + opts.RedirectURI
 
 	if state != "" {
 		url += "&state=" + state
@@ -23,8 +25,8 @@ func (c *Client) GetAuthorizationURL(state string, forceVerify bool) string {
 		url += "&force_verify=true"
 	}
 
-	if len(c.scopes) > 0 {
-		url += "&scope=" + strings.Join(c.scopes, "%20")
+	if len(opts.Scopes) > 0 {
+		url += "&scope=" + strings.Join(opts.Scopes, "%20")
 	}
 
 	return url
@@ -51,10 +53,11 @@ type appAccessTokenRequestData struct {
 
 // GetAppAccessToken ...
 func (c *Client) GetAppAccessToken() (*AppAccessTokenResponse, error) {
+	opts := c.opts
 	data := &accessTokenRequestData{
-		ClientID:     c.clientID,
-		ClientSecret: c.clientSecret,
-		RedirectURI:  c.redirectURI,
+		ClientID:     opts.ClientID,
+		ClientSecret: opts.ClientSecret,
+		RedirectURI:  opts.RedirectURI,
 		GrantType:    "client_credentials",
 	}
 
@@ -98,11 +101,12 @@ type accessTokenRequestData struct {
 
 // GetUserAccessToken ...
 func (c *Client) GetUserAccessToken(code string) (*UserAccessTokenResponse, error) {
+	opts := c.opts
 	data := &accessTokenRequestData{
 		Code:         code,
-		ClientID:     c.clientID,
-		ClientSecret: c.clientSecret,
-		RedirectURI:  c.redirectURI,
+		ClientID:     opts.ClientID,
+		ClientSecret: opts.ClientSecret,
+		RedirectURI:  opts.RedirectURI,
 		GrantType:    "authorization_code",
 	}
 
@@ -142,9 +146,10 @@ type refreshTokenRequestData struct {
 // Token-expiration periods vary in length. You should build your applications
 // in such a way that they are resilient to token authentication failures.
 func (c *Client) RefreshUserAccessToken(refreshToken string) (*RefreshTokenResponse, error) {
+	opts := c.opts
 	data := &refreshTokenRequestData{
-		ClientID:     c.clientID,
-		ClientSecret: c.clientSecret,
+		ClientID:     opts.ClientID,
+		ClientSecret: opts.ClientSecret,
 		GrantType:    "refresh_token",
 		RefreshToken: refreshToken,
 	}
@@ -184,7 +189,7 @@ type revokeAccessTokenRequestData struct {
 // meaningful action a client can take after sending a bad token.
 func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenResponse, error) {
 	data := &revokeAccessTokenRequestData{
-		ClientID:    c.clientID,
+		ClientID:    c.opts.ClientID,
 		AccessToken: accessToken,
 	}
 
