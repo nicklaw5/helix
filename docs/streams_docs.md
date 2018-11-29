@@ -13,8 +13,8 @@ if err != nil {
 }
 
 resp, err := client.GetStreams(&helix.StreamsParams{
-    First: 2,
-    Language: "en",
+    First: 10,
+    Language: []string{"en"},
 })
 if err != nil {
     // handle error
