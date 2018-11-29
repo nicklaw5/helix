@@ -62,9 +62,9 @@ if err != nil {
 }
 
 fmt.Printf("Status code: %d\n", resp.StatusCode)
-fmt.Printf("Rate limit: %d\n", resp.RateLimit.Limit)
-fmt.Printf("Rate limit remaining: %d\n", resp.RateLimit.Remaining)
-fmt.Printf("Rate limit reset: %d\n\n", resp.RateLimit.Reset)
+fmt.Printf("Rate limit: %d\n", resp.GetRateLimit())
+fmt.Printf("Rate limit remaining: %d\n", resp.GetRateLimitRemaining())
+fmt.Printf("Rate limit reset: %d\n\n", resp.GetRateLimitReset())
 
 for _, user := range resp.Data.Users {
     fmt.Printf("ID: %s Name: %s\n", user.ID, user.DisplayName)
@@ -79,10 +79,10 @@ Rate limit: 30
 Rate limit remaining: 29
 Rate limit reset: 1517695315
 
-ID: 26301881 Name: sodapoppin Display Name: sodapoppin
-ID: 18074328 Name: destiny Display Name: Destiny
-ID: 26490481 Name: summit1g Display Name: summit1g
-ID: 23161357 Name: lirik Display Name: LIRIK
+ID: 26301881 Name: sodapoppin
+ID: 18074328 Name: destiny
+ID: 26490481 Name: summit1g
+ID: 23161357 Name: lirik
 ```
 
 ## Contributions
