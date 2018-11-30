@@ -70,3 +70,51 @@ func (c *Client) GetStreamMarkers(params *StreamMarkersParams) (*StreamMarkersRe
 
 	return markers, nil
 }
+
+// CreateStreamMarker ...
+type CreateStreamMarker struct {
+	ID              string `json:"id"`
+	CreatedAt       Time   `json:"created_at"`
+	Description     string `json:"description"`
+	PositionSeconds int    `json:"position_seconds"`
+}
+
+// ManyCreateStreamMarkers ...
+type ManyCreateStreamMarkers struct {
+	CreateStreamMarkers []CreateStreamMarker `json:"data"`
+}
+
+// CreateStreamMarkerResponse ...
+type CreateStreamMarkerResponse struct {
+	ResponseCommon
+	Data ManyCreateStreamMarkers
+}
+
+// CreateStreamMarkerParams ...
+type CreateStreamMarkerParams struct {
+	UserID      string `query:"user_id"`
+	Description string `query:"description"`
+}
+
+// CreateStreamMarker creates a stream marker for a live stream at the current time.
+// The user has to be the stream owner or an editor. Stream markers cannot be created
+// in some cases, see:
+// https://dev.twitch.tv/docs/api/reference/#create-stream-marker
+//
+// Required Scope: user:edit:broadcast
+func (c *Client) CreateStreamMarker(params *CreateStreamMarkerParams) (*CreateStreamMarkerResponse, error) {
+	resp, err := c.post("/streams/markers", &ManyCreateStreamMarkers{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	markers := &CreateStreamMarkerResponse{}
+	markers.StatusCode = resp.StatusCode
+	markers.Header = resp.Header
+	markers.Error = resp.Error
+	markers.ErrorStatus = resp.ErrorStatus
+	markers.ErrorMessage = resp.ErrorMessage
+	markers.Data.CreateStreamMarkers = resp.Data.(*ManyCreateStreamMarkers).CreateStreamMarkers
+
+	return markers, nil
+}

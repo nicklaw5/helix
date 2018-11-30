@@ -62,3 +62,61 @@ func TestGetStreamMarkers(t *testing.T) {
 		}
 	}
 }
+
+func TestCreateStreamMarker(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode  int
+		options     *Options
+		userID      string
+		description string
+		markerCount int
+		respBody    string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"123",
+			"a notable moment",
+			1,
+			`{"data":[{"id":"123","created_at":"2018-08-20T20:10:03Z","description":"hello, this is a marker!","position_seconds":244}]}`},
+		{
+			http.StatusForbidden,
+			&Options{ClientID: "my-client-id"},
+			"124",
+			"another notable moment",
+			0,
+			`{"error":"Forbidden","status":403,"message":"Not authorized to create a stream marker for channel test."}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.CreateStreamMarker(&CreateStreamMarkerParams{
+			UserID:      testCase.userID,
+			Description: testCase.description,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Forbidden Request Responses
+		if resp.StatusCode == http.StatusForbidden {
+			firstErrStr := "Not authorized to create a stream marker for channel test."
+			if resp.ErrorMessage != firstErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", firstErrStr, resp.ErrorMessage)
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if len(resp.Data.CreateStreamMarkers) != testCase.markerCount {
+			t.Errorf("expected \"%d\" stream markers, got \"%d\"", testCase.markerCount, len(resp.Data.CreateStreamMarkers))
+		}
+	}
+}
