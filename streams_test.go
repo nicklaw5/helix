@@ -75,7 +75,7 @@ func TestGetStreamsMetadata(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			1,
-			`{"data":[{"user_id":"43356746","game_id":"138585","overwatch":null,"hearthstone":{"broadcaster":{"hero":{"type":"Alternate hero","class":"Mage","name":"Medivh"}},"opponent":{"hero":{"type":"Classic hero","class":"Warlock","name":"Guldan"}}}}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
+			`{"data":[{"user_id":"43356746","user_name":"Amaz","game_id":"138585","overwatch":null,"hearthstone":{"broadcaster":{"hero":{"type":"Alternate hero","class":"Mage","name":"Medivh"}},"opponent":{"hero":{"type":"Classic hero","class":"Warlock","name":"Guldan"}}}}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
 			[]string{"Alternate hero", "Mage", "Medivh"},  // type, class, name
 			[]string{"Classic hero", "Warlock", "Guldan"}, // type, class, name
 			"15000",
@@ -85,7 +85,7 @@ func TestGetStreamsMetadata(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			1,
-			`{"data":[{"user_id":"132395117","game_id":"488552","overwatch":{"broadcaster":{"hero":{"role":"Support","name":"Lucio","ability":"Sonic Amplifier"}}},"hearthstone":null}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
+			`{"data":[{"user_id":"132395117","user_name":"Wraxu","game_id":"488552","overwatch":{"broadcaster":{"hero":{"role":"Support","name":"Lucio","ability":"Sonic Amplifier"}}},"hearthstone":null}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
 			[]string{"Support", "Lucio", "Sonic Amplifier"}, // role, name, ability
 			[]string{}, // N/A
 			"15000",
