@@ -90,8 +90,8 @@ type CreateStreamMarkerResponse struct {
 	Data ManyCreateStreamMarkers
 }
 
-// CreateMarkerParams ...
-type CreateMarkerParams struct {
+// CreateStreamMarkerParams ...
+type CreateStreamMarkerParams struct {
 	UserID      string `query:"user_id"`
 	Description string `query:"description"`
 }
@@ -103,7 +103,7 @@ type CreateMarkerParams struct {
 //
 // Required Scope: user:edit:broadcast
 func (c *Client) CreateStreamMarker(userID, description string) (*CreateStreamMarkerResponse, error) {
-	params := &CreateMarkerParams{
+	params := &CreateStreamMarkerParams{
 		UserID:      userID,
 		Description: description,
 	}
