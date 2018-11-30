@@ -94,7 +94,10 @@ func TestCreateStreamMarker(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.CreateStreamMarker(testCase.userID, testCase.description)
+		resp, err := c.CreateStreamMarker(&CreateStreamMarkerParams{
+			UserID:      testCase.userID,
+			Description: testCase.description,
+		})
 		if err != nil {
 			t.Error(err)
 		}

@@ -16,7 +16,10 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.CreateStreamMarker("123", "a notable moment")
+resp, err := client.CreateStreamMarker(&helix.CreateStreamMarkerParams{
+    UserId: "123",
+    Description: "a notable moment",
+})
 if err != nil {
     // handle error
 }

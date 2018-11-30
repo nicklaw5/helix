@@ -102,12 +102,7 @@ type CreateStreamMarkerParams struct {
 // https://dev.twitch.tv/docs/api/reference/#create-stream-marker
 //
 // Required Scope: user:edit:broadcast
-func (c *Client) CreateStreamMarker(userID, description string) (*CreateStreamMarkerResponse, error) {
-	params := &CreateStreamMarkerParams{
-		UserID:      userID,
-		Description: description,
-	}
-
+func (c *Client) CreateStreamMarker(params *CreateStreamMarkerParams) (*CreateStreamMarkerResponse, error) {
 	resp, err := c.post("/streams/markers", &ManyCreateStreamMarkers{}, params)
 	if err != nil {
 		return nil, err
