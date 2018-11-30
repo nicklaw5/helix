@@ -95,6 +95,7 @@ PRs are very much welcome. Where possible, please write tests for any code that 
 Thanks to all of the following people (ordered alphabetically) for contributing their time for improving this library:
 
 - Y.Horie ([@u5surf](https://github.com/u5surf))
+- Philipp Führer ([@flipkick](https://github.com/flipkick))
 
 ## License
 
