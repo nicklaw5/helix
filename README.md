@@ -35,6 +35,7 @@ All documentation and usage examples for this package can be found in the [docs 
 - [x] Get Game Analytics
 - [x] Get Streams
 - [x] Get Streams Metadata
+- [x] Create Stream Marker
 - [x] Get Stream Markers
 - [x] Get Users
 - [x] Get Users Follows
