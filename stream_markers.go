@@ -1,51 +1,37 @@
 package helix
 
-import (
-	"time"
-)
-
-// StreamMarkerAPIDetails ...
-type StreamMarkerAPIDetails struct {
-	ID              string    `json:"id"`
-	CreatedAt       time.Time `json:"created_at"`
-	Description     string    `json:"description"`
-	PositionSeconds int       `json:"position_seconds"`
-	URL             string    `json:"URL"`
+// Marker ...
+type Marker struct {
+	ID              string `json:"id"`
+	CreatedAt       Time   `json:"created_at"`
+	Description     string `json:"description"`
+	PositionSeconds int    `json:"position_seconds"`
+	URL             string `json:"URL"`
 }
 
-// StreamMarkerAPIVideo ...
-type StreamMarkerAPIVideo struct {
-	VideoID string                   `json:"video_id"`
-	Markers []StreamMarkerAPIDetails `json:"markers"`
+// VideoMarker ...
+type VideoMarker struct {
+	VideoID string   `json:"video_id"`
+	Markers []Marker `json:"markers"`
 }
 
-// StreamMarkersAPIResponseData ...
-type StreamMarkersAPIResponseData struct {
-	UserID   string                 `json:"user_id"`
-	UserName string                 `json:"user_name"`
-	Videos   []StreamMarkerAPIVideo `json:"videos"`
+// StreamMarker ...
+type StreamMarker struct {
+	UserID   string        `json:"user_id"`
+	UserName string        `json:"user_name"`
+	Videos   []VideoMarker `json:"videos"`
 }
 
-// StreamMarkersAPIResponse ...
-type StreamMarkersAPIResponse struct {
-	Data       []StreamMarkersAPIResponseData `json:"data"`
-	Pagination Pagination                     `json:"pagination"`
-}
-
-// StreamMarkersResponseData ...
-type StreamMarkersResponseData struct {
-	UserID   string                   `json:"user_id"`
-	UserName string                   `json:"user_name"`
-	VideoID  string                   `json:"video_id"`
-	Markers  []StreamMarkerAPIDetails `json:"markers"`
+// ManyStreamMarkers ...
+type ManyStreamMarkers struct {
+	StreamMarkers []StreamMarker `json:"data"`
+	Pagination    Pagination     `json:"pagination"`
 }
 
 // StreamMarkersResponse ...
 type StreamMarkersResponse struct {
 	ResponseCommon
-
-	Data       StreamMarkersResponseData
-	Pagination Pagination `json:"pagination"`
+	Data ManyStreamMarkers
 }
 
 // StreamMarkersParams requires _either_ UserID or VideoID set
@@ -68,30 +54,19 @@ type StreamMarkersParams struct {
 //
 // Required Scope: user:read:broadcast
 func (c *Client) GetStreamMarkers(params *StreamMarkersParams) (*StreamMarkersResponse, error) {
-	apiResponse := &StreamMarkersAPIResponse{}
-	resp, err := c.get("/streams/markers", apiResponse, params)
+	resp, err := c.get("/streams/markers", &ManyStreamMarkers{}, params)
 	if err != nil {
 		return nil, err
 	}
 
-	responseData := StreamMarkersResponseData{}
-	if len(apiResponse.Data) > 0 {
-		responseData.UserID = apiResponse.Data[0].UserID
-		responseData.UserName = apiResponse.Data[0].UserName
-		responseData.VideoID = apiResponse.Data[0].Videos[0].VideoID
-		responseData.Markers = apiResponse.Data[0].Videos[0].Markers
-	}
+	markers := &StreamMarkersResponse{}
+	markers.StatusCode = resp.StatusCode
+	markers.Header = resp.Header
+	markers.Error = resp.Error
+	markers.ErrorStatus = resp.ErrorStatus
+	markers.ErrorMessage = resp.ErrorMessage
+	markers.Data.StreamMarkers = resp.Data.(*ManyStreamMarkers).StreamMarkers
+	markers.Data.Pagination = resp.Data.(*ManyStreamMarkers).Pagination
 
-	streamMarkers := &StreamMarkersResponse{
-		Data: responseData,
-		ResponseCommon: ResponseCommon{
-			StatusCode:   resp.StatusCode,
-			Header:       resp.Header,
-			Error:        resp.Error,
-			ErrorStatus:  resp.ErrorStatus,
-			ErrorMessage: resp.ErrorMessage,
-		},
-	}
-
-	return streamMarkers, nil
+	return markers, nil
 }
