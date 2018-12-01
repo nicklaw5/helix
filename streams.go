@@ -99,6 +99,7 @@ type OverwatchMetadata struct {
 // StreamMetadata ...
 type StreamMetadata struct {
 	UserID      string              `json:"user_id"`
+	UserName    string              `json:"user_name"`
 	GameID      string              `json:"game_id"`
 	Hearthstone HearthstoneMetadata `json:"hearthstone"`
 	Overwatch   OverwatchMetadata   `json:"overwatch"`
