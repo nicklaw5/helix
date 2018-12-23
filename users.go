@@ -83,7 +83,9 @@ func (c *Client) UpdateUser(description string) (*UsersResponse, error) {
 // UserFollow ...
 type UserFollow struct {
 	FromID     string    `json:"from_id"`
+	FromName   string    `json:"from_name"`
 	ToID       string    `json:"to_id"`
+	ToName     string    `json:"to_name"`
 	FollowedAt time.Time `json:"followed_at"`
 }
 
