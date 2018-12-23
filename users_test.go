@@ -156,7 +156,7 @@ func TestGetUsersFollows(t *testing.T) {
 			&Options{ClientID: "my-client-id"},
 			"23161357",
 			2,
-			`{"total":89,"data":[{"from_id":"23161357","to_id":"23528098","followed_at":"2017-10-01T03:57:21Z"},{"from_id":"23161357","to_id":"127506955","followed_at":"2017-08-23T15:04:20Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjoiMTUwMzUwMDY2MDYwNzAyNTAwMCJ9"}}`,
+			`{"total":89,"data":[{"from_id":"23161357","from_name":"lirik","to_id":"23528098","to_name":"avoidingthepuddle","followed_at":"2017-10-01T03:57:21Z"},{"from_id":"23161357","from_name":"lirik","to_id":"127506955","to_name":"playbattlegrounds","followed_at":"2017-08-23T15:04:20Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjoiMTUwMzUwMDY2MDYwNzAyNTAwMCJ9"}}`,
 		},
 	}
 
