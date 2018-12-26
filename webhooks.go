@@ -27,7 +27,7 @@ type WebhookSubscriptionsParams struct {
 }
 
 // GetWebhookSubscriptions gets webhook subscriptions, in order of expiration.
-// Require app access token.
+// Requires an app access token.
 func (c *Client) GetWebhookSubscriptions(params *WebhookSubscriptionsParams) (*WebhookSubscriptionsResponse, error) {
 	resp, err := c.get("/webhooks/subscriptions", &ManyWebhookSubscriptions{}, params)
 	if err != nil {
@@ -45,4 +45,35 @@ func (c *Client) GetWebhookSubscriptions(params *WebhookSubscriptionsParams) (*W
 	webhooks.Data.Pagination = resp.Data.(*ManyWebhookSubscriptions).Pagination
 
 	return webhooks, nil
+}
+
+// WebhookSubscriptionResponse ...
+type WebhookSubscriptionResponse struct {
+	ResponseCommon
+}
+
+// WebhookSubscriptionPayload ...
+type WebhookSubscriptionPayload struct {
+	Mode         string `json:"hub.mode"`
+	Topic        string `json:"hub.topic"`
+	Callback     string `json:"hub.callback"`
+	LeaseSeconds int    `json:"hub.lease_seconds,omitempty"`
+	Secret       string `json:"secret,omitempty"`
+}
+
+// PostWebhookSubscription ...
+func (c *Client) PostWebhookSubscription(payload *WebhookSubscriptionPayload) (*WebhookSubscriptionResponse, error) {
+	resp, err := c.post("/webhooks/hub", nil, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	webhook := &WebhookSubscriptionResponse{}
+	webhook.StatusCode = resp.StatusCode
+	webhook.Header = resp.Header
+	webhook.Error = resp.Error
+	webhook.ErrorStatus = resp.ErrorStatus
+	webhook.ErrorMessage = resp.ErrorMessage
+
+	return webhook, nil
 }

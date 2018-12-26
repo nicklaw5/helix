@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -223,19 +224,50 @@ func isZero(v interface{}) (bool, error) {
 func (c *Client) newRequest(method, path string, data interface{}) (*http.Request, error) {
 	url := c.getBaseURL(path) + path
 
+	// We want to send Webhook POST request data in JSON form.
+	// So here we determine if data is of type `WebhookSubscriptionPayload`.
+	_, ok := data.(*WebhookSubscriptionPayload)
+	if ok {
+		return c.newJSONRequest(method, url, data)
+	}
+
+	return c.newStandardRequest(method, url, data)
+}
+
+func (c *Client) newStandardRequest(method, url string, data interface{}) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	if data != nil {
-		query, err := buildQueryString(req, data)
-		if err != nil {
-			return nil, err
-		}
-
-		req.URL.RawQuery = query
+	if data == nil {
+		return req, nil
 	}
+
+	query, err := buildQueryString(req, data)
+	if err != nil {
+		return nil, err
+	}
+
+	req.URL.RawQuery = query
+
+	return req, nil
+}
+
+func (c *Client) newJSONRequest(method, url string, data interface{}) (*http.Request, error) {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := bytes.NewBuffer(b)
+
+	req, err := http.NewRequest(method, url, buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
 
 	return req, nil
 }
