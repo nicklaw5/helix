@@ -79,8 +79,12 @@ func (ccr *CreateClipResponse) GetClipsCreationRateLimitRemaining() int {
 	return ccr.convertHeaderToInt(ccr.Header.Get("Ratelimit-Helixclipscreation-Remaining"))
 }
 
-type createClipRequestParams struct {
+// CreateClipParams ...
+type CreateClipParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
+
+	// Optional
+	HasDelay bool `query:"has_delay,false"`
 }
 
 // CreateClip creates a clip programmatically. This returns both an ID and
@@ -91,11 +95,7 @@ type createClipRequestParams struct {
 // clip was not created and retry Create Clip.
 //
 // Required scope: clips:edit
-func (c *Client) CreateClip(broadcasterID string) (*CreateClipResponse, error) {
-	params := &createClipRequestParams{
-		BroadcasterID: broadcasterID,
-	}
-
+func (c *Client) CreateClip(params *CreateClipParams) (*CreateClipResponse, error) {
 	resp, err := c.post("/clips", &ManyClipEditURLs{}, params)
 	if err != nil {
 		return nil, err

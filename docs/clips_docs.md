@@ -35,9 +35,10 @@ if err != nil {
     // handle error
 }
 
-broadcasterID := "26490481" // summit1g
-
-resp, err := client.CreateClip(broadcasterID)
+resp, err := client.CreateClip(&helix.CreateClipParams{
+    BroadcasterID: "26490481", // summit1g
+    HasDelay: true, // optional, defaults to false
+})
 if err != nil {
     // handle error
 }

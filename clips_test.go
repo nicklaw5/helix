@@ -70,7 +70,7 @@ func TestCreateClip(t *testing.T) {
 	testCases := []struct {
 		statusCode      int
 		options         *Options
-		broadcasterID   string
+		params          *CreateClipParams
 		respBody        string
 		headerLimit     string
 		headerRemaining string
@@ -78,7 +78,7 @@ func TestCreateClip(t *testing.T) {
 		{
 			http.StatusAccepted,
 			&Options{ClientID: "my-client-id"},
-			"26490481", // summit1g
+			&CreateClipParams{BroadcasterID: "26490481"}, // summit1g
 			`{"data":[{"id":"IronicHedonisticOryxSquadGoals","edit_url":"https://clips.twitch.tv/IronicHedonisticOryxSquadGoals/edit"}]}`,
 			"600",
 			"598",
@@ -86,7 +86,7 @@ func TestCreateClip(t *testing.T) {
 		{
 			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id"},
-			"26490481", // summit1g
+			&CreateClipParams{BroadcasterID: "26490481"},                                 // summit1g
 			`{"error":"Unauthorized","status":401,"message":"Missing clips:edit scope"}`, // missing required scope
 			"600",
 			"597",
@@ -101,7 +101,7 @@ func TestCreateClip(t *testing.T) {
 
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, mockRespHeaders))
 
-		resp, err := c.CreateClip(testCase.broadcasterID)
+		resp, err := c.CreateClip(testCase.params)
 		if err != nil {
 			t.Error(err)
 		}
