@@ -48,6 +48,12 @@ type Options struct {
 	RateLimitFunc   RateLimitFunc
 }
 
+// DateRange is a generic struct used by various responses.
+type DateRange struct {
+	StartedAt Time `json:"started_at"`
+	EndedAt   Time `json:"ended_at"`
+}
+
 // RateLimitFunc ...
 type RateLimitFunc func(*Response) error
 

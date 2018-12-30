@@ -10,16 +10,10 @@ type UserBitTotal struct {
 	Score    int    `json:"score"`
 }
 
-// BitsDateRange ...
-type BitsDateRange struct {
-	StartedAt Time `json:"started_at"`
-	EndedAt   Time `json:"ended_at"`
-}
-
 // ManyUserBitTotals ...
 type ManyUserBitTotals struct {
 	Total         int            `json:"total"`
-	DateRange     BitsDateRange  `json:"date_range"`
+	DateRange     DateRange      `json:"date_range"`
 	UserBitTotals []UserBitTotal `json:"data"`
 }
 

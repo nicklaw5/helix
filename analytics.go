@@ -8,12 +8,6 @@ type ExtensionAnalytic struct {
 	DateRange   DateRange `json:"date_range"`
 }
 
-// DateRange ...
-type DateRange struct {
-	StartedAt Time `json:"started_at"`
-	EndedAt   Time `json:"ended_at"`
-}
-
 // ManyExtensionAnalytics ...
 type ManyExtensionAnalytics struct {
 	ExtensionAnalytics []ExtensionAnalytic `json:"data"`
