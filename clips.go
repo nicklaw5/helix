@@ -2,23 +2,26 @@ package helix
 
 // Clip ...
 type Clip struct {
-	ID            string `json:"id"`
-	URL           string `json:"url"`
-	EmbedURL      string `json:"embed_url"`
-	BroadcasterID string `json:"broadcaster_id"`
-	CreatorID     string `json:"creator_id"`
-	VideoID       string `json:"video_id"`
-	GameID        string `json:"game_id"`
-	Language      string `json:"language"`
-	Title         string `json:"title"`
-	ViewCount     int    `json:"view_count"`
-	CreatedAt     string `json:"created_at"`
-	ThumbnailURL  string `json:"thumbnail_url"`
+	ID              string `json:"id"`
+	URL             string `json:"url"`
+	EmbedURL        string `json:"embed_url"`
+	BroadcasterID   string `json:"broadcaster_id"`
+	BroadcasterName string `json:"broadcaster_name"`
+	CreatorID       string `json:"creator_id"`
+	CreatorName     string `json:"creator_name"`
+	VideoID         string `json:"video_id"`
+	GameID          string `json:"game_id"`
+	Language        string `json:"language"`
+	Title           string `json:"title"`
+	ViewCount       int    `json:"view_count"`
+	CreatedAt       string `json:"created_at"`
+	ThumbnailURL    string `json:"thumbnail_url"`
 }
 
 // ManyClips ...
 type ManyClips struct {
-	Clips []Clip `json:"data"`
+	Clips      []Clip     `json:"data"`
+	Pagination Pagination `json:"pagination"`
 }
 
 // ClipsResponse ...
@@ -29,7 +32,17 @@ type ClipsResponse struct {
 
 // ClipsParams ...
 type ClipsParams struct {
-	IDs []string `query:"id"` // Limit 1
+	// One of the below
+	BroadcasterID string   `query:"broadcaster_id"`
+	GameID        string   `query:"game_id"`
+	IDs           []string `query:"id"` // Limit 100
+
+	// Optional
+	First     int    `query:"first,20"` // Maximum 100
+	After     string `query:"after"`
+	Before    string `query:"before"`
+	StartedAt Time   `query:"started_at"`
+	EndedAt   Time   `query:"ended_at"`
 }
 
 // GetClips returns information about a specified clip.
@@ -46,6 +59,7 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	clips.ErrorStatus = resp.ErrorStatus
 	clips.ErrorMessage = resp.ErrorMessage
 	clips.Data.Clips = resp.Data.(*ManyClips).Clips
+	clips.Data.Pagination = resp.Data.(*ManyClips).Pagination
 
 	return clips, nil
 }
