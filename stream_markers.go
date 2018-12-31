@@ -92,7 +92,9 @@ type CreateStreamMarkerResponse struct {
 
 // CreateStreamMarkerParams ...
 type CreateStreamMarkerParams struct {
-	UserID      string `query:"user_id"`
+	UserID string `query:"user_id"`
+
+	// Optional
 	Description string `query:"description"`
 }
 

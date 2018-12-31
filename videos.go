@@ -26,16 +26,18 @@ type ManyVideos struct {
 
 // VideosParams ...
 type VideosParams struct {
-	IDs      []string `query:"id"`      // Limit 100
-	UserID   string   `query:"user_id"` // Limit 1
-	GameID   string   `query:"game_id"` // Limit 1
-	After    string   `query:"after"`
-	Before   string   `query:"before"`
-	First    int      `query:"first,20"`   // Limit 100
-	Language string   `query:"language"`   // Limit 1
-	Period   string   `query:"period,all"` // "all" (default), "day", "month", and "week"
-	Sort     string   `query:"sort,time"`  // "time" (default), "trending", and "views"
-	Type     string   `query:"type,all"`   // "all" (default), "upload", "archive", and "highlight"
+	IDs    []string `query:"id"`      // Limit 100
+	UserID string   `query:"user_id"` // Limit 1
+	GameID string   `query:"game_id"` // Limit 1
+
+	// Optional
+	After    string `query:"after"`
+	Before   string `query:"before"`
+	First    int    `query:"first,20"`   // Limit 100
+	Language string `query:"language"`   // Limit 1
+	Period   string `query:"period,all"` // "all" (default), "day", "month", and "week"
+	Sort     string `query:"sort,time"`  // "time" (default), "trending", and "views"
+	Type     string `query:"type,all"`   // "all" (default), "upload", "archive", and "highlight"
 }
 
 // VideosResponse ...

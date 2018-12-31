@@ -33,7 +33,11 @@ type UsersParams struct {
 	Logins []string `query:"login"` // Limit 100
 }
 
-// GetUsers ...
+// GetUsers gets information about one or more specified Twitch users.
+// Users are identified by optional user IDs and/or login name. If neither
+// a user ID nor a login name is specified, the user is looked up by Bearer token.
+//
+// Optional scope: user:read:email
 func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	resp, err := c.get("/users", &ManyUsers{}, params)
 	if err != nil {
@@ -51,7 +55,8 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	return users, nil
 }
 
-type updateUserRequestData struct {
+// UpdateUserParams ...
+type UpdateUserParams struct {
 	Description string `query:"description"`
 }
 
@@ -59,12 +64,8 @@ type updateUserRequestData struct {
 // by a Bearer token.
 //
 // Required scope: user:edit
-func (c *Client) UpdateUser(description string) (*UsersResponse, error) {
-	data := &updateUserRequestData{
-		Description: description,
-	}
-
-	resp, err := c.put("/users", &ManyUsers{}, data)
+func (c *Client) UpdateUser(params *UpdateUserParams) (*UsersResponse, error) {
+	resp, err := c.put("/users", &ManyUsers{}, params)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +106,6 @@ type UsersFollowsResponse struct {
 // UsersFollowsParams ...
 type UsersFollowsParams struct {
 	After  string `query:"after"`
-	Before string `query:"before"`
 	First  int    `query:"first,20"` // Limit 100
 	FromID string `query:"from_id"`
 	ToID   string `query:"to_id"`

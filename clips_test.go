@@ -11,29 +11,45 @@ func TestGetClips(t *testing.T) {
 	testCases := []struct {
 		statusCode int
 		options    *Options
-		slug       string
+		params     *ClipsParams
 		respBody   string
 	}{
 		{
-			http.StatusOK,
-			&Options{ClientID: "my-client-id"},
-			"EncouragingPluckySlothSSSsss",
-			`{"data":[{"id":"EncouragingPluckySlothSSSsss","url":"https://clips.twitch.tv/EncouragingPluckySlothSSSsss","embed_url":"https://clips.twitch.tv/embed?clip=EncouragingPluckySlothSSSsss","broadcaster_id":"26490481","creator_id":"143839181","video_id":"222004532","game_id":"490377","language":"en","title":"summit and fat tim discover how to use maps","view_count":81808,"created_at":"2018-01-25T04:04:15Z","thumbnail_url":"https://clips-media-assets.twitch.tv/182509178-preview-480x272.jpg"}]}`,
+			http.StatusUnauthorized,
+			&Options{ClientID: "invalid-client-id"}, // invalid client id
+			&ClipsParams{IDs: []string{"EncouragingPluckySlothSSSsss"}},
+			`{"error":"Unauthorized","status":401,"message":"Must provide a valid Client-ID or OAuth token"}`,
 		},
 		{
-			http.StatusNotFound,
+			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			"bad-slug",
-			`{"error":"Not Found","status":404,"message":"clip not found"}`,
+			&ClipsParams{IDs: []string{"bad-id"}}, // invalid clip id
+			`{"data":[],"pagination":{}}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&ClipsParams{BroadcasterID: "bad-broadcaster-id"}, // invalid broadcaster id
+			`{"data":[],"pagination":{}}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&ClipsParams{GameID: "bad-game-id"}, // invalid game id
+			`{"data":[],"pagination":{}}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&ClipsParams{IDs: []string{"EncouragingPluckySlothSSSsss"}}, // valid clip id
+			`{"data":[{"id":"EncouragingPluckySlothSSSsss","url":"https://clips.twitch.tv/EncouragingPluckySlothSSSsss","embed_url":"https://clips.twitch.tv/embed?clip=EncouragingPluckySlothSSSsss","broadcaster_id":"26490481","broadcaster_name":"summit1g","creator_id":"143839181","creator_name":"nB00ts","video_id":"","game_id":"490377","language":"en","title":"summit and fat tim discover how to use maps","view_count":91876,"created_at":"2018-01-25T04:04:15Z","thumbnail_url":"https://clips-media-assets2.twitch.tv/182509178-preview-480x272.jpg"}],"pagination":{}}`,
 		},
 	}
 
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.GetClips(&ClipsParams{
-			IDs: []string{testCase.slug},
-		})
+		resp, err := c.GetClips(testCase.params)
 		if err != nil {
 			t.Error(err)
 		}
@@ -42,24 +58,25 @@ func TestGetClips(t *testing.T) {
 			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
 		}
 
-		if testCase.statusCode == http.StatusNotFound {
-			if resp.Error != "Not Found" {
-				t.Errorf("expected error to be \"%s\", got \"%s\"", "Not Found", resp.Error)
+		if testCase.statusCode == http.StatusUnauthorized {
+			if resp.Error != "Unauthorized" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Unauthorized", resp.Error)
 			}
 
 			if resp.ErrorStatus != testCase.statusCode {
 				t.Errorf("expected error status to be %d, got %d", testCase.statusCode, resp.ErrorStatus)
 			}
 
-			if resp.ErrorMessage != "clip not found" {
-				t.Errorf("expected error message to be \"%s\", got \"%s\"", "clip not found", resp.ErrorMessage)
+			errMsg := "Must provide a valid Client-ID or OAuth token"
+			if resp.ErrorMessage != errMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", errMsg, resp.ErrorMessage)
 			}
 
 			continue
 		}
 
-		if resp.Data.Clips[0].ID != testCase.slug {
-			t.Errorf("expected clip id to be \"%s\", got \"%s\"", testCase.slug, resp.Data.Clips[0].ID)
+		if len(resp.Data.Clips) != 0 && resp.Data.Clips[0].ID != testCase.params.IDs[0] {
+			t.Errorf("expected clip id to be \"%s\", got \"%s\"", testCase.params.IDs[0], resp.Data.Clips[0].ID)
 		}
 	}
 }
@@ -70,7 +87,7 @@ func TestCreateClip(t *testing.T) {
 	testCases := []struct {
 		statusCode      int
 		options         *Options
-		broadcasterID   string
+		params          *CreateClipParams
 		respBody        string
 		headerLimit     string
 		headerRemaining string
@@ -78,7 +95,7 @@ func TestCreateClip(t *testing.T) {
 		{
 			http.StatusAccepted,
 			&Options{ClientID: "my-client-id"},
-			"26490481", // summit1g
+			&CreateClipParams{BroadcasterID: "26490481"}, // summit1g
 			`{"data":[{"id":"IronicHedonisticOryxSquadGoals","edit_url":"https://clips.twitch.tv/IronicHedonisticOryxSquadGoals/edit"}]}`,
 			"600",
 			"598",
@@ -86,7 +103,7 @@ func TestCreateClip(t *testing.T) {
 		{
 			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id"},
-			"26490481", // summit1g
+			&CreateClipParams{BroadcasterID: "26490481"},                                 // summit1g
 			`{"error":"Unauthorized","status":401,"message":"Missing clips:edit scope"}`, // missing required scope
 			"600",
 			"597",
@@ -101,7 +118,7 @@ func TestCreateClip(t *testing.T) {
 
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, mockRespHeaders))
 
-		resp, err := c.CreateClip(testCase.broadcasterID)
+		resp, err := c.CreateClip(testCase.params)
 		if err != nil {
 			t.Error(err)
 		}

@@ -102,7 +102,9 @@ func TestUpdateUser(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.UpdateUser(testCase.description)
+		resp, err := c.UpdateUser(&UpdateUserParams{
+			Description: testCase.description,
+		})
 		if err != nil {
 			t.Error(err)
 		}
