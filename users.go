@@ -51,7 +51,8 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	return users, nil
 }
 
-type updateUserRequestData struct {
+// UpdateUserParams ...
+type UpdateUserParams struct {
 	Description string `query:"description"`
 }
 
@@ -59,12 +60,8 @@ type updateUserRequestData struct {
 // by a Bearer token.
 //
 // Required scope: user:edit
-func (c *Client) UpdateUser(description string) (*UsersResponse, error) {
-	data := &updateUserRequestData{
-		Description: description,
-	}
-
-	resp, err := c.put("/users", &ManyUsers{}, data)
+func (c *Client) UpdateUser(params *UpdateUserParams) (*UsersResponse, error) {
+	resp, err := c.put("/users", &ManyUsers{}, params)
 	if err != nil {
 		return nil, err
 	}

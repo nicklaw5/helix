@@ -36,9 +36,9 @@ if err != nil {
     // handle error
 }
 
-description := "new description"
-
-resp, err := client.UpdateUser(description)
+resp, err := client.UpdateUser(&UpdateUserParams{
+  Description: "New description",
+})
 if err != nil {
     // handle error
 }
