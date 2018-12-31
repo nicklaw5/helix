@@ -33,7 +33,11 @@ type UsersParams struct {
 	Logins []string `query:"login"` // Limit 100
 }
 
-// GetUsers ...
+// GetUsers gets information about one or more specified Twitch users.
+// Users are identified by optional user IDs and/or login name. If neither
+// a user ID nor a login name is specified, the user is looked up by Bearer token.
+//
+// Optional scope: user:read:email
 func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	resp, err := c.get("/users", &ManyUsers{}, params)
 	if err != nil {
@@ -102,7 +106,6 @@ type UsersFollowsResponse struct {
 // UsersFollowsParams ...
 type UsersFollowsParams struct {
 	After  string `query:"after"`
-	Before string `query:"before"`
 	First  int    `query:"first,20"` // Limit 100
 	FromID string `query:"from_id"`
 	ToID   string `query:"to_id"`
