@@ -63,7 +63,7 @@ type WebhookSubscriptionPayload struct {
 	Topic        string `json:"hub.topic"`
 	Callback     string `json:"hub.callback"`
 	LeaseSeconds int    `json:"hub.lease_seconds,omitempty"`
-	Secret       string `json:"secret,omitempty"`
+	Secret       string `json:"hub.secret,omitempty"`
 }
 
 // PostWebhookSubscription ...
