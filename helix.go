@@ -186,17 +186,19 @@ func buildQueryString(req *http.Request, v interface{}) (string, error) {
 			// Get and correctly format datetime fields, and attach them query params
 			dateStr := fmt.Sprintf("%v", vValue.Field(i))
 
-			if strings.Contains(dateStr, " m=-") {
-				datetimeSplit := strings.Split(dateStr, " m=-")
-				date, err := time.Parse(requestDateTimeFormat, datetimeSplit[0])
-				if err != nil {
-					return "", err
-				}
+			if strings.Contains(dateStr, " m=") {
+				datetimeSplit := strings.Split(dateStr, " m=")
+				dateStr = datetimeSplit[0]
+			}
 
-				// Determine if the date has been set. If it has we'll add it to the query.
-				if !date.IsZero() {
-					query.Add(tag, date.Format(time.RFC3339))
-				}
+			date, err := time.Parse(requestDateTimeFormat, dateStr)
+			if err != nil {
+				return "", err
+			}
+
+			// Determine if the date has been set. If it has we'll add it to the query.
+			if !date.IsZero() {
+				query.Add(tag, date.Format(time.RFC3339))
 			}
 		} else {
 			// Add any scalar values as query params
