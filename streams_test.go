@@ -19,7 +19,7 @@ func TestGetStreams(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			2,
-			`{"data":[{"id":"27833742640","user_id":"19571641","user_name":"Ninja","game_id":"33214","community_ids":[],"type":"live","title":"I have lost my voice D: | twitter.com/Ninja","viewer_count":72124,"started_at":"2018-03-06T15:07:45Z","language":"en","thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_ninja-{width}x{height}.jpg"},{"id":"27834185424","user_id":"17337557","user_name":"DrDisrespect","game_id":"33214","community_ids":[],"type":"live","title":"Turbo Treehouses || @DrDisRespect","viewer_count":29687,"started_at":"2018-03-06T16:05:00Z","language":"en","thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_drdisrespectlive-{width}x{height}.jpg"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6Mn19"}}`,
+			`{"data":[{"id":"27833742640","user_id":"19571641","user_name":"Ninja","game_id":"33214","tag_ids":[],"type":"live","title":"I have lost my voice D: | twitter.com/Ninja","viewer_count":72124,"started_at":"2018-03-06T15:07:45Z","language":"en","thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_ninja-{width}x{height}.jpg"},{"id":"27834185424","user_id":"17337557","user_name":"DrDisrespect","game_id":"33214","tag_ids":[],"type":"live","title":"Turbo Treehouses || @DrDisRespect","viewer_count":29687,"started_at":"2018-03-06T16:05:00Z","language":"en","thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_drdisrespectlive-{width}x{height}.jpg"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6Mn19"}}`,
 		},
 		{
 			http.StatusBadRequest,
