@@ -213,19 +213,17 @@ func buildQueryString(req *http.Request, v interface{}) (string, error) {
 			// Get and correctly format datetime fields, and attach them query params
 			dateStr := fmt.Sprintf("%v", vValue.Field(i))
 
-			if strings.Contains(dateStr, " m=") {
-				datetimeSplit := strings.Split(dateStr, " m=")
-				dateStr = datetimeSplit[0]
-			}
+			if strings.Contains(dateStr, " m=-") {
+				datetimeSplit := strings.Split(dateStr, " m=-")
+				date, err := time.Parse(requestDateTimeFormat, datetimeSplit[0])
+				if err != nil {
+					return "", err
+				}
 
-			date, err := time.Parse(requestDateTimeFormat, dateStr)
-			if err != nil {
-				return "", err
-			}
-
-			// Determine if the date has been set. If it has we'll add it to the query.
-			if !date.IsZero() {
-				query.Add(tag, date.Format(time.RFC3339))
+				// Determine if the date has been set. If it has we'll add it to the query.
+				if !date.IsZero() {
+					query.Add(tag, date.Format(time.RFC3339))
+				}
 			}
 		} else {
 			// Add any scalar values as query params
@@ -334,11 +332,27 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			}
 		}
 
+		// dumpReq, err := httputil.DumpRequest(req, true)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// fmt.Printf("%+v\n", string(dumpReq))
+		// os.Exit(0)
+		// fmt.Println()
+
 		response, err := c.opts.HTTPClient.Do(req)
 		if err != nil {
 			return fmt.Errorf("Failed to execute API request: %s", err.Error())
 		}
 		defer response.Body.Close()
+
+		// dumpResp, err := httputil.DumpResponse(response, true)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// fmt.Printf("%+v\n", string(dumpResp))
+		// os.Exit(0)
+		// fmt.Println()
 
 		resp.Header = response.Header
 
