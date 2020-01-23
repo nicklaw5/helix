@@ -30,6 +30,8 @@ type BannedUsersParams struct {
 }
 
 // GetBannedUsers returns all banned and timed-out users in a channel.
+//
+// Required scope: moderation:read
 func (c *Client) GetBannedUsers(params *BannedUsersParams) (*BannedUsersResponse, error) {
 	resp, err := c.get("/moderation/banned", &ManyBans{}, params)
 	if err != nil {
