@@ -5,7 +5,7 @@ package helix
 type Ban struct {
 	UserID    string `json:"user_id"`
 	UserName  string `json:"user_name"`
-	ExpiresAt string `json:"expires_at"`
+	ExpiresAt Time   `json:"expires_at"`
 }
 
 // ManyBans ...
