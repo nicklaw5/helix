@@ -64,7 +64,7 @@ type WebhookSubscriptionPayload struct {
 
 // PostWebhookSubscription ...
 func (c *Client) PostWebhookSubscription(payload *WebhookSubscriptionPayload) (*WebhookSubscriptionResponse, error) {
-	resp, err := c.post("/webhooks/hub", nil, payload)
+	resp, err := c.postAsJSON("/webhooks/hub", nil, payload)
 	if err != nil {
 		return nil, err
 	}

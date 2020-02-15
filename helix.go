@@ -127,24 +127,32 @@ func NewClient(options *Options) (*Client, error) {
 }
 
 func (c *Client) get(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodGet, path, respData, reqData)
+	return c.sendRequest(http.MethodGet, path, respData, reqData, false)
 }
 
 func (c *Client) post(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodPost, path, respData, reqData)
+	return c.sendRequest(http.MethodPost, path, respData, reqData, false)
 }
 
 func (c *Client) put(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodPut, path, respData, reqData)
+	return c.sendRequest(http.MethodPut, path, respData, reqData, false)
 }
 
-func (c *Client) sendRequest(method, path string, respData, reqData interface{}) (*Response, error) {
+func (c *Client) postAsJSON(path string, respData, reqData interface{}) (*Response, error) {
+	return c.sendRequest(http.MethodPost, path, respData, reqData, true)
+}
+
+func (c *Client) putAsJSON(path string, respData, reqData interface{}) (*Response, error) {
+	return c.sendRequest(http.MethodPut, path, respData, reqData, true)
+}
+
+func (c *Client) sendRequest(method, path string, respData, reqData interface{}, hasJSONBody bool) (*Response, error) {
 	resp := &Response{}
 	if respData != nil {
 		resp.Data = respData
 	}
 
-	req, err := c.newRequest(method, path, reqData)
+	req, err := c.newRequest(method, path, reqData, hasJSONBody)
 	if err != nil {
 		return nil, err
 	}
@@ -238,13 +246,10 @@ func isZero(v interface{}) (bool, error) {
 	return v == reflect.Zero(t).Interface(), nil
 }
 
-func (c *Client) newRequest(method, path string, data interface{}) (*http.Request, error) {
+func (c *Client) newRequest(method, path string, data interface{}, hasJSONBody bool) (*http.Request, error) {
 	url := c.getBaseURL(path) + path
 
-	// We want to send Webhook POST request data in JSON form.
-	// So here we determine if data is of type `WebhookSubscriptionPayload`.
-	_, ok := data.(*WebhookSubscriptionPayload)
-	if ok {
+	if hasJSONBody {
 		return c.newJSONRequest(method, url, data)
 	}
 
