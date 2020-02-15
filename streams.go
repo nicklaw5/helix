@@ -49,11 +49,7 @@ func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 	}
 
 	streams := &StreamsResponse{}
-	streams.StatusCode = resp.StatusCode
-	streams.Header = resp.Header
-	streams.Error = resp.Error
-	streams.ErrorStatus = resp.ErrorStatus
-	streams.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&streams.ResponseCommon)
 	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
 	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
 
@@ -139,11 +135,7 @@ func (c *Client) GetStreamsMetadata(params *StreamsMetadataParams) (*StreamsMeta
 	}
 
 	streams := &StreamsMetadataResponse{}
-	streams.StatusCode = resp.StatusCode
-	streams.Header = resp.Header
-	streams.Error = resp.Error
-	streams.ErrorStatus = resp.ErrorStatus
-	streams.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&streams.ResponseCommon)
 	streams.Data.Streams = resp.Data.(*ManyStreamsMetadata).Streams
 	streams.Data.Pagination = resp.Data.(*ManyStreamsMetadata).Pagination
 

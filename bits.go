@@ -42,11 +42,7 @@ func (c *Client) GetBitsLeaderboard(params *BitsLeaderboardParams) (*BitsLeaderb
 	}
 
 	bits := &BitsLeaderboardResponse{}
-	bits.StatusCode = resp.StatusCode
-	bits.Header = resp.Header
-	bits.Error = resp.Error
-	bits.ErrorStatus = resp.ErrorStatus
-	bits.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&bits.ResponseCommon)
 	bits.Data.Total = resp.Data.(*ManyUserBitTotals).Total
 	bits.Data.DateRange = resp.Data.(*ManyUserBitTotals).DateRange
 	bits.Data.UserBitTotals = resp.Data.(*ManyUserBitTotals).UserBitTotals

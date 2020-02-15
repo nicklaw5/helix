@@ -40,11 +40,7 @@ func (c *Client) GetWebhookSubscriptions(params *WebhookSubscriptionsParams) (*W
 	}
 
 	webhooks := &WebhookSubscriptionsResponse{}
-	webhooks.StatusCode = resp.StatusCode
-	webhooks.Header = resp.Header
-	webhooks.Error = resp.Error
-	webhooks.ErrorStatus = resp.ErrorStatus
-	webhooks.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&webhooks.ResponseCommon)
 	webhooks.Data.Total = resp.Data.(*ManyWebhookSubscriptions).Total
 	webhooks.Data.WebhookSubscriptions = resp.Data.(*ManyWebhookSubscriptions).WebhookSubscriptions
 	webhooks.Data.Pagination = resp.Data.(*ManyWebhookSubscriptions).Pagination
@@ -74,12 +70,7 @@ func (c *Client) PostWebhookSubscription(payload *WebhookSubscriptionPayload) (*
 	}
 
 	webhook := &WebhookSubscriptionResponse{}
-	webhook.StatusCode = resp.StatusCode
-	webhook.Header = resp.Header
-	webhook.Error = resp.Error
-	webhook.ErrorStatus = resp.ErrorStatus
-	webhook.ErrorMessage = resp.ErrorMessage
-
+	resp.HydrateResponseCommon(&webhook.ResponseCommon)
 	return webhook, nil
 }
 

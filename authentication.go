@@ -67,10 +67,7 @@ func (c *Client) GetAppAccessToken() (*AppAccessTokenResponse, error) {
 	}
 
 	token := &AppAccessTokenResponse{}
-	token.StatusCode = resp.StatusCode
-	token.Error = resp.Error
-	token.ErrorStatus = resp.ErrorStatus
-	token.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&token.ResponseCommon)
 	token.Data.AccessToken = resp.Data.(*AppAccessCredentials).AccessToken
 	token.Data.ExpiresIn = resp.Data.(*AppAccessCredentials).ExpiresIn
 
@@ -116,10 +113,7 @@ func (c *Client) GetUserAccessToken(code string) (*UserAccessTokenResponse, erro
 	}
 
 	token := &UserAccessTokenResponse{}
-	token.StatusCode = resp.StatusCode
-	token.Error = resp.Error
-	token.ErrorStatus = resp.ErrorStatus
-	token.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&token.ResponseCommon)
 	token.Data.AccessToken = resp.Data.(*UserAccessCredentials).AccessToken
 	token.Data.RefreshToken = resp.Data.(*UserAccessCredentials).RefreshToken
 	token.Data.ExpiresIn = resp.Data.(*UserAccessCredentials).ExpiresIn
@@ -160,10 +154,7 @@ func (c *Client) RefreshUserAccessToken(refreshToken string) (*RefreshTokenRespo
 	}
 
 	refresh := &RefreshTokenResponse{}
-	refresh.StatusCode = resp.StatusCode
-	refresh.Error = resp.Error
-	refresh.ErrorStatus = resp.ErrorStatus
-	refresh.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&refresh.ResponseCommon)
 	refresh.Data.AccessToken = resp.Data.(*UserAccessCredentials).AccessToken
 	refresh.Data.RefreshToken = resp.Data.(*UserAccessCredentials).RefreshToken
 	refresh.Data.ExpiresIn = resp.Data.(*UserAccessCredentials).ExpiresIn
@@ -199,10 +190,7 @@ func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenRe
 	}
 
 	revoke := &RevokeAccessTokenResponse{}
-	revoke.StatusCode = resp.StatusCode
-	revoke.Error = resp.Error
-	revoke.ErrorStatus = resp.ErrorStatus
-	revoke.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&revoke.ResponseCommon)
 
 	return revoke, nil
 }

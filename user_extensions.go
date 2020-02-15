@@ -31,11 +31,7 @@ func (c *Client) GetUserExtensions() (*UserExtensionsResponse, error) {
 	}
 
 	userExtensions := &UserExtensionsResponse{}
-	userExtensions.StatusCode = resp.StatusCode
-	userExtensions.Header = resp.Header
-	userExtensions.Error = resp.Error
-	userExtensions.ErrorStatus = resp.ErrorStatus
-	userExtensions.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&userExtensions.ResponseCommon)
 	userExtensions.Data.UserExtensions = resp.Data.(*ManyUserExtensions).UserExtensions
 
 	return userExtensions, nil
@@ -85,11 +81,7 @@ func (c *Client) GetUserActiveExtensions(params *UserActiveExtensionsParams) (*U
 	}
 
 	userActiveExtensions := &UserActiveExtensionsResponse{}
-	userActiveExtensions.StatusCode = resp.StatusCode
-	userActiveExtensions.Header = resp.Header
-	userActiveExtensions.Error = resp.Error
-	userActiveExtensions.ErrorStatus = resp.ErrorStatus
-	userActiveExtensions.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&userActiveExtensions.ResponseCommon)
 	userActiveExtensions.Data.UserActiveExtensions = resp.Data.(*UserActiveExtensionSet).UserActiveExtensions
 
 	return userActiveExtensions, nil

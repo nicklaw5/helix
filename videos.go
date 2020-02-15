@@ -55,11 +55,7 @@ func (c *Client) GetVideos(params *VideosParams) (*VideosResponse, error) {
 	}
 
 	videos := &VideosResponse{}
-	videos.StatusCode = resp.StatusCode
-	videos.Header = resp.Header
-	videos.Error = resp.Error
-	videos.ErrorStatus = resp.ErrorStatus
-	videos.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&videos.ResponseCommon)
 	videos.Data.Videos = resp.Data.(*ManyVideos).Videos
 	videos.Data.Pagination = resp.Data.(*ManyVideos).Pagination
 

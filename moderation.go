@@ -39,11 +39,7 @@ func (c *Client) GetBannedUsers(params *BannedUsersParams) (*BannedUsersResponse
 	}
 
 	bans := &BannedUsersResponse{}
-	bans.StatusCode = resp.StatusCode
-	bans.Header = resp.Header
-	bans.Error = resp.Error
-	bans.ErrorStatus = resp.ErrorStatus
-	bans.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&bans.ResponseCommon)
 	bans.Data.Pagination = resp.Data.(*ManyBans).Pagination
 
 	return bans, nil

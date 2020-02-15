@@ -39,11 +39,7 @@ func (c *Client) GetExtensionAnalytics(params *ExtensionAnalyticsParams) (*Exten
 	}
 
 	users := &ExtensionAnalyticsResponse{}
-	users.StatusCode = resp.StatusCode
-	users.Header = resp.Header
-	users.Error = resp.Error
-	users.ErrorStatus = resp.ErrorStatus
-	users.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&users.ResponseCommon)
 	users.Data.ExtensionAnalytics = resp.Data.(*ManyExtensionAnalytics).ExtensionAnalytics
 	users.Data.Pagination = resp.Data.(*ManyExtensionAnalytics).Pagination
 	return users, nil
@@ -89,11 +85,7 @@ func (c *Client) GetGameAnalytics(params *GameAnalyticsParams) (*GameAnalyticsRe
 	}
 
 	users := &GameAnalyticsResponse{}
-	users.StatusCode = resp.StatusCode
-	users.Header = resp.Header
-	users.Error = resp.Error
-	users.ErrorStatus = resp.ErrorStatus
-	users.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&users.ResponseCommon)
 	users.Data.GameAnalytics = resp.Data.(*ManyGameAnalytics).GameAnalytics
 	users.Data.Pagination = resp.Data.(*ManyGameAnalytics).Pagination
 
