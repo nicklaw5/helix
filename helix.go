@@ -93,6 +93,15 @@ type Response struct {
 	Data interface{}
 }
 
+// HydrateResponseCommon copies the content of the source response's ResponseCommon to the supplied ResponseCommon argument
+func (r *Response) HydrateResponseCommon(rc *ResponseCommon) {
+	rc.StatusCode = r.ResponseCommon.StatusCode
+	rc.Header = r.ResponseCommon.Header
+	rc.Error = r.ResponseCommon.Error
+	rc.ErrorStatus = r.ResponseCommon.ErrorStatus
+	rc.ErrorMessage = r.ResponseCommon.ErrorMessage
+}
+
 // Pagination ...
 type Pagination struct {
 	Cursor string `json:"cursor"`

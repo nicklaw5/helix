@@ -40,11 +40,7 @@ func (c *Client) GetSubscriptions(params *SubscriptionsParams) (*SubscriptionsRe
 	}
 
 	subscriptions := &SubscriptionsResponse{}
-	subscriptions.StatusCode = resp.StatusCode
-	subscriptions.Header = resp.Header
-	subscriptions.Error = resp.Error
-	subscriptions.ErrorStatus = resp.ErrorStatus
-	subscriptions.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&subscriptions.ResponseCommon)
 	subscriptions.Data.Subscriptions = resp.Data.(*ManySubscriptions).Subscriptions
 	subscriptions.Data.Pagination = resp.Data.(*ManySubscriptions).Pagination
 

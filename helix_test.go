@@ -324,17 +324,17 @@ func TestGetRateLimitHeaders(t *testing.T) {
 
 		expctedHeaderLimit, _ := strconv.Atoi(testCase.headerLimit)
 		if resp.GetRateLimit() != expctedHeaderLimit {
-			t.Errorf("expeced \"Ratelimit-Limit\" to be \"%d\", got \"%d\"", expctedHeaderLimit, resp.GetRateLimit())
+			t.Errorf("expected \"Ratelimit-Limit\" to be \"%d\", got \"%d\"", expctedHeaderLimit, resp.GetRateLimit())
 		}
 
 		expctedHeaderRemaining, _ := strconv.Atoi(testCase.headerRemaining)
 		if resp.GetRateLimitRemaining() != expctedHeaderRemaining {
-			t.Errorf("expeced \"Ratelimit-Remaining\" to be \"%d\", got \"%d\"", expctedHeaderRemaining, resp.GetRateLimitRemaining())
+			t.Errorf("expected \"Ratelimit-Remaining\" to be \"%d\", got \"%d\"", expctedHeaderRemaining, resp.GetRateLimitRemaining())
 		}
 
 		expctedHeaderReset, _ := strconv.Atoi(testCase.headerReset)
 		if resp.GetRateLimitReset() != expctedHeaderReset {
-			t.Errorf("expeced \"Ratelimit-Reset\" to be \"%d\", got \"%d\"", expctedHeaderReset, resp.GetRateLimitReset())
+			t.Errorf("expected \"Ratelimit-Reset\" to be \"%d\", got \"%d\"", expctedHeaderReset, resp.GetRateLimitReset())
 		}
 	}
 }
@@ -480,5 +480,43 @@ func TestSetRedirectURI(t *testing.T) {
 
 	if client.opts.RedirectURI != redirectURI {
 		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", redirectURI, client.opts.RedirectURI)
+	}
+}
+
+func TestHydrateRequestCommon(t *testing.T) {
+	t.Parallel()
+	var sourceResponse Response
+	sampleStatusCode := 200
+	sampleHeaders := http.Header{}
+	sampleHeaders.Set("Content-Type", "application/json")
+	sampleError := "foo"
+	sampleErrorStatus := 1
+	sampleErrorMessage := "something done broke"
+	sourceResponse.ResponseCommon.StatusCode = sampleStatusCode
+	sourceResponse.ResponseCommon.Header = sampleHeaders
+	sourceResponse.ResponseCommon.Error = sampleError
+	sourceResponse.ResponseCommon.ErrorStatus = sampleErrorStatus
+	sourceResponse.ResponseCommon.ErrorMessage = sampleErrorMessage
+
+	var targetResponse Response
+	sourceResponse.HydrateResponseCommon(&targetResponse.ResponseCommon)
+	if targetResponse.StatusCode != sampleStatusCode {
+		t.Errorf("expected StatusCode to be \"%d\", got \"%d\"", sampleStatusCode, targetResponse.ResponseCommon.StatusCode)
+	}
+
+	if targetResponse.Header.Get("Content-Type") != "application/json" {
+		t.Errorf("expected headers to match")
+	}
+
+	if targetResponse.Error != sampleError {
+		t.Errorf("expected Error to be \"%s\", got \"%s\"", sampleError, targetResponse.ResponseCommon.Error)
+	}
+
+	if targetResponse.ErrorStatus != sampleErrorStatus {
+		t.Errorf("expected ErrorStatus to be \"%d\", got \"%d\"", sampleErrorStatus, targetResponse.ResponseCommon.ErrorStatus)
+	}
+
+	if targetResponse.ErrorMessage != sampleErrorMessage {
+		t.Errorf("expected ErrorMessage to be \"%s\", got \"%s\"", sampleErrorMessage, targetResponse.ResponseCommon.ErrorMessage)
 	}
 }

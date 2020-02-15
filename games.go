@@ -32,11 +32,7 @@ func (c *Client) GetGames(params *GamesParams) (*GamesResponse, error) {
 	}
 
 	games := &GamesResponse{}
-	games.StatusCode = resp.StatusCode
-	games.Header = resp.Header
-	games.Error = resp.Error
-	games.ErrorStatus = resp.ErrorStatus
-	games.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&games.ResponseCommon)
 	games.Data.Games = resp.Data.(*ManyGames).Games
 
 	return games, nil
@@ -69,11 +65,7 @@ func (c *Client) GetTopGames(params *TopGamesParams) (*TopGamesResponse, error) 
 	}
 
 	games := &TopGamesResponse{}
-	games.StatusCode = resp.StatusCode
-	games.Header = resp.Header
-	games.Error = resp.Error
-	games.ErrorStatus = resp.ErrorStatus
-	games.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&games.ResponseCommon)
 	games.Data.Games = resp.Data.(*ManyGamesWithPagination).Games
 	games.Data.Pagination = resp.Data.(*ManyGamesWithPagination).Pagination
 

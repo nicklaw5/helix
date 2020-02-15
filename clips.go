@@ -53,11 +53,7 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	}
 
 	clips := &ClipsResponse{}
-	clips.StatusCode = resp.StatusCode
-	clips.Header = resp.Header
-	clips.Error = resp.Error
-	clips.ErrorStatus = resp.ErrorStatus
-	clips.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&clips.ResponseCommon)
 	clips.Data.Clips = resp.Data.(*ManyClips).Clips
 	clips.Data.Pagination = resp.Data.(*ManyClips).Pagination
 
@@ -116,11 +112,7 @@ func (c *Client) CreateClip(params *CreateClipParams) (*CreateClipResponse, erro
 	}
 
 	clips := &CreateClipResponse{}
-	clips.StatusCode = resp.StatusCode
-	clips.Header = resp.Header
-	clips.Error = resp.Error
-	clips.ErrorStatus = resp.ErrorStatus
-	clips.ErrorMessage = resp.ErrorMessage
+	resp.HydrateResponseCommon(&clips.ResponseCommon)
 	clips.Data.ClipEditURLs = resp.Data.(*ManyClipEditURLs).ClipEditURLs
 
 	return clips, nil
