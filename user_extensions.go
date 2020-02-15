@@ -94,3 +94,35 @@ func (c *Client) GetUserActiveExtensions(params *UserActiveExtensionsParams) (*U
 
 	return userActiveExtensions, nil
 }
+
+type UpdateUserExtensionsPayload struct {
+	Component map[string]UserActiveExtensionInfo `json:"component,omitempty"`
+	Overlay   map[string]UserActiveExtensionInfo `json:"overlay,omitempty"`
+	Panel     map[string]UserActiveExtensionInfo `json:"panel,omitempty"`
+}
+
+type wrappedUpdateUserExtensionsPayload struct {
+	UpdateUserExtensionsPayload `json:"data"`
+}
+
+// UpdateUserExtensions Updates the activation state, extension ID, and/or version number of installed extensions for a specified user, identified by a Bearer token.
+// If you try to activate a given extension under multiple extension types, the last write wins (and there is no guarantee of write order).
+//
+// Required scope: user:edit:broadcast
+func (c *Client) UpdateUserExtensions(payload *UpdateUserExtensionsPayload) (*UserActiveExtensionsResponse, error) {
+	normalizedPayload := &wrappedUpdateUserExtensionsPayload{UpdateUserExtensionsPayload: *payload}
+	resp, err := c.putAsJSON("/users/extensions", &UserActiveExtensionSet{}, normalizedPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	userActiveExtensions := &UserActiveExtensionsResponse{}
+	userActiveExtensions.StatusCode = resp.StatusCode
+	userActiveExtensions.Header = resp.Header
+	userActiveExtensions.Error = resp.Error
+	userActiveExtensions.ErrorStatus = resp.ErrorStatus
+	userActiveExtensions.ErrorMessage = resp.ErrorMessage
+	userActiveExtensions.Data.UserActiveExtensions = resp.Data.(*UserActiveExtensionSet).UserActiveExtensions
+
+	return userActiveExtensions, nil
+}

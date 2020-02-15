@@ -35,7 +35,7 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.GetUserExtensions(nil)
+resp, err := client.GetUserActiveExtensions(nil)
 if err != nil {
     // handle error
 }
@@ -52,9 +52,38 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.GetUserExtensions(&helix.UserActiveExtensionsParams{
+resp, err := client.GetUserActiveExtensions(&helix.UserActiveExtensionsParams{
     UserID: "user-id"
 })
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Update User Extensions
+
+This is an example of how to update user extensions
+The response format is the same as `GetUserActiveExtensions`
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+    UserAccessToken: "user-access-token",
+})
+if err != nil {
+    // handle error
+}
+
+payload := &helix.UpdateUserExtensionsPayload{
+    Panel: map[string]helix.UserActiveExtensionInfo{
+        "1": helix.UserActiveExtensionInfo{
+            Active: false,
+        },
+    },
+}
+resp, err := client.UpdateUserExtensions(payload)
 if err != nil {
     // handle error
 }

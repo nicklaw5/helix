@@ -73,3 +73,57 @@ func TestGetUserActiveExtensions(t *testing.T) {
 		}
 	}
 }
+
+func TestUpdateUserExtensions(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		payload    *UpdateUserExtensionsPayload
+		respBody   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "my-access-token"},
+			&UpdateUserExtensionsPayload{},
+			`{"data":{"panel":{"1":{"active":true}}, "component": {}, "overlay": {}}}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "my-access-token"},
+			&UpdateUserExtensionsPayload{
+				Panel: map[string]UserActiveExtensionInfo{
+					"1": UserActiveExtensionInfo{
+						Active: false,
+					},
+				},
+			},
+			`{"data":{"panel":{"1":{"active":false}}, "component": {}, "overlay": {}}}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.UpdateUserExtensions(testCase.payload)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode == http.StatusOK {
+			data := resp.Data.UserActiveExtensions
+			if testCase.payload.Panel == nil && data.Panel["1"].Active == false {
+				t.Error("empty request should not manipulate extensions")
+			}
+
+			if data.Component == nil || data.Panel == nil || data.Overlay == nil {
+				t.Error("failed to parse successful UserActiveExtension response data")
+			}
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+	}
+}
