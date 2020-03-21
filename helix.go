@@ -46,6 +46,7 @@ type Options struct {
 	Scopes          []string
 	HTTPClient      HTTPClient
 	RateLimitFunc   RateLimitFunc
+	APIBaseURL      string
 }
 
 // DateRange is a generic struct used by various responses.
@@ -118,9 +119,14 @@ func NewClient(options *Options) (*Client, error) {
 		options.HTTPClient = http.DefaultClient
 	}
 
+	baseURL := APIBaseURL
+	if options.APIBaseURL != "" {
+		baseURL = options.APIBaseURL
+	}
+
 	client := &Client{
 		opts:    options,
-		baseURL: APIBaseURL,
+		baseURL: baseURL,
 	}
 
 	return client, nil
@@ -301,7 +307,10 @@ func (c *Client) getBaseURL(path string) string {
 		}
 	}
 
-	return APIBaseURL
+	if c.opts.APIBaseURL == "" {
+		return APIBaseURL
+	}
+	return c.opts.APIBaseURL
 }
 
 func (c *Client) doRequest(req *http.Request, resp *Response) error {
