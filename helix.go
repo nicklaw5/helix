@@ -119,7 +119,7 @@ func NewClient(options *Options) (*Client, error) {
 		options.HTTPClient = http.DefaultClient
 	}
 
-	if options.APIBaseURL != "" {
+	if options.APIBaseURL == "" {
 		options.APIBaseURL = DefaultAPIBaseURL
 	}
 
