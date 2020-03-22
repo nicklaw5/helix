@@ -63,6 +63,7 @@ func TestNewClient(t *testing.T) {
 				RateLimitFunc:   func(*Response) error { return nil },
 				Scopes:          []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
 				RedirectURI:     "http://localhost/auth/callback",
+				APIBaseURL:      "http://localhost/proxy",
 			},
 		},
 	}
@@ -113,6 +114,10 @@ func TestNewClient(t *testing.T) {
 
 		if opts.RedirectURI != testCase.options.RedirectURI {
 			t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", testCase.options.RedirectURI, opts.RedirectURI)
+		}
+
+		if opts.APIBaseURL != testCase.options.APIBaseURL {
+			t.Errorf("expected APIBaseURL to be \"%s\", got \"%s\"", testCase.options.APIBaseURL, opts.APIBaseURL)
 		}
 	}
 }

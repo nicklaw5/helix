@@ -31,7 +31,6 @@ type HTTPClient interface {
 type Client struct {
 	mu           sync.RWMutex
 	opts         *Options
-	baseURL      string
 	lastResponse *Response
 }
 
