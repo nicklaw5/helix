@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	// APIBaseURL is the base URL for composing API requests.
-	APIBaseURL = "https://api.twitch.tv/helix"
+	// DefaultAPIBaseURL is the base URL for composing API requests.
+	DefaultAPIBaseURL = "https://api.twitch.tv/helix"
 
 	// AuthBaseURL is the base URL for composing authentication requests.
 	AuthBaseURL = "https://id.twitch.tv/oauth2"
@@ -46,6 +46,7 @@ type Options struct {
 	Scopes          []string
 	HTTPClient      HTTPClient
 	RateLimitFunc   RateLimitFunc
+	APIBaseURL      string
 }
 
 // DateRange is a generic struct used by various responses.
@@ -118,9 +119,12 @@ func NewClient(options *Options) (*Client, error) {
 		options.HTTPClient = http.DefaultClient
 	}
 
+	if options.APIBaseURL == "" {
+		options.APIBaseURL = DefaultAPIBaseURL
+	}
+
 	client := &Client{
-		opts:    options,
-		baseURL: APIBaseURL,
+		opts: options,
 	}
 
 	return client, nil
@@ -301,7 +305,7 @@ func (c *Client) getBaseURL(path string) string {
 		}
 	}
 
-	return APIBaseURL
+	return c.opts.APIBaseURL
 }
 
 func (c *Client) doRequest(req *http.Request, resp *Response) error {
