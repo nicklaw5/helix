@@ -25,6 +25,7 @@ type SubscriptionsResponse struct {
 
 // SubscriptionsParams ...
 type SubscriptionsParams struct {
+	After         string   `query:"after"`
 	BroadcasterID string   `query:"broadcaster_id"` // Limit 1
 	UserID        []string `query:"user_id"`        // Limit 100
 }
