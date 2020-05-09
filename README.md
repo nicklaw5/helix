@@ -42,6 +42,7 @@ All documentation and usage examples for this package can be found in the [docs 
 - [x] Update User
 - [x] Get Videos
 - [x] Get Webhook Subscriptions
+- [x] Stuff
 
 ## Quick Usage Example
 
