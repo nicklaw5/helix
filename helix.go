@@ -388,8 +388,14 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 		bearerToken = opts.UserAccessToken
 	}
 
+	authType := "Bearer"
+	// Token validation requires different type of Auth
+	if req.URL.String() == AuthBaseURL+authPaths["validate"] {
+		authType = "OAuth"
+	}
+
 	if bearerToken != "" {
-		req.Header.Set("Authorization", "Bearer "+bearerToken)
+		req.Header.Set("Authorization", fmt.Sprintf("%s %s", authType, bearerToken))
 	}
 }
 
