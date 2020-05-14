@@ -442,3 +442,85 @@ func TestRevokeUserAccessToken(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateToken(t *testing.T) {
+	t.Parallel()
+
+	initialUserToken := "original-token"
+	testCases := []struct {
+		statusCode     int
+		accessToken    string
+		respBody       string
+		expectedErrMsg string
+		isValid        bool
+	}{
+		{
+			http.StatusUnauthorized,
+			"", // no access token
+			`{"status":401,"message":"missing authorization token"}`,
+			"missing authorization token",
+			false,
+		},
+		{
+			http.StatusUnauthorized,
+			"invalid-token",
+			`{"status":401,"message":"invalid access token"}`,
+			"invalid access token",
+			false,
+		},
+		{
+			http.StatusOK,
+			"valid-access-token",
+			`{"client_id":"leadku246lkasdj6l6ljsd2","login":"authduser","scopes":["user:read:email"],"user_id":"12345","expires_in":5243778}`,
+			"",
+			true,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(&Options{UserAccessToken: initialUserToken}, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		isValid, resp, err := c.ValidateToken(testCase.accessToken)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		// Test error cases
+		if resp.StatusCode != http.StatusOK {
+			if testCase.expectedErrMsg != "" && resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", testCase.expectedErrMsg, resp.ErrorMessage)
+			}
+
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if isValid {
+				t.Errorf("expected isValid to be %t, go %t", false, isValid)
+			}
+
+			continue
+		}
+
+		// Test success cases
+		if resp.Data.Login != "authduser" {
+			t.Errorf("expected login name to be \"%s\", got \"%s\"", "authduser", resp.Data.Login)
+		}
+
+		if !isValid {
+			t.Errorf("expected isValid to be %t, go %t", true, isValid)
+		}
+
+		if resp.ErrorMessage != "" {
+			t.Errorf("expected error message to be empty, got %s", resp.ErrorMessage)
+		}
+
+		if c.opts.UserAccessToken != initialUserToken {
+			t.Errorf("expected user token to be %s, got %s", initialUserToken, c.opts.UserAccessToken)
+		}
+	}
+}
