@@ -108,3 +108,29 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Validate User Access Token
+
+You can validate an access token and get token details in the following manner:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+userAccessToken := "your-user-access-token-to-validate"
+
+isValid, resp, err := client.ValidateToken(userAccessToken)
+if err != nil {
+    // handle error
+}
+
+if isValid {
+    fmt.Println("%s access token is valid!", userAccessToken)
+}
+
+fmt.Println("%+v", resp)
+```

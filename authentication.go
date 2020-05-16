@@ -1,12 +1,14 @@
 package helix
 
 import (
+	"net/http"
 	"strings"
 )
 
 var authPaths = map[string]string{
-	"token":  "/token",
-	"revoke": "/revoke",
+	"token":    "/token",
+	"revoke":   "/revoke",
+	"validate": "/validate",
 }
 
 // GetAuthorizationURL ...
@@ -193,4 +195,42 @@ func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenRe
 	resp.HydrateResponseCommon(&revoke.ResponseCommon)
 
 	return revoke, nil
+}
+
+type ValidateTokenResponse struct {
+	ResponseCommon
+	Data TokenDetails
+}
+
+type TokenDetails struct {
+	ClientID string   `json:"client_id"`
+	Login    string   `json:"login"`
+	Scopes   []string `json:"scopes"`
+	UserID   string   `json:"user_id"`
+}
+
+// ValidateToken - Validate access token
+func (c *Client) ValidateToken(accessToken string) (bool, *ValidateTokenResponse, error) {
+	// Reset to original token after request
+	currentToken := c.opts.UserAccessToken
+	c.SetUserAccessToken(accessToken)
+	defer c.SetUserAccessToken(currentToken)
+
+	var data TokenDetails
+	resp, err := c.get(authPaths["validate"], &data, nil)
+	if err != nil {
+		return false, nil, err
+	}
+
+	var isValid bool
+	if resp.StatusCode == http.StatusOK {
+		isValid = true
+	}
+
+	tokenResp := &ValidateTokenResponse{
+		Data: data,
+	}
+	resp.HydrateResponseCommon(&tokenResp.ResponseCommon)
+
+	return isValid, tokenResp, nil
 }

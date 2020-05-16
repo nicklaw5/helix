@@ -22,6 +22,7 @@ All documentation and usage examples for this package can be found in the [docs 
 - [x] Get User Access Tokens (OAuth Authorization Code Flow)
 - [x] Refresh User Access Tokens
 - [x] Revoke User Access Tokens
+- [x] Validate Access Token
 
 **API Endpoint:**
 
