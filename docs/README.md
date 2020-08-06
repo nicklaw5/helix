@@ -7,6 +7,7 @@ Follow the links below to their respective API usage examples:
 - [Analytics](analytics_docs.md)
 - [Authentication](authentication_docs.md)
 - [Bits](bits_docs.md)
+- [Channels](channels_docs.md)
 - [Clips](clips_docs.md)
 - [Entitlement Grants](entitlement_grants_docs.md)
 - [Games](games_docs.md)
