@@ -41,7 +41,8 @@ type StreamsParams struct {
 	UserLogins []string `query:"user_login"` // limit 100
 }
 
-// GetStreams ...
+// GetStreams returns a list of live channels based on the search parameters.
+// To query offline channels, use SearchChannels.
 func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 	resp, err := c.get("/streams", &ManyStreams{}, params)
 	if err != nil {
