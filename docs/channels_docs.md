@@ -2,7 +2,7 @@
 
 ## Search Channels
 
-This is an example of how to search channels. Here we are requesting the first two streams from the English language. SearchChannels returns live as well as offline channelsl.
+This is an example of how to search channels. Here we are requesting the first two streams from the English language. SearchChannels returns live as well as offline channels.
 
 ```go
 client, err := helix.NewClient(&helix.Options{
