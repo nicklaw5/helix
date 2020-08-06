@@ -15,7 +15,7 @@ var authPaths = map[string]string{
 func (c *Client) GetAuthorizationURL(state string, forceVerify bool) string {
 	opts := c.opts
 
-	url := AuthBaseURL + "/authorize?response_type=code"
+	url := AuthBaseURL + "/authorize?response_type=token"
 	url += "&client_id=" + opts.ClientID
 	url += "&redirect_uri=" + opts.RedirectURI
 
@@ -36,8 +36,9 @@ func (c *Client) GetAuthorizationURL(state string, forceVerify bool) string {
 
 // AppAccessCredentials ...
 type AppAccessCredentials struct {
-	AccessToken string `json:"access_token"`
-	ExpiresIn   int    `json:"expires_in"`
+	AccessToken string   `json:"access_token"`
+	ExpiresIn   int      `json:"expires_in"`
+	Scopes      []string `json:"scope"`
 }
 
 // AppAccessTokenResponse ...
@@ -61,6 +62,7 @@ func (c *Client) GetAppAccessToken() (*AppAccessTokenResponse, error) {
 		ClientSecret: opts.ClientSecret,
 		RedirectURI:  opts.RedirectURI,
 		GrantType:    "client_credentials",
+		Scope:        strings.Join(opts.Scopes, " "),
 	}
 
 	resp, err := c.post(authPaths["token"], &AppAccessCredentials{}, data)
@@ -72,6 +74,7 @@ func (c *Client) GetAppAccessToken() (*AppAccessTokenResponse, error) {
 	resp.HydrateResponseCommon(&token.ResponseCommon)
 	token.Data.AccessToken = resp.Data.(*AppAccessCredentials).AccessToken
 	token.Data.ExpiresIn = resp.Data.(*AppAccessCredentials).ExpiresIn
+	token.Data.Scopes = resp.Data.(*AppAccessCredentials).Scopes
 
 	return token, nil
 }
@@ -96,6 +99,7 @@ type accessTokenRequestData struct {
 	ClientSecret string `query:"client_secret"`
 	RedirectURI  string `query:"redirect_uri"`
 	GrantType    string `query:"grant_type"`
+	Scope        string `query:"scope"`
 }
 
 // GetUserAccessToken ...
