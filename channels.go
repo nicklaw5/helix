@@ -1,11 +1,5 @@
 package helix
 
-/*
-This file makes up for a missing API in Helix. This appears to be a recent
-change (as of around 2020-08-03) to the Twitch API, where GetStreams no longer
-returns information about offline channels.
-*/
-
 // SearchChannelsParams is parameters for SearchChannels
 type SearchChannelsParams struct {
 	Channel  string `query:"query"`
@@ -22,15 +16,15 @@ type ManySearchChannels struct {
 
 // Channel describes a channel from SearchChannel
 type Channel struct {
-	ID           string `json:"id"`
-	GameID       string `json:"game_id"`
-	DisplayName  string `json:"display_name"`
-	Language     string `json:"broadcaster_language"`
-	Title        string `json:"title"`
-	ThumbnailURL string `json:"thumbnail_url"`
-	IsLive       bool   `json:"is_live"`
-	// StartedAt    time.Time `json:"started_at"` // This can be invalid if the channel is not live; omitting it. Prefer GetStreams for live channels.
-	TagIDs []string `json:"tag_ids"`
+	ID           string   `json:"id"`
+	GameID       string   `json:"game_id"`
+	DisplayName  string   `json:"display_name"`
+	Language     string   `json:"broadcaster_language"`
+	Title        string   `json:"title"`
+	ThumbnailURL string   `json:"thumbnail_url"`
+	IsLive       bool     `json:"is_live"`
+	StartedAt    Time     `json:"started_at"`
+	TagIDs       []string `json:"tag_ids"`
 }
 
 // SearchChannelsResponse is the response from SearchChannels
