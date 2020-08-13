@@ -21,7 +21,7 @@ func TestGetAuthorizationURL(t *testing.T) {
 				ClientID:    "my-client-id",
 				RedirectURI: "https://example.com/auth/callback",
 			},
-			"https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=my-client-id&redirect_uri=https://example.com/auth/callback",
+			"https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=my-client-id&redirect_uri=https://example.com/auth/callback",
 		},
 		{
 			"some-state",
@@ -31,7 +31,7 @@ func TestGetAuthorizationURL(t *testing.T) {
 				RedirectURI: "https://example.com/auth/callback",
 				Scopes:      []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
 			},
-			"https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=my-client-id&redirect_uri=https://example.com/auth/callback&state=some-state&force_verify=true&scope=analytics:read:games%20bits:read%20clips:edit%20user:edit%20user:read:email",
+			"https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=my-client-id&redirect_uri=https://example.com/auth/callback&state=some-state&force_verify=true&scope=analytics:read:games%20bits:read%20clips:edit%20user:edit%20user:read:email",
 		},
 	}
 
