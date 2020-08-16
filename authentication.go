@@ -11,91 +11,89 @@ var authPaths = map[string]string{
 	"validate": "/validate",
 }
 
+// AuthorizationURLParams ...
+type AuthorizationURLParams struct {
+	ResponseType string   // (Required) Options: "code" or "token"
+	Scopes       []string // (Required)
+	State        string   // (Optional)
+	ForceVerify  bool     // (Optional)
+}
+
 // GetAuthorizationURL ...
-func (c *Client) GetAuthorizationURL(state string, forceVerify bool) string {
-	opts := c.opts
+func (c *Client) GetAuthorizationURL(params *AuthorizationURLParams) string {
+	url := AuthBaseURL + "/authorize"
+	url += "?response_type=" + params.ResponseType
+	url += "&client_id=" + c.opts.ClientID
+	url += "&redirect_uri=" + c.opts.RedirectURI
 
-	url := AuthBaseURL + "/authorize?response_type=code"
-	url += "&client_id=" + opts.ClientID
-	url += "&redirect_uri=" + opts.RedirectURI
-
-	if state != "" {
-		url += "&state=" + state
+	if params.State != "" {
+		url += "&state=" + params.State
 	}
 
-	if forceVerify {
+	if params.ForceVerify {
 		url += "&force_verify=true"
 	}
 
-	if len(opts.Scopes) > 0 {
-		url += "&scope=" + strings.Join(opts.Scopes, "%20")
+	if len(params.Scopes) != 0 {
+		url += "&scope=" + strings.Join(params.Scopes, "%20")
 	}
 
 	return url
 }
 
-// AppAccessCredentials ...
-type AppAccessCredentials struct {
-	AccessToken string `json:"access_token"`
-	ExpiresIn   int    `json:"expires_in"`
-}
-
-// AppAccessTokenResponse ...
-type AppAccessTokenResponse struct {
-	ResponseCommon
-	Data AppAccessCredentials
-}
-
-type appAccessTokenRequestData struct {
-	ClientID     string `query:"client_id"`
-	ClientSecret string `query:"client_secret"`
-	RedirectURI  string `query:"redirect_uri"`
-	GrantType    string `query:"grant_type"`
-}
-
-// GetAppAccessToken ...
-func (c *Client) GetAppAccessToken() (*AppAccessTokenResponse, error) {
-	opts := c.opts
-	data := &accessTokenRequestData{
-		ClientID:     opts.ClientID,
-		ClientSecret: opts.ClientSecret,
-		RedirectURI:  opts.RedirectURI,
-		GrantType:    "client_credentials",
-	}
-
-	resp, err := c.post(authPaths["token"], &AppAccessCredentials{}, data)
-	if err != nil {
-		return nil, err
-	}
-
-	token := &AppAccessTokenResponse{}
-	resp.HydrateResponseCommon(&token.ResponseCommon)
-	token.Data.AccessToken = resp.Data.(*AppAccessCredentials).AccessToken
-	token.Data.ExpiresIn = resp.Data.(*AppAccessCredentials).ExpiresIn
-
-	return token, nil
-}
-
-// UserAccessCredentials ...
-type UserAccessCredentials struct {
+// AccessCredentials ...
+type AccessCredentials struct {
 	AccessToken  string   `json:"access_token"`
 	RefreshToken string   `json:"refresh_token"`
 	ExpiresIn    int      `json:"expires_in"`
 	Scopes       []string `json:"scope"`
 }
 
+// AppAccessTokenResponse ...
+type AppAccessTokenResponse struct {
+	ResponseCommon
+	Data AccessCredentials
+}
+
+// GetAppAccessToken ...
+func (c *Client) GetAppAccessToken(scopes []string) (*AppAccessTokenResponse, error) {
+	opts := c.opts
+	data := &accessTokenRequestData{
+		ClientID:     opts.ClientID,
+		ClientSecret: opts.ClientSecret,
+		RedirectURI:  opts.RedirectURI,
+		GrantType:    "client_credentials",
+		Scopes:       scopes,
+	}
+
+	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
+	if err != nil {
+		return nil, err
+	}
+
+	token := &AppAccessTokenResponse{}
+	resp.HydrateResponseCommon(&token.ResponseCommon)
+	token.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
+	token.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
+	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
+	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
+
+	return token, nil
+}
+
 // UserAccessTokenResponse ...
 type UserAccessTokenResponse struct {
 	ResponseCommon
-	Data UserAccessCredentials
+	Data AccessCredentials
 }
 
 type accessTokenRequestData struct {
-	Code         string `query:"code"`
-	ClientID     string `query:"client_id"`
-	ClientSecret string `query:"client_secret"`
-	RedirectURI  string `query:"redirect_uri"`
-	GrantType    string `query:"grant_type"`
+	Code         string   `query:"code"`
+	ClientID     string   `query:"client_id"`
+	ClientSecret string   `query:"client_secret"`
+	RedirectURI  string   `query:"redirect_uri"`
+	GrantType    string   `query:"grant_type"`
+	Scopes       []string `query:"scope"`
 }
 
 // GetUserAccessToken ...
@@ -109,17 +107,17 @@ func (c *Client) GetUserAccessToken(code string) (*UserAccessTokenResponse, erro
 		GrantType:    "authorization_code",
 	}
 
-	resp, err := c.post(authPaths["token"], &UserAccessCredentials{}, data)
+	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
 	if err != nil {
 		return nil, err
 	}
 
 	token := &UserAccessTokenResponse{}
 	resp.HydrateResponseCommon(&token.ResponseCommon)
-	token.Data.AccessToken = resp.Data.(*UserAccessCredentials).AccessToken
-	token.Data.RefreshToken = resp.Data.(*UserAccessCredentials).RefreshToken
-	token.Data.ExpiresIn = resp.Data.(*UserAccessCredentials).ExpiresIn
-	token.Data.Scopes = resp.Data.(*UserAccessCredentials).Scopes
+	token.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
+	token.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
+	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
+	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
 
 	return token, nil
 }
@@ -127,7 +125,7 @@ func (c *Client) GetUserAccessToken(code string) (*UserAccessTokenResponse, erro
 // RefreshTokenResponse ...
 type RefreshTokenResponse struct {
 	ResponseCommon
-	Data UserAccessCredentials
+	Data AccessCredentials
 }
 
 type refreshTokenRequestData struct {
@@ -150,17 +148,17 @@ func (c *Client) RefreshUserAccessToken(refreshToken string) (*RefreshTokenRespo
 		RefreshToken: refreshToken,
 	}
 
-	resp, err := c.post(authPaths["token"], &UserAccessCredentials{}, data)
+	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
 	if err != nil {
 		return nil, err
 	}
 
 	refresh := &RefreshTokenResponse{}
 	resp.HydrateResponseCommon(&refresh.ResponseCommon)
-	refresh.Data.AccessToken = resp.Data.(*UserAccessCredentials).AccessToken
-	refresh.Data.RefreshToken = resp.Data.(*UserAccessCredentials).RefreshToken
-	refresh.Data.ExpiresIn = resp.Data.(*UserAccessCredentials).ExpiresIn
-	refresh.Data.Scopes = resp.Data.(*UserAccessCredentials).Scopes
+	refresh.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
+	refresh.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
+	refresh.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
+	refresh.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
 
 	return refresh, nil
 }
@@ -197,12 +195,13 @@ func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenRe
 	return revoke, nil
 }
 
+// ValidateTokenResponse ...
 type ValidateTokenResponse struct {
 	ResponseCommon
-	Data TokenDetails
+	Data validateTokenDetails
 }
 
-type TokenDetails struct {
+type validateTokenDetails struct {
 	ClientID string   `json:"client_id"`
 	Login    string   `json:"login"`
 	Scopes   []string `json:"scopes"`
@@ -216,7 +215,7 @@ func (c *Client) ValidateToken(accessToken string) (bool, *ValidateTokenResponse
 	c.SetUserAccessToken(accessToken)
 	defer c.SetUserAccessToken(currentToken)
 
-	var data TokenDetails
+	var data validateTokenDetails
 	resp, err := c.get(authPaths["validate"], &data, nil)
 	if err != nil {
 		return false, nil, err

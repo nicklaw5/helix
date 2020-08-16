@@ -42,7 +42,6 @@ type Options struct {
 	UserAccessToken string
 	UserAgent       string
 	RedirectURI     string
-	Scopes          []string
 	HTTPClient      HTTPClient
 	RateLimitFunc   RateLimitFunc
 	APIBaseURL      string
@@ -424,13 +423,6 @@ func (c *Client) SetUserAgent(userAgent string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.opts.UserAgent = userAgent
-}
-
-// SetScopes ...
-func (c *Client) SetScopes(scopes []string) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.opts.Scopes = scopes
 }
 
 // SetRedirectURI ...

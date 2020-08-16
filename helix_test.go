@@ -61,7 +61,6 @@ func TestNewClient(t *testing.T) {
 				UserAccessToken: "my-user-access-token",
 				UserAgent:       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
 				RateLimitFunc:   func(*Response) error { return nil },
-				Scopes:          []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
 				RedirectURI:     "http://localhost/auth/callback",
 				APIBaseURL:      "http://localhost/proxy",
 			},
@@ -108,10 +107,6 @@ func TestNewClient(t *testing.T) {
 			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.UserAccessToken, opts.UserAccessToken)
 		}
 
-		if len(opts.Scopes) != len(testCase.options.Scopes) {
-			t.Errorf("expected \"%d\" scopes, got \"%d\"", len(testCase.options.Scopes), len(opts.Scopes))
-		}
-
 		if opts.RedirectURI != testCase.options.RedirectURI {
 			t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", testCase.options.RedirectURI, opts.RedirectURI)
 		}
@@ -156,10 +151,6 @@ func TestNewClientDefault(t *testing.T) {
 
 	if opts.RateLimitFunc != nil {
 		t.Errorf("expected rateLimitFunc to be \"%v\", got \"%v\"", nil, opts.RateLimitFunc)
-	}
-
-	if len(opts.Scopes) != len(options.Scopes) {
-		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(options.Scopes), len(opts.Scopes))
 	}
 
 	if opts.RedirectURI != options.RedirectURI {
@@ -449,24 +440,6 @@ func TestSetUserAgent(t *testing.T) {
 
 	if client.opts.UserAgent != userAgent {
 		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", userAgent, client.opts.UserAgent)
-	}
-}
-
-func TestSetScopes(t *testing.T) {
-	t.Parallel()
-
-	client, err := NewClient(&Options{
-		ClientID: "cid",
-	})
-	if err != nil {
-		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
-	}
-
-	scopes := []string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"}
-	client.SetScopes(scopes)
-
-	if len(client.opts.Scopes) != len(scopes) {
-		t.Errorf("expected \"%d\" scopes, got \"%d\"", len(scopes), len(client.opts.Scopes))
 	}
 }
 
