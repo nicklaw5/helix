@@ -18,21 +18,16 @@ Follow the links below to their respective API usage examples:
 
 ## Getting Started
 
-It's recommended that you use a dependency management tool such as [Dep](https://github.com/golang/dep). If you are using Dep you can import helix by running:
-
-```bash
-dep ensure -add github.com/nicklaw5/helix
-```
-
-Or you can simply import using the Go toolchain:
-
 ```bash
 go get -u github.com/nicklaw5/helix
 ```
 
 ## Creating A New API Client
 
-The only requirement for creating a new API client is your Twitch Client-ID. See the [Twitch authentication docs](https://dev.twitch.tv/docs/authentication) on how to obtain a Client-ID. Once you have a Client-ID, to create a new client simply the `NewClient` function. passing through your client ID as an option. For example:
+The only requirement for creating a new API client is your Twitch Client-ID. See the
+[Twitch authentication docs](https://dev.twitch.tv/docs/authentication) on how to obtain a Client-ID.
+Once you have a Client-ID, to create a new client simply the `NewClient` function. passing through
+your client ID as an option. For example:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
@@ -75,9 +70,9 @@ type Options struct {
     UserAccessToken string            // Default: empty string
     UserAgent       string            // Default: empty string
     RedirectURI     string            // Default: empty string
-    Scopes          []string          // Default: empty string slice
     HTTPClient      HTTPClient        // Default: http.DefaultClient
     RateLimitFunc   RateLimitFunc     // Default: nil
+    APIBaseURL      string            // Default: https://api.twitch.tv/helix
 }
 ```
 
@@ -85,7 +80,12 @@ If no custom `http.Client` is provided, `http.DefaultClient` is used by default.
 
 ## Responses
 
-It is common for a Twitch API request to simply fail sometimes. Occasionally a request gets hung up and eventually fails with a 500 internal server error. It's also possible that an invalid request was sent and Twitch responded with an error. To assist in circumstances such as these, the HTTP status code is returned with each API request, along with any error that may been encountered. For example, notice below that the `UsersResponse` struct, which is returned with the `GetUsers()` method, includes fields from the `ResponseCommon` struct.
+It is common for a Twitch API request to simply fail sometimes. Occasionally a request gets hung up
+and eventually fails with a 500 internal server error. It's also possible that an invalid request was
+sent and Twitch responded with an error. To assist in circumstances such as these, the HTTP status code
+is returned with each API request, along with any error that may been encountered. For example, notice
+below that the `UsersResponse` struct, which is returned with the `GetUsers()` method, includes fields
+from the `ResponseCommon` struct.
 
 ```go
 type UsersResponse struct {
@@ -110,9 +110,13 @@ Also note from above that the `ResponseCommon` struct includes the header result
 
 ## Request Rate Limiting
 
-Twitch enforces strict request rate limits for their API. See [their documentation](https://dev.twitch.tv/docs/api#rate-limits) for the specific rate limit values. At the time of writing this, requests are limited to 30 queries per minute (if a Bearer token is not provided) or 120 queries per minute (if a Bearer token is provided).
+Twitch enforces strict request rate limits for their API. See
+[their documentation](https://dev.twitch.tv/docs/api/guide) for the specific rate limit values. At the
+time of writing this, requests are limited to 30 points per minute if a Bearer token is not provided or
+800 points per minute if a Bearer token is provided.
 
-There are a number of helper methods on the response object for retrieving rate limit headers are integers. These include:
+There are a number of helper methods on the response object for retrieving rate limit headers are integers.
+These include:
 
 - `Response.GetRateLimit()`
 - `Response.GetRateLimitRemaining()`
@@ -122,9 +126,13 @@ There are a number of helper methods on the response object for retrieving rate 
 - `Response.GetStreamsMetadataRateLimit()` (only available when called `client.GetStreamsMetadata()`)
 - `Response.GetStreamsMetadataRateLimitRemaining()` (only available when called `client.GetStreamsMetadata()`)
 
-This package also allows users to provide a rate limit callback of their own which will be executed just before a request is sent. That way you can provide some sort of functionality for limiting the requests sent and prevent spamming Twitch with requests.
+This package also allows users to provide a rate limit callback of their own which will be executed just
+before a request is sent. That way you can provide some sort of functionality for limiting the requests sent
+and prevent spamming Twitch with requests.
 
-The below snippet provides an example of how you might structure your rate limit callback to approach limiting requests. In this example, once we've reached our rate limit, we'll simply wait for the limit to pass before sending the next request.
+The below snippet provides an example of how you might structure your rate limit callback to approach limiting
+requests. In this example, once we've reached our rate limit, we'll simply wait for the limit to pass before
+sending the next request.
 
 ```go
 func rateLimitCallback(lastResponse *helix.Response) error {
@@ -157,19 +165,27 @@ if err != nil {
 }
 ```
 
-If a `RateLimitFunc` is provided, the client will re-attempt to send a failed request if said request received a 429 (Too Many Requests) response. Before retrying the request, the `RateLimitFunc` will be applied.
+If a `RateLimitFunc` is provided, the client will re-attempt to send a failed request if said request received
+a 429 (Too Many Requests) response. Before retrying the request, the `RateLimitFunc` will be applied.
 
 ## Access Tokens
 
-Some API endpoints require that you have a valid access token in order to fulfill the request. There are two types of access tokens: app access tokens and user access tokens.
+Some API endpoints require that you have a valid access token in order to fulfill the request. There are two types
+of access tokens: app access tokens and user access tokens.
 
-App access tokens allow game developers to integrate their game into Twitch's viewing experience. [Drops](https://dev.twitch.tv/drops) are an example of this.
+App access tokens allow game developers to integrate their game into Twitch's viewing experience.
+[Drops](https://dev.twitch.tv/drops) are an example of this.
 
-User access tokens, on the other hand, are used to interact with the Twitch API on behalf of a registered Twitch user. If you're only looking to consume the standard API, such as getting access to a user's registered email address, user access tokens are what you will need.
+User access tokens, on the other hand, are used to interact with the Twitch API on behalf of a registered Twitch user.
+If you're only looking to consume the standard API, such as getting access to a user's registered email address, user
+access tokens are what you will need.
 
-It is worth noting that both app and user access tokens have the ability to extend the request rate limit enforced by Twitch. However, if you provide both an app and a user token - as is the case in the below example - the app access token will be ignored as user access tokens are prioritized when setting the request _Authorization_ header.
+It is worth noting that both app and user access tokens have the ability to extend the request rate limit enforced by
+Twitch. However, if you provide both an app and a user token - as is the case in the below example - the app access
+token will be ignored as user access tokens are prioritized when setting the request _Authorization_ header.
 
-In order to set the access token for a request, you can either supply it as an option or use the `SetUserAccessToken` or `SetAppAccessToken` methods. For example:
+In order to set the access token for a request, you can either supply it as an option or use the `SetUserAccessToken`
+or `SetAppAccessToken` methods. For example:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
@@ -200,11 +216,14 @@ client.SetAppAccessToken("your-app-access-token")
 // send API request...
 ```
 
-Note that any subsequent API requests will utilize this same access token. So it is necessary to unset the access token when you are finished with it. To do so, simply pass an empty string to the `SetUserAccessToken` or `SetAppAccessToken` methods.
+Note that any subsequent API requests will utilize this same access token. So it is necessary to unset the access
+token when you are finished with it. To do so, simply pass an empty string to the `SetUserAccessToken` or
+`SetAppAccessToken` methods.
 
 ## User-Agent Header
 
-It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each request. You can do so by passing it through as an option when creating a new client, like so:
+It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each
+request. You can do so by passing it through as an option when creating a new client, like so:
 
 with the `SetUserAgent()` method before sending a request. For example:
 
@@ -216,7 +235,6 @@ client, err := helix.NewClient(&helix.Options{
 if err != nil {
     // handle error
 }
-
 
 // send API request...
 ```
