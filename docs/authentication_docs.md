@@ -45,7 +45,7 @@ if err != nil {
 
 code := "your-authentication-code"
 
-resp, err := client.GetUserAccessToken(code)
+resp, err := client.RequestUserAccessToken(code)
 if err != nil {
     // handle error
 }
@@ -91,7 +91,7 @@ if err != nil {
     // handle error
 }
 
-userAccessToken := "your-user-access-token-to-revoke"
+userAccessToken := client.GetUserAccessToken()
 
 resp, err := client.RevokeUserAccessToken(userAccessToken)
 if err != nil {
@@ -113,7 +113,7 @@ if err != nil {
     // handle error
 }
 
-userAccessToken := "your-user-access-token-to-validate"
+userAccessToken := client.GetUserAccessToken()
 
 isValid, resp, err := client.ValidateToken(userAccessToken)
 if err != nil {
@@ -140,7 +140,7 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.GetAppAccessToken([]string{"user:read:email"})
+resp, err := client.RequestAppAccessToken([]string{"user:read:email"})
 if err != nil {
     // handle error
 }

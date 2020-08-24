@@ -404,11 +404,21 @@ func setResponseStatusCode(v interface{}, fieldName string, code int) {
 	field.SetInt(int64(code))
 }
 
+// GetAppAccessToken returns the current app access token.
+func (c *Client) GetAppAccessToken() string {
+	return c.opts.AppAccessToken
+}
+
 // SetAppAccessToken ...
 func (c *Client) SetAppAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.opts.AppAccessToken = accessToken
+}
+
+// GetUserAccessToken returns the current user access token.
+func (c *Client) GetUserAccessToken() string {
+	return c.opts.UserAccessToken
 }
 
 // SetUserAccessToken ...

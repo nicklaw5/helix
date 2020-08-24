@@ -55,8 +55,8 @@ type AppAccessTokenResponse struct {
 	Data AccessCredentials
 }
 
-// GetAppAccessToken ...
-func (c *Client) GetAppAccessToken(scopes []string) (*AppAccessTokenResponse, error) {
+// RequestAppAccessToken ...
+func (c *Client) RequestAppAccessToken(scopes []string) (*AppAccessTokenResponse, error) {
 	opts := c.opts
 	data := &accessTokenRequestData{
 		ClientID:     opts.ClientID,
@@ -96,8 +96,8 @@ type accessTokenRequestData struct {
 	Scopes       []string `query:"scope"`
 }
 
-// GetUserAccessToken ...
-func (c *Client) GetUserAccessToken(code string) (*UserAccessTokenResponse, error) {
+// RequestUserAccessToken ...
+func (c *Client) RequestUserAccessToken(code string) (*UserAccessTokenResponse, error) {
 	opts := c.opts
 	data := &accessTokenRequestData{
 		Code:         code,

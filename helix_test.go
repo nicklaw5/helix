@@ -387,6 +387,25 @@ func TestDecodingBadJSON(t *testing.T) {
 	}
 }
 
+func TestGetAppAccessToken(t *testing.T) {
+	t.Parallel()
+
+	accessToken := "my-app-access-token"
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	client.SetAppAccessToken(accessToken)
+
+	if client.GetAppAccessToken() != accessToken {
+		t.Errorf("expected GetAppAccessToken to return \"%s\", got \"%s\"", accessToken, client.GetAppAccessToken())
+	}
+}
+
 func TestSetAppAccessToken(t *testing.T) {
 	t.Parallel()
 
@@ -403,6 +422,25 @@ func TestSetAppAccessToken(t *testing.T) {
 
 	if client.opts.AppAccessToken != accessToken {
 		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.opts.AppAccessToken)
+	}
+}
+
+func TestGetUserAccessToken(t *testing.T) {
+	t.Parallel()
+
+	accessToken := "my-user-access-token"
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	client.SetUserAccessToken(accessToken)
+
+	if client.GetUserAccessToken() != accessToken {
+		t.Errorf("expected GetUserAccessToken to return \"%s\", got \"%s\"", accessToken, client.GetUserAccessToken())
 	}
 }
 
