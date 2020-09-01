@@ -27,5 +27,5 @@ jobs:
         run: go test -v -parallel=10 -covermode=count -coverprofile=coverage.out
       - name: Send coverage
         env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
         run: goveralls -coverprofile=covprofile -service=github
