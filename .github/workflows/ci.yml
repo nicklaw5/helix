@@ -1,5 +1,4 @@
-
-name: Tests
+name: Tests and Coverage
 
 on:
   push:
@@ -19,13 +18,22 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
+      - name: Check out code the Go-Way
+        run: go get github.com/${GITHUB_REPOSITORY}
       - name: Setup
         run: |
+          cd ~/go/src/github.com/${GITHUB_REPOSITORY}
+          go get -v -t -d ./...
           go get golang.org/x/tools/cmd/cover
           go get github.com/mattn/goveralls
+          go install -v github.com/mattn/goveralls
       - name: Test
-        run: go test -v -parallel=10 -covermode=count -coverprofile=coverage.out
+        run: |
+          cd ~/go/src/github.com/${GITHUB_REPOSITORY}
+          go test -v -parallel=10 -covermode=count -coverprofile=coverage.out
       - name: Send coverage
         env:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        run: goveralls -coverprofile=coverage.out -service=github
+        run: |
+          cd ~/go/src/github.com/${GITHUB_REPOSITORY}
+          goveralls -coverprofile=coverage.out -service=github
