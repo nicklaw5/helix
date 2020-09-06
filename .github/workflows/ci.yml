@@ -23,10 +23,8 @@ jobs:
       - name: Setup
         run: |
           cd ~/go/src/github.com/${GITHUB_REPOSITORY}
-          go get -v -t -d ./...
           go get golang.org/x/tools/cmd/cover
           go get github.com/mattn/goveralls
-          go install -v github.com/mattn/goveralls
       - name: Test
         run: |
           cd ~/go/src/github.com/${GITHUB_REPOSITORY}
