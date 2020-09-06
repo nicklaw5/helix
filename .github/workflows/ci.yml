@@ -1,5 +1,4 @@
-
-name: Tests
+name: Tests and Coverage
 
 on:
   push:
@@ -11,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.14.x', '1.13.x', '1.12.x', '1.11.x', '1.10.x', '1.9.x', '1.8.x' ]
+        go: [ '1.15.x', '1.14.x', '1.13.x', '1.12.x' ]
     name: Test with Go v${{ matrix.go }}
     steps:
       - uses: actions/checkout@v2
@@ -24,8 +23,10 @@ jobs:
           go get golang.org/x/tools/cmd/cover
           go get github.com/mattn/goveralls
       - name: Test
-        run: go test -v -parallel=10 -covermode=count -coverprofile=coverage.out
+        run: |
+          go test -v -parallel=10 -covermode=count -coverprofile=coverage.out
       - name: Send coverage
         env:
-          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        run: goveralls -coverprofile=covprofile -service=github
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          goveralls -coverprofile=coverage.out -service=github
