@@ -2,7 +2,7 @@
 
 A Twitch Helix API client written in Go (Golang).
 
-[![Build Status](https://github.com/nicklaw5/helix/workflows/Tests/badge.svg)]
+![Build Status](https://github.com/nicklaw5/helix/workflows/Tests/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/nicklaw5/helix/badge.svg)](https://coveralls.io/github/nicklaw5/helix)
 
 ## Package Status
