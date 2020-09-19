@@ -56,7 +56,7 @@ func TestGetAuthorizationURL(t *testing.T) {
 	}
 }
 
-func TestGetAppAccessToken(t *testing.T) {
+func TestRequestAppAccessToken(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -97,7 +97,7 @@ func TestGetAppAccessToken(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.GetAppAccessToken([]string{"some-scope"})
+		resp, err := c.RequestAppAccessToken([]string{"some-scope"})
 		if err != nil {
 			t.Error(err)
 		}
@@ -130,7 +130,7 @@ func TestGetAppAccessToken(t *testing.T) {
 	}
 }
 
-func TestGetUserAccessToken(t *testing.T) {
+func TestRequestUserAccessToken(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -218,7 +218,7 @@ func TestGetUserAccessToken(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.GetUserAccessToken(testCase.code)
+		resp, err := c.RequestUserAccessToken(testCase.code)
 		if err != nil {
 			t.Error(err)
 		}
