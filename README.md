@@ -28,21 +28,48 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 
 **API Endpoint:**
 
-- [x] Get Bits Leaderboard
-- [x] Get Clip
-- [x] Create Clip
-- [x] Create Entitlement Grants Upload URL
-- [x] Get Games
-- [x] Get Top Games
+- [ ] Start Commercial
 - [x] Get Extension Analytics
+- [ ] Get Cheermotes
 - [x] Get Game Analytics
+- [x] Get Bits Leaderboard
+- [ ] Get Extension Transactions
+- [x] Create Clip
+- [x] Get Clip
+- [ ] Get Clips
+- [x] Create Entitlement Grants Upload URL
+- [ ] Get Code Status
+- [ ] Get Drops Entitlements
+- [ ] Redeem Code
+- [x] Get Top Games
+- [x] Get Games
+- [ ] Get Hype Train Events
+- [ ] Check AutoMod Status
+- [ ] Get Banned Users
+- [ ] Get Banned Events
+- [ ] Get Moderators
+- [ ] Get Moderator Events
+- [ ] Search Categories
+- [ ] Search Channels
+- [ ] Get Stream Key
 - [x] Get Streams
 - [x] Get Streams Metadata
 - [x] Create Stream Marker
 - [x] Get Stream Markers
+- [ ] Get Channel Information
+- [ ] Modify Channel Information
+- [ ] Get Broadcaster Subscriptions
+- [ ] Get All Stream Tags
+- [ ] Get Stream Tags
+- [ ] Replace Stream Tags
+- [ ] Create User Follows
+- [ ] Delete User Follows
 - [x] Get Users
 - [x] Get Users Follows
+- [ ] Get User Extensions
+- [ ] Get User Active Extensions
 - [x] Update User
+- [ ] Update User Extensions
 - [x] Get Videos
 - [x] Get Webhook Subscriptions
 
