@@ -14,7 +14,7 @@ type GetDropEntitlementsParams struct {
 type Entitlement struct {
 	EntitlementID string `json:"id"`
 	BenefitID string `json:"benefit_id"`
-	Timestamp string `json:"timestamp"`
+	Timestamp Time `json:"timestamp"`
 	UserID string `json:"user_id"`
 	GameID string `json:"game_id"`
 }
@@ -27,7 +27,7 @@ type ManyEntitlements struct {
 // ManyEntitlementsWithPagination ...
 type ManyEntitlementsWithPagination struct {
 	ManyEntitlements
-	Pagination Pagination `json:"pagination"`
+	Pagination `json:"pagination"`
 }
 
 // GetDropsEntitlementsResponse ...
