@@ -75,11 +75,11 @@ func TestGetDropsEntitlements(t *testing.T) {
 
 		// Test success case
 		if len(resp.Data.Entitlements) < 1 {
-			t.Errorf("Expected entitlements to be a positive number")
+			t.Errorf("Expected the number of entitlements to be a positive number")
 		}
 
 		if !strings.EqualFold(resp.Data.Entitlements[0].GameID, testCase.gameID) {
-			t.Errorf("Expected Entitlement's GameID to be the same as the requested GameID - wanted \"%s\", got \"%s\"",
+			t.Errorf("Expected the Entitlement's GameID to be the same as the requested GameID - wanted \"%s\", got \"%s\"",
 				resp.Data.Entitlements[0].GameID, testCase.gameID)
 		}
 	}
