@@ -1,22 +1,21 @@
 package helix
 
-
 // GetDropEntitlementsParams ...
 type GetDropEntitlementsParams struct {
 	EntitlementID string `query:"id"`
-	UserID  string `query:"user_id"`
-	GameID  string `query:"game_id"`
-	After  string `query:"after"`
-	First  int    `query:"first,20"` // Limit 100
+	UserID        string `query:"user_id"`
+	GameID        string `query:"game_id"`
+	After         string `query:"after"`
+	First         int    `query:"first,20"` // Limit 100
 }
 
 // Entitlement ...
 type Entitlement struct {
 	EntitlementID string `json:"id"`
-	BenefitID string `json:"benefit_id"`
-	Timestamp Time `json:"timestamp"`
-	UserID string `json:"user_id"`
-	GameID string `json:"game_id"`
+	BenefitID     string `json:"benefit_id"`
+	Timestamp     Time   `json:"timestamp"`
+	UserID        string `json:"user_id"`
+	GameID        string `json:"game_id"`
 }
 
 // ManyEntitlements ...
@@ -40,8 +39,8 @@ type GetDropsEntitlementsResponse struct {
 // Filtering by UserID returns all of the entitlements related to that specific user.
 // Filtering by GameID returns all of the entitlements related to that game.
 // Filtering by GameID and UserID returns all of the entitlements related to that game and that user.
-// Entitlements are digital items that users are entitled to use. Twitch entitlements are granted to users
-// gratis or as part of a purchase on Twitch.
+// Entitlements are digital items that users are entitled to use. Twitch entitlements are granted based on viewership
+// engagement with a content creator, based on the game developers' campaign.
 func (c *Client) GetDropsEntitlements(params *GetDropEntitlementsParams) (*GetDropsEntitlementsResponse, error) {
 	resp, err := c.get("/entitlements/drops", &ManyEntitlementsWithPagination{}, params)
 	if err != nil {
