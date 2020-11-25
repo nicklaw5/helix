@@ -2,7 +2,7 @@ package helix
 
 // GetDropEntitlementsParams ...
 type GetDropEntitlementsParams struct {
-	EntitlementID string `query:"id"`
+	ID string `query:"id"`
 	UserID        string `query:"user_id"`
 	GameID        string `query:"game_id"`
 	After         string `query:"after"`
@@ -11,7 +11,7 @@ type GetDropEntitlementsParams struct {
 
 // Entitlement ...
 type Entitlement struct {
-	EntitlementID string `json:"id"`
+	ID string `json:"id"`
 	BenefitID     string `json:"benefit_id"`
 	Timestamp     Time   `json:"timestamp"`
 	UserID        string `json:"user_id"`
