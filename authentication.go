@@ -63,7 +63,7 @@ func (c *Client) RequestAppAccessToken(scopes []string) (*AppAccessTokenResponse
 		ClientSecret: opts.ClientSecret,
 		RedirectURI:  opts.RedirectURI,
 		GrantType:    "client_credentials",
-		Scopes:       scopes,
+		Scopes:       strings.Join(scopes, " "),
 	}
 
 	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
@@ -88,12 +88,12 @@ type UserAccessTokenResponse struct {
 }
 
 type accessTokenRequestData struct {
-	Code         string   `query:"code"`
-	ClientID     string   `query:"client_id"`
-	ClientSecret string   `query:"client_secret"`
-	RedirectURI  string   `query:"redirect_uri"`
-	GrantType    string   `query:"grant_type"`
-	Scopes       []string `query:"scope"`
+	Code         string `query:"code"`
+	ClientID     string `query:"client_id"`
+	ClientSecret string `query:"client_secret"`
+	RedirectURI  string `query:"redirect_uri"`
+	GrantType    string `query:"grant_type"`
+	Scopes       string `query:"scope"`
 }
 
 // RequestUserAccessToken ...
