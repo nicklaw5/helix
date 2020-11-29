@@ -40,7 +40,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Create Entitlement Grants Upload URL
 - [x] Get Code Status
 - [x] Get Drops Entitlements
-- [ ] Redeem Code
+- [x] Redeem Code
 - [x] Get Top Games
 - [x] Get Games
 - [ ] Get Hype Train Events
