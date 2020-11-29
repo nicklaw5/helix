@@ -55,3 +55,21 @@ func (c *Client) GetEntitlementCodeStatus(params *CodesParams) (*CodeResponse, e
 
 	return codes, nil
 }
+
+/**
+Per https://dev.twitch.tv/docs/api/reference/#redeem-code
+Access is controlled via an app access token on the calling service. The client ID associated with the app access token must be approved by Twitch.
+Callers with an app access token are authorized to redeem codes on behalf of any Twitch user account.
+*/
+func (c *Client) RedeemEntitlementCode(params *CodesParams) (*CodeResponse, error) {
+	resp, err := c.post("/entitlements/code", &ManyCodes{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	codes := &CodeResponse{}
+	resp.HydrateResponseCommon(&codes.ResponseCommon)
+	codes.Data.Codes = resp.Data.(*ManyCodes).Codes
+
+	return codes, nil
+}
