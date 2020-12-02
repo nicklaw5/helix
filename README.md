@@ -28,7 +28,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 
 **API Endpoint:**
 
-- [ ] Start Commercial
+- [x] Start Commercial
 - [x] Get Extension Analytics
 - [ ] Get Cheermotes
 - [x] Get Game Analytics
