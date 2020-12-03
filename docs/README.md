@@ -123,8 +123,6 @@ These include:
 - `Response.GetRateLimitReset()`
 - `Response.GetClipsCreationRateLimit()` (only available when called `client.CreateClip()`)
 - `Response.GetClipsCreationRateLimitRemaining()` (only available when called `client.CreateClip()`)
-- `Response.GetStreamsMetadataRateLimit()` (only available when called `client.GetStreamsMetadata()`)
-- `Response.GetStreamsMetadataRateLimitRemaining()` (only available when called `client.GetStreamsMetadata()`)
 
 This package also allows users to provide a rate limit callback of their own which will be executed just
 before a request is sent. That way you can provide some sort of functionality for limiting the requests sent

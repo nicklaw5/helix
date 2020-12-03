@@ -53,7 +53,6 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [ ] Search Channels
 - [ ] Get Stream Key
 - [x] Get Streams
-- [x] Get Streams Metadata
 - [x] Create Stream Marker
 - [x] Get Stream Markers
 - [ ] Get Channel Information
