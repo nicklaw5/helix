@@ -30,7 +30,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 
 - [x] Start Commercial
 - [x] Get Extension Analytics
-- [ ] Get Cheermotes
+- [x] Get Cheermotes
 - [x] Get Game Analytics
 - [x] Get Bits Leaderboard
 - [ ] Get Extension Transactions
