@@ -4,10 +4,11 @@ import "time"
 
 // UserBitTotal ...
 type UserBitTotal struct {
-	UserID   string `json:"user_id"`
-	UserName string `json:"user_name"`
-	Rank     int    `json:"rank"`
-	Score    int    `json:"score"`
+	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
+	UserName  string `json:"user_name"`
+	Rank      int    `json:"rank"`
+	Score     int    `json:"score"`
 }
 
 // ManyUserBitTotals ...

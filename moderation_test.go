@@ -33,7 +33,7 @@ func TestGetBannedUsers(t *testing.T) {
 			"",
 			"",
 			"",
-			`{"data":[{"expires_at":"","user_id":"54946241","user_name":"chronophylos"},{"expires_at":"2022-03-15T02:00:28Z","user_id":"423374343","user_name":"glowillig"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
+			`{"data":[{"expires_at":"","user_id":"54946241","user_name":"chronophylos","user_name":"chronophylos"},{"expires_at":"2022-03-15T02:00:28Z","user_id":"423374343","user_name":"glowillig"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
 		},
 	}
 
