@@ -4,6 +4,7 @@ package helix
 type Video struct {
 	ID           string `json:"id"`
 	UserID       string `json:"user_id"`
+	UserLogin    string `json:"user_login"`
 	UserName     string `json:"user_name"`
 	Title        string `json:"title"`
 	Description  string `json:"description"`

@@ -17,9 +17,10 @@ type VideoMarker struct {
 
 // StreamMarker ...
 type StreamMarker struct {
-	UserID   string        `json:"user_id"`
-	UserName string        `json:"user_name"`
-	Videos   []VideoMarker `json:"videos"`
+	UserID    string        `json:"user_id"`
+	UserName  string        `json:"user_name"`
+	UserLogin string        `json:"user_login"`
+	Videos    []VideoMarker `json:"videos"`
 }
 
 // ManyStreamMarkers ...

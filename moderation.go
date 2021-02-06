@@ -4,6 +4,7 @@ package helix
 // ExpiresAt must be parsed manually since an empty string means perma ban
 type Ban struct {
 	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
 	UserName  string `json:"user_name"`
 	ExpiresAt Time   `json:"expires_at"`
 }

@@ -31,7 +31,7 @@ func TestClient_GetBitsLeaderboard(t *testing.T) {
 			2,
 			"week",
 			time.Time{},
-			`{"data":[{"user_id":"158010205","user_name":"TundraCowboy","rank":1,"score":12543},{"user_id":"7168163","rank":2,"score":6900}],"date_range":{"started_at":"2018-02-05T08:00:00Z","ended_at":"2018-02-12T08:00:00Z"},"total":2}`,
+			`{"data":[{"user_id":"158010205","user_login":"tundracowboy","user_name":"TundraCowboy","rank":1,"score":12543},{"user_id":"7168163","rank":2,"score":6900}],"date_range":{"started_at":"2018-02-05T08:00:00Z","ended_at":"2018-02-12T08:00:00Z"},"total":2}`,
 		},
 		{
 			http.StatusOK,

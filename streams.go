@@ -6,6 +6,7 @@ import "time"
 type Stream struct {
 	ID           string    `json:"id"`
 	UserID       string    `json:"user_id"`
+	UserLogin    string    `json:"user_login"`
 	UserName     string    `json:"user_name"`
 	GameID       string    `json:"game_id"`
 	TagIDs       []string  `json:"tag_ids"`

@@ -24,7 +24,7 @@ func TestGetVideos(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&VideosParams{GameID: "21779", Period: "month", Type: "highlight", Language: "en", Sort: "views", First: 1},
-			`{"data":[{"id":"224404190","user_id":"30080751","user_name":"Dyrus","title":"jhin mains LUL","description":"LUL","created_at":"2018-01-31T22:35:55Z","published_at":"2018-01-31T22:35:55Z","url":"https://www.twitch.tv/videos/224404190","thumbnail_url":"https://static-cdn.jtvnw.net/s3_vods/427483724d153cb8c673_dyrus_27413838016_782035045//thumb/thumb224404190-%{width}x%{height}.jpg","viewable":"public","view_count":4924,"language":"en","type":"highlight","duration":"50s"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
+			`{"data":[{"id":"224404190","user_id":"30080751","user_name":"dyrus","user_name":"Dyrus","title":"jhin mains LUL","description":"LUL","created_at":"2018-01-31T22:35:55Z","published_at":"2018-01-31T22:35:55Z","url":"https://www.twitch.tv/videos/224404190","thumbnail_url":"https://static-cdn.jtvnw.net/s3_vods/427483724d153cb8c673_dyrus_27413838016_782035045//thumb/thumb224404190-%{width}x%{height}.jpg","viewable":"public","view_count":4924,"language":"en","type":"highlight","duration":"50s"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,
 		},
 	}
 
