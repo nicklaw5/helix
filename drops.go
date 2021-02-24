@@ -2,20 +2,20 @@ package helix
 
 // GetDropEntitlementsParams ...
 type GetDropEntitlementsParams struct {
-	ID string `query:"id"`
-	UserID        string `query:"user_id"`
-	GameID        string `query:"game_id"`
-	After         string `query:"after"`
-	First         int    `query:"first,20"` // Limit 100
+	ID     string `query:"id"`
+	UserID string `query:"user_id"`
+	GameID string `query:"game_id"`
+	After  string `query:"after"`
+	First  int    `query:"first,20"` // Limit 100
 }
 
 // Entitlement ...
 type Entitlement struct {
-	ID string `json:"id"`
-	BenefitID     string `json:"benefit_id"`
-	Timestamp     Time   `json:"timestamp"`
-	UserID        string `json:"user_id"`
-	GameID        string `json:"game_id"`
+	ID        string `json:"id"`
+	BenefitID string `json:"benefit_id"`
+	Timestamp Time   `json:"timestamp"`
+	UserID    string `json:"user_id"`
+	GameID    string `json:"game_id"`
 }
 
 // ManyEntitlements ...
