@@ -109,3 +109,89 @@ func TestSearchChannels(t *testing.T) {
 		}
 	}
 }
+
+func TestGetChannelInformation(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		BroadcasterID string
+		respBody      string
+		parsed        []ChannelInformation
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"44445592",
+			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^"}]}`,
+			[]ChannelInformation{
+				ChannelInformation{
+					ID:         "44445592",
+					Display:    "pokimane",
+					Language:   "en",
+					CategoryID: "509658",
+					Category:   "Just Chatting",
+					Title:      "See you Wednesday 8am for Among Us ^_^",
+				},
+			},
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"9999999999999999999",
+			`{"error":"Bad Request","status":400,"message":"Invalid broadcasterID"}`,
+			[]ChannelInformation{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetChannelInformation(&GetChannelInformationParams{
+			BroadcasterID: testCase.BroadcasterID,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			broadcasterIDErrStr := "Invalid broadcasterID"
+			if resp.ErrorMessage != broadcasterIDErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", broadcasterIDErrStr, resp.ErrorMessage)
+				continue
+			}
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		for i, channel := range resp.Data.Channels {
+			if channel.ID != testCase.parsed[i].ID {
+				t.Errorf("Expected struct field ID = %s, was %s", testCase.parsed[i].ID, channel.ID)
+			}
+
+			if channel.Display != testCase.parsed[i].Display {
+				t.Errorf("Expected struct field DisplayName = %s, was %s", testCase.parsed[i].Display, channel.Display)
+			}
+
+			if channel.Language != testCase.parsed[i].Language {
+				t.Errorf("Expected struct field Language = %s, was %s", testCase.parsed[i].Language, channel.Language)
+			}
+
+			if channel.CategoryID != testCase.parsed[i].CategoryID {
+				t.Errorf("Expected struct field CategoryID = %s, was %s", testCase.parsed[i].CategoryID, channel.CategoryID)
+			}
+
+			if channel.Category != testCase.parsed[i].Category {
+				t.Errorf("Expected struct field Category = %s, was %s", testCase.parsed[i].Category, channel.Category)
+			}
+
+			if channel.Title != testCase.parsed[i].Title {
+				t.Errorf("Expected struct field Title = %s, was %s", testCase.parsed[i].Title, channel.Title)
+			}
+		}
+	}
+}

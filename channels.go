@@ -49,3 +49,43 @@ func (c *Client) SearchChannels(params *SearchChannelsParams) (*SearchChannelsRe
 
 	return channels, nil
 }
+
+// GetChannelInformationParams ...
+type GetChannelInformationParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+}
+
+// GetChannelInformationResponse ...
+type GetChannelInformationResponse struct {
+	ResponseCommon
+	Data ManyChannelInformation
+}
+
+// ManyChannelInformation ...
+type ManyChannelInformation struct {
+	Channels []ChannelInformation `json:"data"`
+}
+
+// ChannelInformation ...
+type ChannelInformation struct {
+	ID         string `json:"broadcaster_id"`
+	Display    string `json:"broadcaster_name"`
+	Language   string `json:"broadcaster_language"`
+	CategoryID string `json:"game_id"`
+	Category   string `json:"game_name"`
+	Title      string `json:"title"`
+}
+
+// GetChannelInformation ...
+func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*GetChannelInformationResponse, error) {
+	resp, err := c.get("/channels", &ManyChannelInformation{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	channels := &GetChannelInformationResponse{}
+	resp.HydrateResponseCommon(&channels.ResponseCommon)
+	channels.Data.Channels = resp.Data.(*ManyChannelInformation).Channels
+
+	return channels, nil
+}
