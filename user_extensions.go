@@ -87,6 +87,7 @@ func (c *Client) GetUserActiveExtensions(params *UserActiveExtensionsParams) (*U
 	return userActiveExtensions, nil
 }
 
+// UpdateUserExtensionsPayload ...
 type UpdateUserExtensionsPayload struct {
 	Component map[string]UserActiveExtensionInfo `json:"component,omitempty"`
 	Overlay   map[string]UserActiveExtensionInfo `json:"overlay,omitempty"`

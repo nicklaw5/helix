@@ -21,7 +21,7 @@ func TestSearchChannels(t *testing.T) {
 			2,
 			`{"data":[{"broadcaster_language":"en","display_name":"Ninja","game_id":"33214","id":"27833742640","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_ninja-{width}x{height}.jpg","title":"I have lost my voice D: | twitter.com/Ninja","started_at":"2018-03-06T15:07:45Z"},{"broadcaster_language":"en","display_name":"DrDisrespect","game_id":"33214","id":"27834185424","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_drdisrespectlive-{width}x{height}.jpg","title":"Turbo Treehouses || @DrDisRespect","started_at":"2018-03-06T16:05:00Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6Mn19"}}`,
 			[]Channel{
-				Channel{
+				{
 					ID:               "27833742640",
 					GameID:           "33214",
 					BroadcasterLogin: "ninja",
@@ -32,7 +32,7 @@ func TestSearchChannels(t *testing.T) {
 					IsLive:           false,
 					TagIDs:           []string{},
 				},
-				Channel{
+				{
 					ID:               "27834185424",
 					GameID:           "33214",
 					BroadcasterLogin: "drdisrespect",
@@ -126,7 +126,7 @@ func TestGetChannelInformation(t *testing.T) {
 			"44445592",
 			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^"}]}`,
 			[]ChannelInformation{
-				ChannelInformation{
+				{
 					ID:         "44445592",
 					Display:    "pokimane",
 					Language:   "en",

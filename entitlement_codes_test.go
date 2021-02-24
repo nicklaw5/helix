@@ -12,7 +12,7 @@ func TestClient_GetEntitlementCodeStatus(t *testing.T) {
 		statusCode int
 		options    *Options
 		count      int
-		userId     string
+		userID     string
 		codes      []string
 		respBody   string
 	}{
@@ -31,7 +31,7 @@ func TestClient_GetEntitlementCodeStatus(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		params := &CodesParams{
-			UserID: testCase.userId,
+			UserID: testCase.userID,
 			Codes:  testCase.codes,
 		}
 
@@ -68,7 +68,7 @@ func TestClient_RedeemEntitlementCode(t *testing.T) {
 		statusCode int
 		options    *Options
 		count      int
-		userId     string
+		userID     string
 		codes      []string
 		respBody   string
 	}{
@@ -87,7 +87,7 @@ func TestClient_RedeemEntitlementCode(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		params := &CodesParams{
-			UserID: testCase.userId,
+			UserID: testCase.userID,
 			Codes:  testCase.codes,
 		}
 

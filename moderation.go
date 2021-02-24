@@ -21,7 +21,7 @@ type BannedUsersResponse struct {
 	Data ManyBans
 }
 
-// BannedUsersResponse
+// BannedUsersParams ...
 // BroadcasterID must match the auth tokens user_id
 type BannedUsersParams struct {
 	BroadcasterID string `query:"broadcaster_id"`

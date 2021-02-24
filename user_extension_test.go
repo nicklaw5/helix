@@ -94,7 +94,7 @@ func TestUpdateUserExtensions(t *testing.T) {
 			&Options{ClientID: "my-client-id", UserAccessToken: "my-access-token"},
 			&UpdateUserExtensionsPayload{
 				Panel: map[string]UserActiveExtensionInfo{
-					"1": UserActiveExtensionInfo{
+					"1": {
 						Active: false,
 					},
 				},
