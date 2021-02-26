@@ -124,7 +124,7 @@ func TestPostWebhookSubscriptions(t *testing.T) {
 }
 
 func newMockWebhookRequest(header string) *http.Request {
-	return &http.Request{Header: map[string][]string{"Link": []string{header}}}
+	return &http.Request{Header: map[string][]string{"Link": {header}}}
 }
 
 func TestGetWebhookTopicFromRequest(t *testing.T) {

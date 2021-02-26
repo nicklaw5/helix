@@ -10,11 +10,11 @@ func TestGetDropsEntitlements(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode      int
-		options         *Options
-		gameID          string
-		respBody        string
-		expectedErrMsg  string
+		statusCode     int
+		options        *Options
+		gameID         string
+		respBody       string
+		expectedErrMsg string
 	}{
 		{
 			http.StatusUnauthorized,

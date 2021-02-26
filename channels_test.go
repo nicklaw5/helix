@@ -21,7 +21,7 @@ func TestSearchChannels(t *testing.T) {
 			2,
 			`{"data":[{"broadcaster_language":"en","display_name":"Ninja","game_id":"33214","id":"27833742640","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_ninja-{width}x{height}.jpg","title":"I have lost my voice D: | twitter.com/Ninja","started_at":"2018-03-06T15:07:45Z"},{"broadcaster_language":"en","display_name":"DrDisrespect","game_id":"33214","id":"27834185424","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_drdisrespectlive-{width}x{height}.jpg","title":"Turbo Treehouses || @DrDisRespect","started_at":"2018-03-06T16:05:00Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6Mn19"}}`,
 			[]Channel{
-				Channel{
+				{
 					ID:               "27833742640",
 					GameID:           "33214",
 					BroadcasterLogin: "ninja",
@@ -32,7 +32,7 @@ func TestSearchChannels(t *testing.T) {
 					IsLive:           false,
 					TagIDs:           []string{},
 				},
-				Channel{
+				{
 					ID:               "27834185424",
 					GameID:           "33214",
 					BroadcasterLogin: "drdisrespect",
@@ -105,6 +105,92 @@ func TestSearchChannels(t *testing.T) {
 			}
 			if len(channel.TagIDs) != len(testCase.parsed[i].TagIDs) {
 				t.Errorf("Expected struct field TagIDs length = %d, was %d", len(testCase.parsed[i].TagIDs), len(channel.TagIDs))
+			}
+		}
+	}
+}
+
+func TestGetChannelInformation(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		BroadcasterID string
+		respBody      string
+		parsed        []ChannelInformation
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"44445592",
+			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^"}]}`,
+			[]ChannelInformation{
+				{
+					BroadcasterID:         "44445592",
+					BroadcasterName:    "pokimane",
+					BroadcasterLanguage:   "en",
+					GameID: "509658",
+					GameName:   "Just Chatting",
+					Title:      "See you Wednesday 8am for Among Us ^_^",
+				},
+			},
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"9999999999999999999",
+			`{"error":"Bad Request","status":400,"message":"Invalid broadcasterID"}`,
+			[]ChannelInformation{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetChannelInformation(&GetChannelInformationParams{
+			BroadcasterID: testCase.BroadcasterID,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			broadcasterIDErrStr := "Invalid broadcasterID"
+			if resp.ErrorMessage != broadcasterIDErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", broadcasterIDErrStr, resp.ErrorMessage)
+				continue
+			}
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		for i, channel := range resp.Data.Channels {
+			if channel.BroadcasterID != testCase.parsed[i].BroadcasterID {
+				t.Errorf("Expected struct field BroadcasterID = %s, was %s", testCase.parsed[i].BroadcasterID, channel.BroadcasterID)
+			}
+
+			if channel.BroadcasterName != testCase.parsed[i].BroadcasterName {
+				t.Errorf("Expected struct field BroadcasterName = %s, was %s", testCase.parsed[i].BroadcasterName, channel.BroadcasterName)
+			}
+
+			if channel.BroadcasterLanguage != testCase.parsed[i].BroadcasterLanguage {
+				t.Errorf("Expected struct field BroadcasterLanguage = %s, was %s", testCase.parsed[i].BroadcasterLanguage, channel.BroadcasterLanguage)
+			}
+
+			if channel.GameID != testCase.parsed[i].GameID {
+				t.Errorf("Expected struct field GameID = %s, was %s", testCase.parsed[i].GameID, channel.GameID)
+			}
+
+			if channel.GameName != testCase.parsed[i].GameName {
+				t.Errorf("Expected struct field GameName = %s, was %s", testCase.parsed[i].GameName, channel.GameName)
+			}
+
+			if channel.Title != testCase.parsed[i].Title {
+				t.Errorf("Expected struct field Title = %s, was %s", testCase.parsed[i].Title, channel.Title)
 			}
 		}
 	}

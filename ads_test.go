@@ -12,7 +12,7 @@ func TestClient_StartCommercial(t *testing.T) {
 		statusCode     int
 		options        *Options
 		count          int
-		broadcasterId  string
+		broadcasterID  string
 		adLength       AdLengthEnum
 		respBody       string
 		expectedErrMsg string
@@ -45,7 +45,7 @@ func TestClient_StartCommercial(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		params := &StartCommercialParams{
-			BroadcasterID: testCase.broadcasterId,
+			BroadcasterID: testCase.broadcasterID,
 			Length:        testCase.adLength,
 		}
 
