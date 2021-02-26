@@ -127,11 +127,11 @@ func TestGetChannelInformation(t *testing.T) {
 			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^"}]}`,
 			[]ChannelInformation{
 				{
-					ID:         "44445592",
-					Display:    "pokimane",
-					Language:   "en",
-					CategoryID: "509658",
-					Category:   "Just Chatting",
+					BroadcasterID:         "44445592",
+					BroadcasterName:    "pokimane",
+					BroadcasterLanguage:   "en",
+					GameID: "509658",
+					GameName:   "Just Chatting",
 					Title:      "See you Wednesday 8am for Among Us ^_^",
 				},
 			},
