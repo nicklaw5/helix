@@ -173,8 +173,8 @@ func TestGetChannelInformation(t *testing.T) {
 				t.Errorf("Expected struct field BroadcasterID = %s, was %s", testCase.parsed[i].BroadcasterID, channel.BroadcasterID)
 			}
 
-			if channel.Display != testCase.parsed[i].Display {
-				t.Errorf("Expected struct field DisplayName = %s, was %s", testCase.parsed[i].Display, channel.Display)
+			if channel.BroadcasterName != testCase.parsed[i].BroadcasterName {
+				t.Errorf("Expected struct field BroadcasterName = %s, was %s", testCase.parsed[i].BroadcasterName, channel.BroadcasterName)
 			}
 
 			if channel.Language != testCase.parsed[i].Language {
