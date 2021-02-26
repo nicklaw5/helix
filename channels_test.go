@@ -185,8 +185,8 @@ func TestGetChannelInformation(t *testing.T) {
 				t.Errorf("Expected struct field GameID = %s, was %s", testCase.parsed[i].GameID, channel.GameID)
 			}
 
-			if channel.Category != testCase.parsed[i].Category {
-				t.Errorf("Expected struct field Category = %s, was %s", testCase.parsed[i].Category, channel.Category)
+			if channel.GameName != testCase.parsed[i].GameName {
+				t.Errorf("Expected struct field GameName = %s, was %s", testCase.parsed[i].GameName, channel.GameName)
 			}
 
 			if channel.Title != testCase.parsed[i].Title {
