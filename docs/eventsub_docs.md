@@ -29,7 +29,7 @@ fmt.Printf("%+v\n", resp)
 
 ## Create EventSub Subscription
 
-To create a subscription call CreateEventSubSubscription with a pointer to a subscription. As of writing Version sould always be "1" except for the Channel Raid Event which is still in beta and therefore you need to use Version "beta".
+To create a subscription call CreateEventSubSubscription with a pointer to a subscription. As of writing, Version should always be "1" except for the Channel moderator add / remove events which are still in beta and therefore you need to use Version "beta".
 Within the Transport the only supported Method currently is "webhook". Callback needs to be a https link on port 443. With the secret you can verify if notifications came from twitch. See (#verify-eventSub-notification)
 
 ```go
@@ -95,21 +95,21 @@ type eventSubNotification struct {
 func eventsubFollow(w http.ResponseWriter, r *http.Request) {
     body, err := ioutil.ReadAll(r.Body)
     if err != nil {
-        logrus.Error(err)
+        log.Println(err)
         return
     }
     defer r.Body.Close()
     // verify that the notification came from twitch using the secret.
     if !helix.VerifyEventSubNotification("s3cre7w0rd", r.Header, string(body)) {
-        logrus.Errorf("no valid signature on subscription\n%s", string(body))
+        log.Println("no valid signature on subscription")
         return
     } else {
-        logrus.Info("verified signature for subscription")
+        log.Println("verified signature for subscription")
     }
     var vals eventSubNotification
     err = json.NewDecoder(bytes.NewReader(body)).Decode(&vals)
     if err != nil {
-        logrus.Error(err)
+        log.Println(err)
         return
     }
     // if there's a challenge in the request, respond with only the challenge to verify your eventsub.
@@ -121,7 +121,7 @@ func eventsubFollow(w http.ResponseWriter, r *http.Request) {
     s, _ := vals.Event.MarshalJSON()
     err = json.NewDecoder(bytes.NewReader(s)).Decode(&followEvent)
     
-    logrus.Infof("got follow webhook: %s follows %s", followEvent.UserName, followEvent.BroadcasterUserName)
+    log.Printf("got follow webhook: %s follows %s\n", followEvent.UserName, followEvent.BroadcasterUserName)
     w.WriteHeader(200)
     w.Write([]byte("ok"))
 }
