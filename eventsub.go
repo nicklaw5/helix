@@ -393,13 +393,14 @@ func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*Eve
 	if callbackUrl.Port() != "" && callbackUrl.Port() != "443" {
 		return nil, fmt.Errorf("error: callback must use port 443")
 	}
-	resp, err := c.postAsJSON("/eventsub/subscriptions", nil, payload)
+	resp, err := c.postAsJSON("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, payload)
 	if err != nil {
 		return nil, err
 	}
 
 	eventsub := &EventSubSubscriptionsResponse{}
 	resp.HydrateResponseCommon(&eventsub.ResponseCommon)
+	eventsub.Data = *resp.Data.(*ManyEventSubSubscriptions)
 	return eventsub, nil
 }
 
