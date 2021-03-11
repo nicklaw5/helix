@@ -12,7 +12,7 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 		statusCode int
 		options    *Options
 		params     *EventSubSubscriptionsParams
-		count		int
+		count      int
 		respBody   string
 	}{
 		{
@@ -164,10 +164,10 @@ func TestCreateEventSubSubscriptions(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&EventSubSubscription{
-				Type:      "channel.follow",
-				Version:   "1",
+				Type:    "channel.follow",
+				Version: "1",
 				Condition: EventSubCondition{
-					BroadcasterUserID:     "12345678",
+					BroadcasterUserID: "12345678",
 				},
 				Transport: EventSubTransport{
 					Method:   "webhook",
@@ -222,11 +222,11 @@ func TestVerifyEventSubNotification(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		messageID	string
-		messageSignature	string
-		messageTimestamp	string
-		respBody   string
-		secret	string
+		messageID        string
+		messageSignature string
+		messageTimestamp string
+		respBody         string
+		secret           string
 	}{
 		{
 			"e76c6bd4-55c9-4987-8304-da1588d8988b",
