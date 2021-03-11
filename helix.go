@@ -140,6 +140,10 @@ func (c *Client) put(path string, respData, reqData interface{}) (*Response, err
 	return c.sendRequest(http.MethodPut, path, respData, reqData, false)
 }
 
+func (c *Client) delete(path string, respData, reqData interface{}) (*Response, error) {
+	return c.sendRequest(http.MethodDelete, path, respData, reqData, false)
+}
+
 func (c *Client) postAsJSON(path string, respData, reqData interface{}) (*Response, error) {
 	return c.sendRequest(http.MethodPost, path, respData, reqData, true)
 }

@@ -71,6 +71,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [ ] Update User Extensions
 - [x] Get Videos
 - [x] Get Webhook Subscriptions
+- [x] Create / Remove / List EventSub Subscriptions
 
 ## Quick Usage Example
 

@@ -1,0 +1,414 @@
+package helix
+
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"log"
+	"net/http"
+	"net/url"
+	"strings"
+)
+
+// EventSub Types for Parsing Requests / Responses
+
+// Represents a subscription
+type EventSubSubscription struct {
+	ID        string            `json:"id"`
+	Type      string            `json:"type"`
+	Version   string            `json:"version"`
+	Status    string            `json:"status"`
+	Condition EventSubCondition `json:"condition"`
+	Transport EventSubTransport `json:"transport"`
+	CreatedAt Time              `json:"created_at"`
+}
+
+// Conditions for a subscription, not all are necessary and some only apply to some subscription types, see https://dev.twitch.tv/docs/eventsub/eventsub-reference
+type EventSubCondition struct {
+	BroadcasterUserID     string `json:"broadcaster_user_id"`
+	FromBroadcasterUserID string `json:"from_broadcaster_user_id"`
+	ToBroadcasterUserID   string `json:"to_broadcaster_user_id"`
+	RewardID              string `json:"reward_id"`
+	ClientID              string `json:"client_id"`
+	UserID                string `json:"user_id"`
+}
+
+// Transport for the subscription, currently the only supported Method is "webhook". Secret must be between 10 and 100 characters
+type EventSubTransport struct {
+	Method   string `json:"method"`
+	Callback string `json:"callback"`
+	Secret   string `json:"secret"`
+}
+
+// Twitch Response for getting all current subscriptions
+type ManyEventSubSubscriptions struct {
+	Total                 int                    `json:"total"`
+	EventSubSubscriptions []EventSubSubscription `json:"data"`
+	Pagination            Pagination             `json:"pagination"`
+	Limit                 int                    `json:"limit"`
+}
+
+// Response for getting all current subscriptions
+type EventSubSubscriptionsResponse struct {
+	ResponseCommon
+	Data ManyEventSubSubscriptions
+}
+
+// Parameter for filtering subscriptions, currently only the status is filterable
+type EventSubSubscriptionsParams struct {
+	Status string `query:"status"`
+}
+
+// Parameter for removing a subscription.
+type RemoveEventSubSubscriptionParams struct {
+	ID string `query:"id"`
+}
+
+// Response for removing a subscription
+type RemoveEventSubSubscriptionParamsResponse struct {
+	ResponseCommon
+}
+
+// EventSub helper Variables for Types and Status
+const (
+	EventSubStatusEnabled                      = "enabled"
+	EventSubStatusPending                      = "webhook_callback_verification_pending"
+	EventSubStatusFailed                       = "webhook_callback_verification_failed"
+	EventSubStatusNotificationFailuresExceeded = "notification_failures_exceeded"
+	EventSubStatusAuthorizationRevoked         = "authorization_revoked"
+	EventSubStatusUserRemoved                  = "user_removed"
+
+	EventSubTypeChannelUpdate                             = "channel.update"
+	EventSubTypeChannelFollow                             = "channel.follow"
+	EventSubTypeChannelSubscription                       = "channel.subscribe"
+	EventSubTypeChannelCheer                              = "channel.cheer"
+	EventSubTypeChannelRaid                               = "channel.raid"
+	EventSubTypeChannelBan                                = "channel.ban"
+	EventSubTypeChannelUnban                              = "channel.unban"
+	EventSubTypeModeratorAdd                              = "channel.moderator.add"
+	EventSubTypeModeratorRemove                           = "channel.moderator.remove"
+	EventSubTypeChannelPointsCustomRewardAdd              = "channel.channel_points_custom_reward.add"
+	EventSubTypeChannelPointsCustomRewardUpdate           = "channel.channel_points_custom_reward.update"
+	EventSubTypeChannelPointsCustomRewardRemove           = "channel.channel_points_custom_reward.remove"
+	EventSubTypeChannelPointsCustomRewardRedemptionAdd    = "channel.channel_points_custom_reward_redemption.add"
+	EventSubTypeChannelPointsCustomRewardRedemptionUpdate = "channel.channel_points_custom_reward_redemption.update"
+	EventSubTypeHypeTrainBegin                            = "channel.hype_train.begin"
+	EventSubTypeHypeTrainProgress                         = "channel.hype_train.progress"
+	EventSubTypeHypeTrainEnd                              = "channel.hype_train.end"
+	EventSubTypeStreamOnline                              = "stream.online"
+	EventSubTypeStreamOffline                             = "stream.offline"
+	EventSubTypeUserAuthorizationRevoke                   = "user.authorization.revoke"
+	EventSubTypeUserUpdate                                = "user.update"
+)
+
+// Event Notification Responses
+
+// Data for a channel ban notification
+type EventSubChannelBanEvent struct {
+	UserID               string `json:"user_id"`
+	UserLogin            string `json:"user_login"`
+	UserName             string `json:"user_name"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	ModeratorUserID      string `json:"moderator_user_id"`
+	ModeratorUserLogin   string `json:"moderator_user_login"`
+	ModeratorUserName    string `json:"moderator_user_name"`
+	Reason               string `json:"reason"`
+	EndsAt               Time   `json:"ends_at"`
+	IsPermanent          bool   `json:"is_permanent"`
+}
+
+// Data for a channel subscribe notification
+type EventSubChannelSubscribeEvent struct {
+	UserID               string `json:"user_id"`
+	UserLogin            string `json:"user_login"`
+	UserName             string `json:"user_name"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	Tier                 string `json:"tier"`
+	IsGift               bool   `json:"is_gift"`
+}
+
+// Data for a channel cheer notification
+type EventSubChannelCheerEvent struct {
+	IsAnonymous          bool   `json:"is_anonymous"`
+	UserID               string `json:"user_id"`
+	UserLogin            string `json:"user_login"`
+	UserName             string `json:"user_name"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	Message              string `json:"message"`
+	Bits                 int    `json:"bits"`
+}
+
+// Data for a channel update notification
+type EventSubChannelUpdateEvent struct {
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	Title                string `json:"title"`
+	Language             string `json:"language"`
+	CategoryID           string `json:"category_id"`
+	CategoryName         string `json:"category_name"`
+	IsMature             string `json:"is_mature"`
+}
+
+// Data for a channel unban notification
+type EventSubChannelUnbanEvent struct {
+	UserID               string `json:"user_id"`
+	UserLogin            string `json:"user_login"`
+	UserName             string `json:"user_name"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	ModeratorUserID      string `json:"moderator_user_id"`
+	ModeratorUserLogin   string `json:"moderator_user_login"`
+	ModeratorUserName    string `json:"moderator_user_name"`
+}
+
+// Data for a channel follow notification
+type EventSubChannelFollowEvent struct {
+	UserID               string `json:"user_id"`
+	UserLogin            string `json:"user_login"`
+	UserName             string `json:"user_name"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+}
+
+// Data for a channel moderator add notification, it's the same as the channel follow notification
+type EventSubModeratorAddEvent = EventSubChannelFollowEvent
+
+// Data for a channel moderator remove notification, it's the same as the channel follow notification
+type EventSubModeratorRemoveEvent = EventSubChannelFollowEvent
+
+// Data for a channel raid notification
+type EventSubChannelRaidEvent struct {
+	FromBroadcasterUserID    string `json:"from_broadcaster_user_id"`
+	FromBroadcasterUserLogin string `json:"from_broadcaster_user_login"`
+	FromBroadcasterUserName  string `json:"from_broadcaster_user_name"`
+	ToBroadcasterUserID      string `json:"to_broadcaster_user_id"`
+	ToBroadcasterUserLogin   string `json:"to_broadcaster_user_login"`
+	ToBroadcasterUserName    string `json:"to_broadcaster_user_name"`
+	Viewers                  int    `json:"viewers"`
+}
+
+// Data for a channel points custom reward notification
+type EventSubChannelPointsCustomRewardEvent struct {
+	ID                                string                 `json:"id"`
+	BroadcasterUserID                 string                 `json:"broadcaster_user_id"`
+	BroadcasterUserLogin              string                 `json:"broadcaster_user_login"`
+	BroadcasterUserName               string                 `json:"broadcaster_user_name"`
+	IsEnabled                         bool                   `json:"is_enabled"`
+	IsPaused                          bool                   `json:"is_paused"`
+	IsInStock                         bool                   `json:"is_in_stock"`
+	Title                             string                 `json:"title"`
+	Cost                              int                    `json:"cost"`
+	Prompt                            string                 `json:"prompt"`
+	IsUserInputRequired               bool                   `json:"is_user_input_required"`
+	ShouldRedemptionsSkipRequestQueue bool                   `json:"should_redemptions_skip_request_queue"`
+	MaxPerStream                      EventSubMaxPerStream   `json:"max_per_stream"`
+	MaxPerUserPerStream               EventSubMaxPerStream   `json:"max_per_user_per_stream"`
+	BackgroundColor                   string                 `json:"background_color"`
+	Image                             EventSubImage          `json:"image"`
+	DefaultImage                      EventSubImage          `json:"default_image"`
+	GlobalCooldown                    EventSubGlobalCooldown `json:"global_cooldown"`
+	CooldownExpiresAt                 Time                   `json:"cooldown_expires_at"`
+	RedemptionsRedeemedCurrentStream  int                    `json:"redemptions_redeemed_current_stream"`
+}
+
+// Data for a channel points custom reward redemption notification
+type EventSubChannelPointsCustomRewardRedemptionEvent struct {
+	ID                   string         `json:"id"`
+	BroadcasterUserID    string         `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string         `json:"broadcaster_user_login"`
+	BroadcasterUserName  string         `json:"broadcaster_user_name"`
+	UserID               string         `json:"user_id"`
+	UserLogin            string         `json:"user_login"`
+	UserName             string         `json:"user_name"`
+	UserInput            string         `json:"user_input`
+	Status               string         `json:"status"`
+	Reward               EventSubReward `json:"reward"`
+	RedeemedAt           Time           `json:"redeemed_at"`
+}
+
+// Data for a hype train begin notification
+type EventSubHypeTrainBeginEvent struct {
+	BroadcasterUserID    string                 `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string                 `json:"broadcaster_user_login"`
+	BroadcasterUserName  string                 `json:"broadcaster_user_name"`
+	Total                int                    `json:"total"`
+	Progress             int                    `json:"progress"`
+	Goal                 int                    `json:"goal"`
+	TopContributions     []EventSubContribution `json:"top_contributions"`
+	LastContribution     EventSubContribution   `json:"last_contribution"`
+	StartedAt            Time                   `json:"started_at"`
+	ExpiresAt            Time                   `json:"expires_at"`
+}
+
+// Data for a hype train progress notification
+type EventSubHypeTrainProgressEvent struct {
+	BroadcasterUserID    string                 `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string                 `json:"broadcaster_user_login"`
+	BroadcasterUserName  string                 `json:"broadcaster_user_name"`
+	Level                int                    `json:"level"`
+	Total                int                    `json:"total"`
+	Progress             int                    `json:"progress"`
+	Goal                 int                    `json:"goal"`
+	TopContributions     []EventSubContribution `json:"top_contributions"`
+	LastContribution     EventSubContribution   `json:"last_contribution"`
+	StartedAt            Time                   `json:"started_at"`
+	ExpiresAt            Time                   `json:"expires_at"`
+}
+
+// Data for a hype train end notification
+type EventSubHypeTrainEndEvent struct {
+	BroadcasterUserID    string                 `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string                 `json:"broadcaster_user_login"`
+	BroadcasterUserName  string                 `json:"broadcaster_user_name"`
+	Level                int                    `json:"level"`
+	Total                int                    `json:"total"`
+	TopContributions     []EventSubContribution `json:"top_contributions"`
+	StartedAt            Time                   `json:"started_at"`
+	ExpiresAt            Time                   `json:"expires_at"`
+	CooldownEndsAt       Time                   `json:"cooldown_ends_at"`
+}
+
+// Data for a stream online notification
+type EventSubStreamOnlineEvent struct {
+	ID                   string `json:"id"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	Type                 string `json:"type"`
+	StartedAt            Time   `json:"started_at"`
+}
+
+// Data for a stream offline notification
+type EventSubStreamOfflineEvent struct {
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+}
+
+// Data for an user authentication revoke notification, this means the user has revoked the access token and if you need to comply with gdpr you need to delete your user data belonging to the user.
+type EventSubUserAuthenticationRevokeEvent struct {
+	ClientID  string `json:"client_id"`
+	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
+	UserName  string `json:"user_name"`
+}
+
+// Data for an user update notification
+type EventSubUserUpdateEvent struct {
+	UserID      string `json:"user_id"`
+	UserLogin   string `json:"user_login"`
+	UserName    string `json:"user_name"`
+	Email       string `json:"email"`
+	Description string `json:"description"`
+}
+
+// This belongs to a custom reward and defines it's cooldown
+type EventSubGlobalCooldown struct {
+	IsEnabled bool `json:"is_enabled"`
+	Seconds   int  `json:"seconds"`
+}
+
+// This also belongs to a custom reward and defines the image urls
+type EventSubImage struct {
+	Url1X string `json:"url_1x"`
+	Url2X string `json:"url_2x"`
+	Url4X string `json:"url_4x"`
+}
+
+// This belongs to a hype train and defines a user contribution
+type EventSubContribution struct {
+	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
+	UserName  string `json:"user_name"`
+	Type      string `json:"type"`
+	Total     string `json:"total"`
+}
+
+// This belongs to a custom reward and defines if it is limited per stream
+type EventSubMaxPerStream struct {
+	IsEnabled bool `json:"is_enabled"`
+	Value     int  `json:"value"`
+}
+
+// This belongs to a reward redemption and defines the reward redeemed
+type EventSubReward struct {
+	ID     string `json:"id"`
+	Title  string `json:"title"`
+	Cost   int    `json:"cost"`
+	Prompt string `json:"prompt"`
+}
+
+// Get all EventSub Subscriptions
+func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (*EventSubSubscriptionsResponse, error) {
+	resp, err := c.get("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	eventSubs := &EventSubSubscriptionsResponse{}
+	resp.HydrateResponseCommon(&eventSubs.ResponseCommon)
+	eventSubs.Data.Total = resp.Data.(*ManyEventSubSubscriptions).Total
+	eventSubs.Data.EventSubSubscriptions = resp.Data.(*ManyEventSubSubscriptions).EventSubSubscriptions
+	eventSubs.Data.Pagination = resp.Data.(*ManyEventSubSubscriptions).Pagination
+	eventSubs.Data.Limit = resp.Data.(*ManyEventSubSubscriptions).Limit
+
+	return eventSubs, nil
+}
+
+// Remove an EventSub Subscription
+func (c *Client) RemoveEventSubSubscription(id string) (*RemoveEventSubSubscriptionParamsResponse, error) {
+
+	resp, err := c.delete("/eventsub/subscriptions", nil, &RemoveEventSubSubscriptionParams{ID: id})
+	if err != nil {
+		return nil, err
+	}
+
+	eventsub := &RemoveEventSubSubscriptionParamsResponse{}
+	resp.HydrateResponseCommon(&eventsub.ResponseCommon)
+	return eventsub, nil
+}
+
+// Creates an EventSub subscription
+func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*EventSubSubscriptionsResponse, error) {
+	if payload.Type == EventSubTypeModeratorAdd || payload.Type == EventSubTypeModeratorRemove {
+		log.Println("warning: the EventSub subscription type is still in Beta and may stop working at any time.")
+	}
+	if payload.Transport.Method == "webhook" && !strings.HasPrefix(payload.Transport.Callback, "https://") {
+		return nil, fmt.Errorf("error: callback must use https")
+	}
+	callbackUrl, err := url.Parse(payload.Transport.Callback)
+	if err != nil {
+		return nil, err
+	}
+	if callbackUrl.Port() != "" && callbackUrl.Port() != "443" {
+		return nil, fmt.Errorf("error: callback must use port 443")
+	}
+	resp, err := c.postAsJSON("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	eventsub := &EventSubSubscriptionsResponse{}
+	resp.HydrateResponseCommon(&eventsub.ResponseCommon)
+	eventsub.Data = *resp.Data.(*ManyEventSubSubscriptions)
+	return eventsub, nil
+}
+
+// Verifys that a notification came from twitch using the a signature and the secret used when creating the subscription
+func VerifyEventSubNotification(secret string, header http.Header, message string) bool {
+	hmacMessage := []byte(fmt.Sprintf("%s%s%s", header.Get("Twitch-Eventsub-Message-Id"), header.Get("Twitch-Eventsub-Message-Timestamp"), message))
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(hmacMessage)
+	hmacsha256 := fmt.Sprintf("sha256=%s", hex.EncodeToString(mac.Sum(nil)))
+	return hmacsha256 == header.Get("Twitch-Eventsub-Message-Signature")
+}
