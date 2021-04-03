@@ -18,7 +18,7 @@ if err != nil {
 }
 
 resp, err := client.GetEventSubSubscriptions(&helix.EventSubSubscriptionsParams{
-    Status: helix.EventSubStatusEnabled // This is optional.
+    Status: helix.EventSubStatusEnabled, // This is optional.
 })
 if err != nil {
     // handle error
@@ -45,8 +45,8 @@ resp, err := client.CreateEventSubSubscription(&helix.EventSubSubscription{
     Type: helix.EventSubTypeChannelFollow,
     Version: "1",
     Condition &helix.EventSubCondition{
-        BroadcasterUserID: "1337"
-    }, 
+        BroadcasterUserID: "1337",
+    },
     Transport &helix.EventSubTransport{
         Method: "webhook",
         Callback: "https://example.com/follow",
@@ -62,7 +62,7 @@ fmt.Printf("%+v\n", resp)
 
 ## Delete EventSub Subscription
 
-To delete a subscription you need to call DeleteEventSubSubscription with the subscription id as parameter.
+To delete a subscription you need to call RemoveEventSubSubscription with the subscription id as parameter.
 
 ```go
 client, err := helix.NewClient(&helix.Options{
@@ -73,7 +73,7 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.DeleteEventSubSubscription("subscription-id")
+resp, err := client.RemoveEventSubSubscription("subscription-id")
 if err != nil {
     // handle error
 }
@@ -87,9 +87,9 @@ fmt.Printf("%+v\n", resp)
 ```go
 
 type eventSubNotification struct {
-    Subscription    helix.EventSubSubscription `json:"subscription"`
-    Challenge       string `json:"challenge"`
-    Event           json.RawMessage `json:"event"`
+	Subscription helix.EventSubSubscription `json:"subscription"`
+	Challenge    string                     `json:"challenge"`
+	Event        json.RawMessage            `json:"event"`
 }
 
 func eventsubFollow(w http.ResponseWriter, r *http.Request) {
@@ -120,7 +120,7 @@ func eventsubFollow(w http.ResponseWriter, r *http.Request) {
     var followEvent helix.EventSubChannelFollowEvent
     s, _ := vals.Event.MarshalJSON()
     err = json.NewDecoder(bytes.NewReader(s)).Decode(&followEvent)
-    
+
     log.Printf("got follow webhook: %s follows %s\n", followEvent.UserName, followEvent.BroadcasterUserName)
     w.WriteHeader(200)
     w.Write([]byte("ok"))
