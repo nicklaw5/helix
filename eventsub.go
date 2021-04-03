@@ -230,7 +230,7 @@ type EventSubChannelPointsCustomRewardRedemptionEvent struct {
 	UserID               string         `json:"user_id"`
 	UserLogin            string         `json:"user_login"`
 	UserName             string         `json:"user_name"`
-	UserInput            string         `json:"user_input`
+	UserInput            string         `json:"user_input"`
 	Status               string         `json:"status"`
 	Reward               EventSubReward `json:"reward"`
 	RedeemedAt           Time           `json:"redeemed_at"`
