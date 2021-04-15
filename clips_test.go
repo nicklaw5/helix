@@ -42,7 +42,7 @@ func TestGetClips(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&ClipsParams{IDs: []string{"EncouragingPluckySlothSSSsss"}}, // valid clip id
-			`{"data":[{"id":"EncouragingPluckySlothSSSsss","url":"https://clips.twitch.tv/EncouragingPluckySlothSSSsss","embed_url":"https://clips.twitch.tv/embed?clip=EncouragingPluckySlothSSSsss","broadcaster_id":"26490481","broadcaster_name":"summit1g","creator_id":"143839181","creator_name":"nB00ts","video_id":"","game_id":"490377","language":"en","title":"summit and fat tim discover how to use maps","view_count":91876,"created_at":"2018-01-25T04:04:15Z","thumbnail_url":"https://clips-media-assets2.twitch.tv/182509178-preview-480x272.jpg"}],"pagination":{}}`,
+			`{"data":[{"id":"EncouragingPluckySlothSSSsss","url":"https://clips.twitch.tv/EncouragingPluckySlothSSSsss","embed_url":"https://clips.twitch.tv/embed?clip=EncouragingPluckySlothSSSsss","broadcaster_id":"26490481","broadcaster_name":"summit1g","creator_id":"143839181","creator_name":"nB00ts","video_id":"","game_id":"490377","language":"en","title":"summit and fat tim discover how to use maps","view_count":91876,"created_at":"2018-01-25T04:04:15Z","thumbnail_url":"https://clips-media-assets2.twitch.tv/182509178-preview-480x272.jpg","duration":22.3}],"pagination":{}}`,
 		},
 	}
 

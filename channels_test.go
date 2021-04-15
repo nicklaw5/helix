@@ -19,11 +19,12 @@ func TestSearchChannels(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			2,
-			`{"data":[{"broadcaster_language":"en","display_name":"Ninja","game_id":"33214","id":"27833742640","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_ninja-{width}x{height}.jpg","title":"I have lost my voice D: | twitter.com/Ninja","started_at":"2018-03-06T15:07:45Z"},{"broadcaster_language":"en","display_name":"DrDisrespect","game_id":"33214","id":"27834185424","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_drdisrespectlive-{width}x{height}.jpg","title":"Turbo Treehouses || @DrDisRespect","started_at":"2018-03-06T16:05:00Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6Mn19"}}`,
+			`{"data":[{"broadcaster_language":"en","display_name":"Ninja","game_id":"33214","game_name":"Loserfruit","id":"27833742640","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_ninja-{width}x{height}.jpg","title":"I have lost my voice D: | twitter.com/Ninja","started_at":"2018-03-06T15:07:45Z"},{"broadcaster_language":"en","display_name":"DrDisrespect","game_id":"33214","game_name":"Loserfruit","id":"27834185424","is_live":false,"tag_ids":[],"thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_drdisrespectlive-{width}x{height}.jpg","title":"Turbo Treehouses || @DrDisRespect","started_at":"2018-03-06T16:05:00Z"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6Mn19"}}`,
 			[]Channel{
 				{
 					ID:               "27833742640",
 					GameID:           "33214",
+					GameName:         "Loserfruit",
 					BroadcasterLogin: "ninja",
 					DisplayName:      "Ninja",
 					Language:         "en",
@@ -35,6 +36,7 @@ func TestSearchChannels(t *testing.T) {
 				{
 					ID:               "27834185424",
 					GameID:           "33214",
+					GameName:         "Loserfruit",
 					BroadcasterLogin: "drdisrespect",
 					DisplayName:      "DrDisrespect",
 					Language:         "en",
