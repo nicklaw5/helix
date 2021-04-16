@@ -18,6 +18,7 @@ type ManySearchChannels struct {
 type Channel struct {
 	ID               string   `json:"id"`
 	GameID           string   `json:"game_id"`
+	GameName         string   `json:"game_name"`
 	BroadcasterLogin string   `json:"broadcaster_login"`
 	DisplayName      string   `json:"display_name"`
 	Language         string   `json:"broadcaster_language"`

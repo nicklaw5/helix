@@ -36,7 +36,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [ ] Get Extension Transactions
 - [x] Create Clip
 - [x] Get Clip
-- [ ] Get Clips
+- [x] Get Clips
 - [x] Create Entitlement Grants Upload URL
 - [x] Get Code Status
 - [x] Get Drops Entitlements
@@ -45,7 +45,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Games
 - [ ] Get Hype Train Events
 - [ ] Check AutoMod Status
-- [ ] Get Banned Users
+- [x] Get Banned Users
 - [ ] Get Banned Events
 - [ ] Get Moderators
 - [ ] Get Moderator Events

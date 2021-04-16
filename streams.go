@@ -10,6 +10,7 @@ type Stream struct {
 	UserName     string    `json:"user_name"`
 	GameID       string    `json:"game_id"`
 	TagIDs       []string  `json:"tag_ids"`
+	IsMature     bool      `json:"is_mature"`
 	Type         string    `json:"type"`
 	Title        string    `json:"title"`
 	ViewerCount  int       `json:"viewer_count"`
