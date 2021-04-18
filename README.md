@@ -55,9 +55,10 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Streams
 - [x] Create Stream Marker
 - [x] Get Stream Markers
-- [ ] Get Channel Information
-- [ ] Modify Channel Information
-- [ ] Get Broadcaster Subscriptions
+- [x] Get Channel Information
+- [x] Modify Channel Information
+- [x] Get Broadcaster Subscriptions
+- [x] Check User Subscription
 - [ ] Get All Stream Tags
 - [ ] Get Stream Tags
 - [ ] Replace Stream Tags
@@ -72,6 +73,16 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Videos
 - [x] Get Webhook Subscriptions
 - [x] Create / Remove / List EventSub Subscriptions
+- [ ] Create Extension Secret
+- [ ] Get Extension Secret
+- [ ] Revoke Extension Secrets
+- [ ] Get Live Channels with Extension Activated
+- [ ] Set Extension Required Configuration
+- [ ] Set Extension Configuration Segment
+- [ ] Get Extension Channel Configuration
+- [ ] Get Extension Configuration Segment
+- [ ] Send Extension PubSub Message
+- [ ] Send Extension Chat Message
 
 ## Quick Usage Example
 

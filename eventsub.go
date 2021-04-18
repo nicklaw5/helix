@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -380,9 +379,6 @@ func (c *Client) RemoveEventSubSubscription(id string) (*RemoveEventSubSubscript
 
 // Creates an EventSub subscription
 func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*EventSubSubscriptionsResponse, error) {
-	if payload.Type == EventSubTypeModeratorAdd || payload.Type == EventSubTypeModeratorRemove {
-		log.Println("warning: the EventSub subscription type is still in Beta and may stop working at any time.")
-	}
 	if payload.Transport.Method == "webhook" && !strings.HasPrefix(payload.Transport.Callback, "https://") {
 		return nil, fmt.Errorf("error: callback must use https")
 	}

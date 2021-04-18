@@ -6,7 +6,7 @@ type GetDropEntitlementsParams struct {
 	UserID string `query:"user_id"`
 	GameID string `query:"game_id"`
 	After  string `query:"after"`
-	First  int    `query:"first,20"` // Limit 100
+	First  int    `query:"first,20"` // Limit 1000
 }
 
 // Entitlement ...
