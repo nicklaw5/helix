@@ -144,6 +144,10 @@ func (c *Client) delete(path string, respData, reqData interface{}) (*Response, 
 	return c.sendRequest(http.MethodDelete, path, respData, reqData, false)
 }
 
+func (c *Client) patchAsJSON(path string, respData, reqData interface{}) (*Response, error) {
+	return c.sendRequest(http.MethodPatch, path, respData, reqData, true)
+}
+
 func (c *Client) postAsJSON(path string, respData, reqData interface{}) (*Response, error) {
 	return c.sendRequest(http.MethodPost, path, respData, reqData, true)
 }
@@ -294,6 +298,13 @@ func (c *Client) newJSONRequest(method, url string, data interface{}) (*http.Req
 	if err != nil {
 		return nil, err
 	}
+
+	query, err := buildQueryString(req, data)
+	if err != nil {
+		return nil, err
+	}
+
+	req.URL.RawQuery = query
 
 	req.Header.Set("Content-Type", "application/json")
 

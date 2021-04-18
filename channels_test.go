@@ -197,3 +197,76 @@ func TestGetChannelInformation(t *testing.T) {
 		}
 	}
 }
+
+func TestEditChannelInformation(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		params        *EditChannelInformationParams
+		respBody      string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&EditChannelInformationParams{
+				BroadcasterID: "123",
+				GameID: "456",
+				BroadcasterLanguage: "en",
+				Title: "Test title",
+			},
+			`{"data":[{"game_id":"498566","broadcaster_language":"en","title":"Test Twitch API"}]}`,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&EditChannelInformationParams{
+				BroadcasterID: "789",
+				GameID: "456",
+				BroadcasterLanguage: "en",
+				Title: "Test title",
+				Delay: 3,
+			},
+			`{"error":"Bad Request","status":400,"message":"the broadcaster is not partnered, failed to set delay"}`,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&EditChannelInformationParams{
+				BroadcasterID: "789",
+				GameID: "-1",
+				BroadcasterLanguage: "en",
+				Title: "Test title",
+			},
+			`{"error":"Bad Request","status":400,"message":"invalid game_id"}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.EditChannelInformation(testCase.params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			broadcasterIDErrStr := "the broadcaster is not partnered, failed to set delay"
+
+			if testCase.params.GameID == "-1" {
+				broadcasterIDErrStr = "invalid game_id"
+			}
+
+			if resp.ErrorMessage != broadcasterIDErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", broadcasterIDErrStr, resp.ErrorMessage)
+				continue
+			}
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+	}
+}

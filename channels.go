@@ -56,10 +56,24 @@ type GetChannelInformationParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 }
 
+// EditChannelInformationParams ...
+type EditChannelInformationParams struct {
+	BroadcasterID       string `query:"broadcaster_id" json:"-"`
+	GameID              string `json:"game_id"`
+	BroadcasterLanguage string `json:"broadcaster_language"`
+	Title               string `json:"title"`
+	Delay               int    `json:"delay,omitempty"`
+}
+
 // GetChannelInformationResponse ...
 type GetChannelInformationResponse struct {
 	ResponseCommon
 	Data ManyChannelInformation
+}
+
+// EditChannelInformationResponse ...
+type EditChannelInformationResponse struct {
+	ResponseCommon
 }
 
 // ManyChannelInformation ...
@@ -90,3 +104,18 @@ func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*Ge
 
 	return channels, nil
 }
+
+// EditChannelInformation ...
+func (c *Client) EditChannelInformation(params *EditChannelInformationParams) (*EditChannelInformationResponse, error) {
+	resp, err := c.patchAsJSON("/channels", &EditChannelInformationResponse{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	channels := &EditChannelInformationResponse{}
+	resp.HydrateResponseCommon(&channels.ResponseCommon)
+
+	return channels, nil
+}
+
+
