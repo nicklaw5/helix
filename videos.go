@@ -49,10 +49,20 @@ type VideosParams struct {
 	Type     string `query:"type,all"`   // "all" (default), "upload", "archive", and "highlight"
 }
 
+// DeleteVideosParams ...
+type DeleteVideosParams struct {
+	IDs    []string `query:"id"` // Limit 5
+}
+
 // VideosResponse ...
 type VideosResponse struct {
 	ResponseCommon
 	Data ManyVideos
+}
+
+// DeleteVideosResponse ...
+type DeleteVideosResponse struct {
+	ResponseCommon
 }
 
 // GetVideos gets video information by video ID (one or more), user ID (one only),
@@ -67,6 +77,20 @@ func (c *Client) GetVideos(params *VideosParams) (*VideosResponse, error) {
 	resp.HydrateResponseCommon(&videos.ResponseCommon)
 	videos.Data.Videos = resp.Data.(*ManyVideos).Videos
 	videos.Data.Pagination = resp.Data.(*ManyVideos).Pagination
+
+	return videos, nil
+}
+
+// DeleteVideos delete one or more videos (max 5)
+// Required scope: channel:manage:videos
+func (c *Client) DeleteVideos(params *DeleteVideosParams) (*DeleteVideosResponse, error) {
+	resp, err := c.delete("/videos", &DeleteVideosResponse{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	videos := &DeleteVideosResponse{}
+	resp.HydrateResponseCommon(&videos.ResponseCommon)
 
 	return videos, nil
 }
