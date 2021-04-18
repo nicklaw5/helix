@@ -55,8 +55,8 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Streams
 - [x] Create Stream Marker
 - [x] Get Stream Markers
-- [ ] Get Channel Information
-- [ ] Modify Channel Information
+- [x] Get Channel Information
+- [x] Modify Channel Information
 - [ ] Get Broadcaster Subscriptions
 - [ ] Get All Stream Tags
 - [ ] Get Stream Tags
