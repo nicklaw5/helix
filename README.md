@@ -77,9 +77,9 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Users Follows
 - [ ] Create User Follows
 - [ ] Delete User Follows
-- [ ] Get User Block List
-- [ ] Block User
-- [ ] UnBlock User
+- [x] Get User Block List
+- [x] Block User
+- [x] UnBlock User
 - [ ] Get User Extensions
 - [ ] Get User Active Extensions
 - [ ] Update User Extensions
