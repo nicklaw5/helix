@@ -30,10 +30,19 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 
 - [x] Start Commercial
 - [x] Get Extension Analytics
-- [x] Get Cheermotes
 - [x] Get Game Analytics
 - [x] Get Bits Leaderboard
+- [x] Get Cheermotes
 - [ ] Get Extension Transactions
+- [x] Get Channel Information
+- [x] Modify Channel Information
+- [x] Get Channel Editors
+- [ ] Create Custom Rewards
+- [ ] Delete Custom Reward
+- [ ] Get Custom Reward
+- [ ] Get Custom Reward Redemption
+- [ ] Update Custom Reward
+- [ ] Update Redemption Status
 - [x] Create Clip
 - [x] Get Clip
 - [x] Get Clips
@@ -41,12 +50,13 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Code Status
 - [x] Get Drops Entitlements
 - [x] Redeem Code
+- [x] Create / Remove / List EventSub Subscriptions
 - [x] Get Top Games
 - [x] Get Games
 - [ ] Get Hype Train Events
 - [ ] Check AutoMod Status
-- [x] Get Banned Users
 - [ ] Get Banned Events
+- [x] Get Banned Users
 - [ ] Get Moderators
 - [ ] Get Moderator Events
 - [ ] Search Categories
@@ -55,24 +65,27 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Streams
 - [x] Create Stream Marker
 - [x] Get Stream Markers
-- [x] Get Channel Information
-- [x] Modify Channel Information
 - [x] Get Broadcaster Subscriptions
 - [x] Check User Subscription
 - [ ] Get All Stream Tags
 - [ ] Get Stream Tags
 - [ ] Replace Stream Tags
+- [ ] Get Channel Teams
+- [ ] Get Teams
+- [x] Get Users
+- [x] Update User
+- [x] Get Users Follows
 - [ ] Create User Follows
 - [ ] Delete User Follows
-- [x] Get Users
-- [x] Get Users Follows
+- [ ] Get User Block List
+- [ ] Block User
+- [ ] UnBlock User
 - [ ] Get User Extensions
 - [ ] Get User Active Extensions
-- [x] Update User
 - [ ] Update User Extensions
 - [x] Get Videos
+- [x] Delete Videos
 - [x] Get Webhook Subscriptions
-- [x] Create / Remove / List EventSub Subscriptions
 - [ ] Create Extension Secret
 - [ ] Get Extension Secret
 - [ ] Revoke Extension Secrets
