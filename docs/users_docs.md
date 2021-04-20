@@ -67,3 +67,71 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get User Block List
+
+This is an example of how to get users blocked
+
+```
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.GetUsersBlocked(&helix.UsersBlockedParams{
+    BroadcasterID: "145328278",
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Block User
+
+This is an example of how to block user
+
+```
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.BlockUser(&helix.BlockUserParams{
+    TargetUserID:  "677636701",
+    SourceContext: "chat",
+    Reason:        "spam",
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Unblock User
+
+This is an example of how to unblock user
+
+```
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.UnblockUser(&helix.UnblockUserParams{
+    TargetUserID: "677636701",
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```

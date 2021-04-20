@@ -205,3 +205,207 @@ func TestGetUsersFollows(t *testing.T) {
 		}
 	}
 }
+
+func TestGetUsersBlocked(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		BroadcasterID string
+		First         int
+		respBody      string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"",
+			1,
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"23161357",
+			1,
+			`{"data":[{"user_id":"199340135","user_login":"jlarkyzus","display_name":"JLArkyzus"}],"pagination":{"cursor":"xxx"}}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetUsersBlocked(&UsersBlockedParams{
+			First:         testCase.First,
+			BroadcasterID: testCase.BroadcasterID,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "Missing required parameter \"broadcaster_id\""
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		if len(resp.Data.Users) != testCase.First {
+			t.Errorf("expected result length to be \"%d\", got \"%d\"", testCase.First, len(resp.Data.Users))
+		}
+
+		userID := "199340135"
+		if resp.Data.Users[0].UserID != userID {
+			t.Errorf("expected user id to be \"%s\", got \"%s\"", userID, resp.Data.Users[0].UserID)
+		}
+
+		userLogin := "jlarkyzus"
+		if resp.Data.Users[0].UserLogin != userLogin {
+			t.Errorf("expected user id to be \"%s\", got \"%s\"", userLogin, resp.Data.Users[0].UserLogin)
+		}
+
+		displayName := "JLArkyzus"
+		if resp.Data.Users[0].DisplayName != displayName {
+			t.Errorf("expected user id to be \"%s\", got \"%s\"", displayName, resp.Data.Users[0].DisplayName)
+		}
+
+		cursor := "xxx"
+		if resp.Data.Pagination.Cursor != cursor {
+			t.Errorf("expected cursor to be \"%s\", got \"%s\"", cursor, resp.Data.Pagination.Cursor)
+		}
+	}
+}
+
+func TestBlockUser(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		Params     *BlockUserParams
+		respBody   string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&BlockUserParams{
+				TargetUserID:  "199340135",
+				SourceContext: "twitter",
+				Reason:        "spam",
+			},
+			`{"error":"Bad Request","status":400,"message":"The parameter \"source_context\" was malformed: value must be one of \"chat\", \"whisper\", \"\""}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&BlockUserParams{
+				TargetUserID:  "199340135",
+				SourceContext: "chat",
+				Reason:        "spam",
+			},
+			``,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.BlockUser(testCase.Params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "The parameter \"source_context\" was malformed: value must be one of \"chat\", \"whisper\", \"\""
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+}
+
+func TestUnblockUser(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		Params     *UnblockUserParams
+		respBody   string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&UnblockUserParams{
+				TargetUserID:  "",
+			},
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"target_user_id\""}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&UnblockUserParams{
+				TargetUserID:  "199340135",
+			},
+			``,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.UnblockUser(testCase.Params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "Missing required parameter \"target_user_id\""
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+}

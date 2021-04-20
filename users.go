@@ -122,3 +122,94 @@ func (c *Client) GetUsersFollows(params *UsersFollowsParams) (*UsersFollowsRespo
 
 	return users, nil
 }
+
+// UserBlocked ...
+type UserBlocked struct {
+	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
+	DisplayName  string `json:"display_name"`
+}
+
+// ManyUsersBlocked ...
+type ManyUsersBlocked struct {
+	Users      []UserBlocked `json:"data"`
+	Pagination Pagination   `json:"pagination"`
+}
+
+// UsersBlockedResponse ...
+type UsersBlockedResponse struct {
+	ResponseCommon
+	Data ManyUsersBlocked
+}
+
+// UsersBlockedParams ...
+type UsersBlockedParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+	After         string `query:"after"`
+	First         int    `query:"first,20"` // Limit 100
+}
+
+// GetUsersBlocked : Gets a specified user’s block list.
+//
+// Required scope: user:read:blocked_users
+func (c *Client) GetUsersBlocked(params *UsersBlockedParams) (*UsersBlockedResponse, error) {
+	resp, err := c.get("/users/blocks", &ManyUsersBlocked{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	users := &UsersBlockedResponse{}
+	resp.HydrateResponseCommon(&users.ResponseCommon)
+	users.Data.Users = resp.Data.(*ManyUsersBlocked).Users
+	users.Data.Pagination = resp.Data.(*ManyUsersBlocked).Pagination
+
+	return users, nil
+}
+
+// BlockUserResponse ...
+type BlockUserResponse struct {
+	ResponseCommon
+}
+
+// BlockUserParams ...
+type BlockUserParams struct {
+	TargetUserID  string `query:"target_user_id"`
+	SourceContext string `query:"source_context"` // Valid values: "chat", "whisper"
+	Reason        string `query:"reason"`         // Valid values: "spam", "harassment", "other"
+}
+
+// BlockUser : Blocks the specified user on behalf of the authenticated user.
+//
+// Required scope: user:manage:blocked_users
+func (c *Client) BlockUser(params *BlockUserParams) (*BlockUserResponse, error) {
+	resp, err := c.put("/users/blocks", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	block := &BlockUserResponse{}
+	resp.HydrateResponseCommon(&block.ResponseCommon)
+
+	return block, nil
+}
+
+// UnblockUserParams ...
+type UnblockUserParams struct {
+	TargetUserID string `query:"target_user_id"`
+}
+
+// UnblockUser : Unblocks the specified user on behalf of the authenticated user.
+//
+// Required scope: user:manage:blocked_users
+func (c *Client) UnblockUser(params *UnblockUserParams) (*BlockUserResponse, error) {
+	resp, err := c.delete("/users/blocks", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	block := &BlockUserResponse{}
+	resp.HydrateResponseCommon(&block.ResponseCommon)
+
+	return block, nil
+}
+
