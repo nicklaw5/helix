@@ -22,3 +22,26 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get Followed Streams
+
+This is an example of how to get followed streams.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.GetFollowedStream(&helix.FollowedStreamsParams{
+    UserID: "123456",
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
