@@ -63,6 +63,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [ ] Search Channels
 - [ ] Get Stream Key
 - [x] Get Streams
+- [x] Get Followed Streams
 - [x] Create Stream Marker
 - [x] Get Stream Markers
 - [x] Get Broadcaster Subscriptions

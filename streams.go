@@ -9,6 +9,7 @@ type Stream struct {
 	UserLogin    string    `json:"user_login"`
 	UserName     string    `json:"user_name"`
 	GameID       string    `json:"game_id"`
+	GameName     string    `json:"game_name"`
 	TagIDs       []string  `json:"tag_ids"`
 	IsMature     bool      `json:"is_mature"`
 	Type         string    `json:"type"`
@@ -58,3 +59,33 @@ func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 
 	return streams, nil
 }
+
+// FollowedStreamsParams ...
+type FollowedStreamsParams struct {
+	After      string   `query:"after"`
+	Before     string   `query:"before"`
+	First      int      `query:"first,20"`   // Limit 100
+	UserID     string   `query:"user_id"`
+}
+
+// GetFollowedStream : Gets information about active streams belonging to channels
+// that the authenticated user follows. Streams are returned sorted by number of
+// current viewers, in descending order. Across multiple pages of results, there
+// may be duplicate or missing streams, as viewers join and leave streams.
+//
+// Required scope: user:read:follows
+func (c *Client) GetFollowedStream(params *FollowedStreamsParams) (*StreamsResponse, error) {
+	resp, err := c.get("/streams/followed", &ManyStreams{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	streams := &StreamsResponse{}
+	resp.HydrateResponseCommon(&streams.ResponseCommon)
+	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
+	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
+
+	return streams, nil
+}
+
+
