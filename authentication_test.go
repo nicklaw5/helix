@@ -128,6 +128,26 @@ func TestRequestAppAccessToken(t *testing.T) {
 			t.Errorf("expected ExpiresIn to not be \"0\"")
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RequestAppAccessToken([]string{"some-scope"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestRequestUserAccessToken(t *testing.T) {
@@ -257,6 +277,26 @@ func TestRequestUserAccessToken(t *testing.T) {
 			t.Errorf("expected number of scope to be \"%d\", got \"%d\"", len(testCase.scopes), len(resp.Data.Scopes))
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RequestUserAccessToken("valid-auth-code")
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestRefreshUserAccessToken(t *testing.T) {
@@ -380,6 +420,26 @@ func TestRefreshUserAccessToken(t *testing.T) {
 			t.Errorf("expected number of scope to be \"%d\", got \"%d\"", len(testCase.expectedScopes), len(resp.Data.Scopes))
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RefreshUserAccessToken("refresh-token")
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestRevokeUserAccessToken(t *testing.T) {
@@ -446,6 +506,26 @@ func TestRevokeUserAccessToken(t *testing.T) {
 
 			continue
 		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RevokeUserAccessToken("access-token")
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }
 
@@ -528,5 +608,25 @@ func TestValidateToken(t *testing.T) {
 		if c.opts.UserAccessToken != initialUserToken {
 			t.Errorf("expected user token to be %s, got %s", initialUserToken, c.opts.UserAccessToken)
 		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+	},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, _, err := c.ValidateToken("access-token")
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }

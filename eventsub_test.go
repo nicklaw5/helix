@@ -71,6 +71,26 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 			t.Errorf("expected result length to be \"%d\", got \"%d\"", testCase.count, len(resp.Data.EventSubSubscriptions))
 		}
 	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetEventSubSubscriptions(&EventSubSubscriptionsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestRemoveEventSubSubscriptions(t *testing.T) {
@@ -142,6 +162,26 @@ func TestRemoveEventSubSubscriptions(t *testing.T) {
 
 			continue
 		}
+	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RemoveEventSubSubscription("832389eb-0d0b-41f8-b564-da039f6c4c75")
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }
 

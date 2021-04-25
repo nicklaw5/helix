@@ -71,6 +71,26 @@ func TestGetExtensionAnalytics(t *testing.T) {
 			t.Errorf("expected extension analytics url not to be an empty string, got \"%s\"", resp.Data.ExtensionAnalytics[0].URL)
 		}
 	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetExtensionAnalytics(&ExtensionAnalyticsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestGetGameAnalytics(t *testing.T) {
@@ -134,5 +154,25 @@ func TestGetGameAnalytics(t *testing.T) {
 		if len(resp.Data.GameAnalytics[0].URL) < 1 {
 			t.Errorf("expected game analytics url not to be an empty string, got \"%s\"", resp.Data.GameAnalytics[0].URL)
 		}
+	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetGameAnalytics(&GameAnalyticsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }
