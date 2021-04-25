@@ -61,6 +61,26 @@ func TestGetStreamMarkers(t *testing.T) {
 			t.Errorf("expected \"%d\" stream markers, got \"%d\"", testCase.markerCount, len(resp.Data.StreamMarkers))
 		}
 	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetStreamMarkers(&StreamMarkersParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestCreateStreamMarker(t *testing.T) {
@@ -118,5 +138,25 @@ func TestCreateStreamMarker(t *testing.T) {
 		if len(resp.Data.CreateStreamMarkers) != testCase.markerCount {
 			t.Errorf("expected \"%d\" stream markers, got \"%d\"", testCase.markerCount, len(resp.Data.CreateStreamMarkers))
 		}
+	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.CreateStreamMarker(&CreateStreamMarkerParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }

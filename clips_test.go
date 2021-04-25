@@ -79,6 +79,26 @@ func TestGetClips(t *testing.T) {
 			t.Errorf("expected clip id to be \"%s\", got \"%s\"", testCase.params.IDs[0], resp.Data.Clips[0].ID)
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetClips(&ClipsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestCreateClip(t *testing.T) {
@@ -158,5 +178,25 @@ func TestCreateClip(t *testing.T) {
 		if resp.GetClipsCreationRateLimitRemaining() < 1 {
 			t.Errorf("expected clip create rate limit remaining not to be \"0\", got \"%d\"", resp.GetClipsCreationRateLimitRemaining())
 		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.CreateClip(&CreateClipParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }

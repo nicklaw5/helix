@@ -103,7 +103,26 @@ func TestClient_GetBitsLeaderboard(t *testing.T) {
 		if resp.Data.Total < 1 {
 			t.Error("expected Total to be more than zero")
 		}
+	}
 
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetBitsLeaderboard(&BitsLeaderboardParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }
 
@@ -598,5 +617,25 @@ func TestClient_GetCheermotes(t *testing.T) {
 		if len(cheermotes.Tiers) != testCase.initialTiersCount {
 			t.Errorf("expected tier count of \"%d\", got \"%d\"", testCase.initialTiersCount, len(cheermotes.Tiers))
 		}
+	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetCheermotes(&CheermotesParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }

@@ -101,4 +101,24 @@ func TestCreateEntitlementsUploadURL(t *testing.T) {
 			t.Errorf("Expected URL to contain manifest id \"%s\", got \"%s\"", testCase.manifestID, resp.Data.URLs[0].URL)
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.CreateEntitlementsUploadURL("manifestID", "entitlementType")
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
