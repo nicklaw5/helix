@@ -59,6 +59,26 @@ func TestClient_GetEntitlementCodeStatus(t *testing.T) {
 		}
 
 	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetEntitlementCodeStatus(&CodesParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestClient_RedeemEntitlementCode(t *testing.T) {

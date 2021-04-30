@@ -74,6 +74,26 @@ func TestGetUsers(t *testing.T) {
 			t.Errorf("expected username 2 to be \"%s\", got \"%s\"", testCase.expectUsers[0], resp.Data.Users[0].Login)
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetUsers(&UsersParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestUpdateUser(t *testing.T) {
@@ -133,6 +153,26 @@ func TestUpdateUser(t *testing.T) {
 		if resp.Data.Users[0].Description != testCase.description {
 			t.Errorf("expected description to be \"%s\", got \"%s\"", testCase.description, resp.Data.Users[0].Description)
 		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.UpdateUser(&UpdateUserParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }
 
@@ -203,6 +243,26 @@ func TestGetUsersFollows(t *testing.T) {
 				t.Errorf("expected from_id to be \"%s\", got \"%s\"", testCase.FromID, follow.FromID)
 			}
 		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetUsersFollows(&UsersFollowsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }
 
@@ -288,6 +348,26 @@ func TestGetUsersBlocked(t *testing.T) {
 			t.Errorf("expected cursor to be \"%s\", got \"%s\"", cursor, resp.Data.Pagination.Cursor)
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetUsersBlocked(&UsersBlockedParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestBlockUser(t *testing.T) {
@@ -350,6 +430,26 @@ func TestBlockUser(t *testing.T) {
 			continue
 		}
 	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.BlockUser(&BlockUserParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestUnblockUser(t *testing.T) {
@@ -407,5 +507,25 @@ func TestUnblockUser(t *testing.T) {
 
 			continue
 		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.UnblockUser(&UnblockUserParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }

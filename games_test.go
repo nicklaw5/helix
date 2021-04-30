@@ -53,6 +53,26 @@ func TestGetGames(t *testing.T) {
 			t.Errorf("expected game name to be \"%s\", got \"%s\"", testCase.expectGame, resp.Data.Games[0].Name)
 		}
 	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetGames(&GamesParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestGetTopGames(t *testing.T) {
@@ -146,5 +166,25 @@ func TestGetTopGames(t *testing.T) {
 				t.Errorf("expected cursor to be \"%s\", got \"%s\"", cursor, resp.Data.Pagination.Cursor)
 			}
 		}
+	}
+
+    // Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetTopGames(&TopGamesParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
 	}
 }
