@@ -59,6 +59,12 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Banned Users
 - [ ] Get Moderators
 - [ ] Get Moderator Events
+- [x] Get Polls         {beta}
+- [x] Create Poll       {beta}
+- [x] End Poll          {beta}
+- [ ] Get Predictions   {beta}
+- [ ] Create Prediction {beta}
+- [ ] End Prediction    {beta}
 - [ ] Search Categories
 - [ ] Search Channels
 - [ ] Get Stream Key
