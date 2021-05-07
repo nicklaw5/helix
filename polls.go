@@ -3,25 +3,26 @@ package helix
 // Poll ...
 type Poll struct {
 	ID                         string              `json:"id"`
-	BroadcasterUserID          string              `json:"broadcaster_user_id"`
-	BroadcasterUserLogin       string              `json:"broadcaster_user_login"`
-	BroadcasterUserName        string              `json:"broadcaster_user_name"`
+	BroadcasterID              string              `json:"broadcaster_id"`
+	BroadcasterLogin           string              `json:"broadcaster_login"`
+	BroadcasterName            string              `json:"broadcaster_name"`
 	Title                      string              `json:"title"`
-	Choices                    []Choice            `json:"choices"`
+	Choices                    []PollChoice        `json:"choices"`
 	BitsVotingEnabled          bool                `json:"bits_voting_enabled"`
 	BitsPerVote                int                 `json:"bits_per_vote"`
 	ChannelPointsVotingEnabled bool                `json:"channel_points_voting_enabled"`
 	ChannelPointsPerVote       int                 `json:"channel_points_per_vote"`
 	Status                     string              `json:"status"`
+	Duration                   int                 `json:"duration"`
 	StartedAt                  Time                `json:"started_at"`
-	EndedAt                     Time               `json:"ended_at"`
+	EndedAt                    Time                `json:"ended_at"`
 }
 
-// Choice ...
-type Choice struct {
+// PollChoice ...
+type PollChoice struct {
 	ID                 string `json:"id"`
 	Title              string `json:"title"`
-	BitVotes           int    `json:"bit_votes"`
+	BitsVotes          int    `json:"bits_votes"`
 	ChannelPointsVotes int    `json:"channel_points_votes"`
 	Votes              int    `json:"votes"`
 }
@@ -41,6 +42,9 @@ type PollsResponse struct {
 // PollsParams ...
 type PollsParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
+	ID            string `query:"id"`
+	After         string `query:"after"`
+	First         string `query:"first`
 }
 
 // GetPollsResponse ...
@@ -67,18 +71,18 @@ func (c *Client) GetPolls(params *PollsParams) (*PollsResponse, error) {
 
 // CreatePollParams ...
 type CreatePollParams struct {
-	BroadcasterID              string        `json:"broadcaster_id"`
-	Title                      string        `json:"title"`                         // Maximum: 60 characters.
-	Choices                    []ChoiceParam `json:"choices"`                       // Minimum: 2 choices. Maximum: 5 choices.
-	Duration                   int           `json:"duration"`                      // Minimum: 15. Maximum: 1800.
-	BitsVotingEnabled          bool          `json:"bits_voting_enabled"`           // Default: false
-	BitsPerVote                int           `json:"bits_per_vote"`                 // Minimum: 0. Maximum: 10000.
-	ChannelPointsVotingEnabled bool          `json:"channel_points_voting_enabled"` // Default: false
-	ChannelPointsPerVote       int           `json:"channel_points_per_vote"`       // Minimum: 0. Maximum: 1000000.
+	BroadcasterID              string            `json:"broadcaster_id"`
+	Title                      string            `json:"title"`                         // Maximum: 60 characters.
+	Choices                    []PollChoiceParam `json:"choices"`                       // Minimum: 2 choices. Maximum: 5 choices.
+	Duration                   int               `json:"duration"`                      // Minimum: 15. Maximum: 1800.
+	BitsVotingEnabled          bool              `json:"bits_voting_enabled"`           // Default: false
+	BitsPerVote                int               `json:"bits_per_vote"`                 // Minimum: 0. Maximum: 10000.
+	ChannelPointsVotingEnabled bool              `json:"channel_points_voting_enabled"` // Default: false
+	ChannelPointsPerVote       int               `json:"channel_points_per_vote"`       // Minimum: 0. Maximum: 1000000.
 }
 
-// ChoiceParam ...
-type ChoiceParam struct {
+// PollChoiceParam ...
+type PollChoiceParam struct {
 	Title string `json:"title"` // Maximum: 25 characters.
 }
 

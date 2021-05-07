@@ -37,9 +37,9 @@ if err != nil {
 resp, err := client.CreatePoll(&helix.CreatePollParams{
     BroadcasterID: "145328278",
     Title: "Test",
-    Choices: []helix.ChoiceParam{
-        helix.ChoiceParam{ Title: "choice 1" },
-        helix.ChoiceParam{ Title: "choice 2" },
+    Choices: []helix.PollChoiceParam{
+        helix.PollChoiceParam{ Title: "choice 1" },
+        helix.PollChoiceParam{ Title: "choice 2" },
     },
     Duration: 30,
 })
