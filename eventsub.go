@@ -81,6 +81,7 @@ const (
 	EventSubTypeChannelUpdate                             = "channel.update"
 	EventSubTypeChannelFollow                             = "channel.follow"
 	EventSubTypeChannelSubscription                       = "channel.subscribe"
+	EventSubTypeChannelUnsubscribe                        = "channel.unsubscribe" /* beta */
 	EventSubTypeChannelCheer                              = "channel.cheer"
 	EventSubTypeChannelRaid                               = "channel.raid"
 	EventSubTypeChannelBan                                = "channel.ban"
@@ -92,6 +93,13 @@ const (
 	EventSubTypeChannelPointsCustomRewardRemove           = "channel.channel_points_custom_reward.remove"
 	EventSubTypeChannelPointsCustomRewardRedemptionAdd    = "channel.channel_points_custom_reward_redemption.add"
 	EventSubTypeChannelPointsCustomRewardRedemptionUpdate = "channel.channel_points_custom_reward_redemption.update"
+	EventSubTypeChannelPollBegin                          = "channel.poll.begin"          /* beta */
+	EventSubTypeChannelPollProgress                       = "channel.poll.progress"       /* beta */
+	EventSubTypeChannelPollEnd                            = "channel.poll.end"            /* beta */
+	EventSubTypeChannelPredictionBegin                    = "channel.prediction.begin"    /* beta */
+	EventSubTypeChannelPredictionProgress                 = "channel.prediction.progress" /* beta */
+	EventSubTypeChannelPredictionLock                     = "channel.prediction.lock"     /* beta */
+	EventSubTypeChannelPredictionEnd                      = "channel.prediction.end"      /* beta */
 	EventSubTypeHypeTrainBegin                            = "channel.hype_train.begin"
 	EventSubTypeHypeTrainProgress                         = "channel.hype_train.progress"
 	EventSubTypeHypeTrainEnd                              = "channel.hype_train.end"
@@ -196,6 +204,48 @@ type EventSubChannelRaidEvent struct {
 	Viewers                  int    `json:"viewers"`
 }
 
+// Data for a channel poll begin event
+type EventSubChannelPollBeginEvent struct {
+	ID                      string                      `json:"id"`
+	BroadcasterUserID       string                      `json:"broadcaster_user_id"`
+	BroadcasterUserLogin    string                      `json:"broadcaster_user_login"`
+	BroadcasterUserName     string                      `json:"broadcaster_user_name"`
+	Title                   string                      `json:"title"`
+	Choices                 []Choice                    `json:"choices"`
+	BitVoting               EventSubBitVoting           `json:"bits_voting"`
+	ChannelPointsVoting     EventSubChannelPointsVoting `json:"channel_points_voting"`
+	StartedAt               Time                        `json:"started_at"`
+	EndsAt                  Time                        `json:"ends_at"`
+}
+
+// Data for a channel poll progress event, it's the same as the channel poll begin event
+type EventSubChannelPollProgressEvent = EventSubChannelPollBeginEvent
+
+// Data for a channel poll end event
+type EventSubChannelPollEndEvent struct {
+	ID                      string                      `json:"id"`
+	BroadcasterUserID       string                      `json:"broadcaster_user_id"`
+	BroadcasterUserLogin    string                      `json:"broadcaster_user_login"`
+	BroadcasterUserName     string                      `json:"broadcaster_user_name"`
+	Title                   string                      `json:"title"`
+	Choices                 []Choice                    `json:"choices"`
+	BitVoting               EventSubBitVoting           `json:"bits_voting"`
+	ChannelPointsVoting     EventSubChannelPointsVoting `json:"channel_points_voting"`
+	Status                  string                      `json:"status"`
+	StartedAt               Time                        `json:"started_at"`
+	EndedAt                 Time                        `json:"ended_at"`
+}
+
+// EventSubBitVoting ...
+type EventSubBitVoting struct {
+	IsEnabled     bool `json:"is_enabled"`
+	AmountPerVote int  `json:"amount_per_vote"`
+}
+
+// ChannelPointsVoting ...
+type EventSubChannelPointsVoting = EventSubBitVoting
+
+
 // Data for a channel points custom reward notification
 type EventSubChannelPointsCustomRewardEvent struct {
 	ID                                string                 `json:"id"`
@@ -233,6 +283,39 @@ type EventSubChannelPointsCustomRewardRedemptionEvent struct {
 	Status               string         `json:"status"`
 	Reward               EventSubReward `json:"reward"`
 	RedeemedAt           Time           `json:"redeemed_at"`
+}
+
+// Data for a channel channel prediction begin event
+type EventSubChannelPredictionBeginEvent struct {
+	ID                   string            `json:"id"`
+	BroadcasterUserID    string            `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string            `json:"broadcaster_user_login"`
+	BroadcasterUserName  string            `json:"broadcaster_user_name"`
+	Title                string            `json:"title"`
+	Outcomes             []EventSubOutcome `json:"outcomes"`
+	StartedAt            Time              `json:"started_at"`
+	LocksAt              Time              `json:"outcomes"`
+}
+
+// Data for a channel channel prediction progress event
+type EventSubChannelPredictionProgressEvent = EventSubChannelPredictionBeginEvent
+
+// Data for a channel channel prediction lock event
+type EventSubChannelPredictionLockEvent = EventSubChannelPredictionBeginEvent
+
+// Data for a channel channel prediction end event
+type EventSubChannelPredictionEndEvent struct {
+	ID                   string            `json:"id"`
+	BroadcasterUserID    string            `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string            `json:"broadcaster_user_login"`
+	BroadcasterUserName  string            `json:"broadcaster_user_name"`
+	Title                string            `json:"title"`
+	WinningOutcomeID     string            `json:"winning_outcome_id"`
+	Outcomes             []EventSubOutcome `json:"outcomes"`
+	Status               string            `json:"status"`
+	StartedAt            Time              `json:"started_at"`
+	LocksAt              Time              `json:"outcomes"`
+	EndedAt              Time              `json:"eneded_at"`
 }
 
 // Data for a hype train begin notification
@@ -333,10 +416,29 @@ type EventSubContribution struct {
 	Total     string `json:"total"`
 }
 
+// This belong to an outcome and defines user reward
+type EventSubTopPredictor struct {
+	UserID            string `json:"user_id"`
+	UserLogin         string `json:"user_login"`
+	UserName          string `json:"user_name"`
+	ChannelPointWon   string `json:"channel_points_won"`
+	ChannelPointsUsed int    `json:"channel_points_used"`
+}
+
 // This belongs to a custom reward and defines if it is limited per stream
 type EventSubMaxPerStream struct {
 	IsEnabled bool `json:"is_enabled"`
 	Value     int  `json:"value"`
+}
+
+// This belong to a channel prediction and defines the outcomes
+type EventSubOutcome struct {
+	ID            string                 `json:"id"`
+	Title         string                 `json:"title"`
+	Color         string                 `json:"color"`
+	Users         int                    `json:"users"`
+	ChannelPoints int                    `json:"channel_points"`
+	TopPredictors []EventSubTopPredictor `json:"top_predictors"`
 }
 
 // This belongs to a reward redemption and defines the reward redeemed
