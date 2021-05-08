@@ -211,8 +211,8 @@ type EventSubChannelPollBeginEvent struct {
 	BroadcasterUserLogin    string                      `json:"broadcaster_user_login"`
 	BroadcasterUserName     string                      `json:"broadcaster_user_name"`
 	Title                   string                      `json:"title"`
-	Choices                 []Choice                    `json:"choices"`
-	BitVoting               EventSubBitVoting           `json:"bits_voting"`
+	Choices                 []PollChoice                `json:"choices"`
+	BitsVoting              EventSubBitVoting           `json:"bits_voting"`
 	ChannelPointsVoting     EventSubChannelPointsVoting `json:"channel_points_voting"`
 	StartedAt               Time                        `json:"started_at"`
 	EndsAt                  Time                        `json:"ends_at"`
@@ -228,8 +228,8 @@ type EventSubChannelPollEndEvent struct {
 	BroadcasterUserLogin    string                      `json:"broadcaster_user_login"`
 	BroadcasterUserName     string                      `json:"broadcaster_user_name"`
 	Title                   string                      `json:"title"`
-	Choices                 []Choice                    `json:"choices"`
-	BitVoting               EventSubBitVoting           `json:"bits_voting"`
+	Choices                 []PollChoice                `json:"choices"`
+	BitsVoting              EventSubBitVoting           `json:"bits_voting"`
 	ChannelPointsVoting     EventSubChannelPointsVoting `json:"channel_points_voting"`
 	Status                  string                      `json:"status"`
 	StartedAt               Time                        `json:"started_at"`

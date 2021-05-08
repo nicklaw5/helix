@@ -5,33 +5,33 @@ import (
 	"testing"
 )
 
-func TestGetPolls(t *testing.T) {
+func TestGetPredictions(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode   int
-		options      *Options
-		PollsParams  *PollsParams
-		respBody     string
+		statusCode        int
+		options           *Options
+		PredictionsParams *PredictionsParams
+		respBody          string
 	}{
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
-			&PollsParams{BroadcasterID: ""},
+			&PredictionsParams{BroadcasterID: ""},
 			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
 		},
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			&PollsParams{BroadcasterID: "121445595"},
-			`{"data":[{"id":"ed961efd-8a3f-4cf5-a9d0-e616c590cd2a","broadcaster_id":"55696719","broadcaster_name":"TwitchDev","broadcaster_login":"twitchdev","title":"Heads or Tails?","choices":[{"id": "4c123012-1351-4f33-84b7-43856e7a0f47","title": "Heads","votes": 0,"channel_points_votes": 0,"bits_votes": 0},{"id": "279087e3-54a7-467e-bcd0-c1393fcea4f0","title": "Tails","votes": 0,"channel_points_votes": 0,"bits_votes": 0}],"bits_voting_enabled": false,"bits_per_vote": 0,"channel_points_voting_enabled": false,"channel_points_per_vote": 0,"status": "ACTIVE","duration": 1800,"started_at": "2021-03-19T06:08:33.871278372Z"}],"pagination": {}}`,
+			&PredictionsParams{BroadcasterID: "121445595"},
+			`{"data":[{"id":"0eb6f04e-8867-4f9f-8bdd-e4038556d0e8","broadcaster_id":"145328278","broadcaster_name":"Scorfly","broadcaster_login":"scorfly","title":"test 1","winning_outcome_id":"760f8303-5a4f-420e-8649-527752447e0f","outcomes":[{"id":"760f8303-5a4f-420e-8649-527752447e0f","title":"choice blue","users":1,"channel_points":10,"top_predictors":[{"user_id":"250117050","user_login":"botvause","user_name":"BotVause","channel_points_used":10,"channel_points_won":10}],"color":"BLUE"},{"id":"6c0fe617-1309-4bb7-ad03-9c1b232f2251","title":"choice pink","users":0,"channel_points":0,"top_predictors":null,"color":"PINK"}],"prediction_window":30,"status":"RESOLVED","created_at":"2021-05-07T21:30:28.20509235Z","ended_at":"2021-05-07T21:32:12.402517544Z","locked_at":"2021-05-07T21:30:57.242055129Z"}],"pagination":{}}`,
 		},
 	}
 
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.GetPolls(testCase.PollsParams)
+		resp, err := c.GetPredictions(testCase.PredictionsParams)
 		if err != nil {
 			t.Error(err)
 		}
@@ -69,7 +69,7 @@ func TestGetPolls(t *testing.T) {
 		opts: options,
 	}
 
-	_, err := c.GetPolls(&PollsParams{})
+	_, err := c.GetPredictions(&PredictionsParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
@@ -79,41 +79,41 @@ func TestGetPolls(t *testing.T) {
 	}
 }
 
-func TestCreatePoll(t *testing.T) {
+func TestCreatePrediction(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
 		statusCode       int
 		options          *Options
-		CreatePollParams *CreatePollParams
+		CreatePredictionParams *CreatePredictionParams
 		respBody         string
 	}{
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
-			&CreatePollParams{BroadcasterID: ""},
+			&CreatePredictionParams{BroadcasterID: ""},
 			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
 		},
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			&CreatePollParams{
+			&CreatePredictionParams{
 				BroadcasterID: "145328278",
 				Title: "Test",
-				Choices: []PollChoiceParam{
-					PollChoiceParam{ Title: "choix 1" },
-					PollChoiceParam{ Title: "choix 2" },
+				Outcomes: []PredictionChoiceParam{
+					PredictionChoiceParam{ Title: "Panda" },
+					PredictionChoiceParam{ Title: "Tiger" },
 				},
-				Duration: 30,
+				PredictionWindow: 300,
 			},
-			`{"data":[{"id":"fb156390-a4de-4acb-8ca6-52ef125f533b","broadcaster_id":"145328278","broadcaster_name":"Scorfly","broadcaster_login":"scorfly","title":"Test","choices":[{"id":"3fea0835-6059-4bb2-95ab-1318659f0282","title":"choix 1","votes":0,"channel_points_votes":0,"bits_votes":0},{"id":"fc4d6457-f32b-492b-a93e-aaa88c343598","title":"choix 2","votes":0,"channel_points_votes":0,"bits_votes":0}],"bits_voting_enabled":false,"bits_per_vote":0,"channel_points_voting_enabled":false,"channel_points_per_vote":0,"status":"ACTIVE","duration":30,"started_at":"2021-05-06T20:43:24.60506479Z"}]}`,
+			`{"data":[{"id":"92bdcb5c-6d83-4c75-95d6-fdd34f128d43","broadcaster_id":"145328278","broadcaster_name":"Scorfly","broadcaster_login":"scorfly","title":"Test","winning_outcome_id":null,"outcomes":[{"id":"6afe5daf-e54c-48d7-9c57-d07e791c496b","title":"choix 1","users":0,"channel_points":0,"top_predictors":null,"color":"BLUE"},{"id":"d8ffec60-f87f-44ac-b7b1-c53001bf2e4b","title":"choix 2","users":0,"channel_points":0,"top_predictors":null,"color":"PINK"}],"prediction_window":300,"status":"ACTIVE","created_at":"2021-05-07T22:15:34.457301028Z","ended_at":null,"locked_at":null}]}`,
 		},
 	}
 
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.CreatePoll(testCase.CreatePollParams)
+		resp, err := c.CreatePrediction(testCase.CreatePredictionParams)
 		if err != nil {
 			t.Error(err)
 		}
@@ -151,7 +151,7 @@ func TestCreatePoll(t *testing.T) {
 		opts: options,
 	}
 
-	_, err := c.CreatePoll(&CreatePollParams{})
+	_, err := c.CreatePrediction(&CreatePredictionParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
@@ -162,37 +162,38 @@ func TestCreatePoll(t *testing.T) {
 }
 
 
-func TestEndPoll(t *testing.T) {
+func TestEndPrediction(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
 		statusCode    int
 		options       *Options
-		EndPollParams *EndPollParams
+		EndPredictionParams *EndPredictionParams
 		respBody      string
 	}{
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
-			&EndPollParams{BroadcasterID: ""},
+			&EndPredictionParams{BroadcasterID: ""},
 			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
 		},
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			&EndPollParams{
+			&EndPredictionParams{
 				BroadcasterID: "145328278",
-				ID: "25b14b42-d4d8-4756-86ce-842bf76f82a0",
-				Status: "TERMINATED",
+				ID: "92bdcb5c-6d83-4c75-95d6-fdd34f128d43",
+				Status: "RESOLVED",
+				WinningOutcomeID: "6afe5daf-e54c-48d7-9c57-d07e791c496b",
 			},
-			`{"data":[{"id":"6aee6aae-e536-4eb0-afa5-d64567aec2c6","broadcaster_id":"145328278","broadcaster_name":"Scorfly","broadcaster_login":"scorfly","title":"Test","choices":[{"id":"cdebad56-ea5a-4d7a-8caf-cdf80c71514e","title":"choix 1","votes":0,"channel_points_votes":0,"bits_votes":0},{"id":"e3027452-e3ab-4ee4-bc4a-03d9bac37dcc","title":"choix 2","votes":0,"channel_points_votes":0,"bits_votes":0}],"bits_voting_enabled":false,"bits_per_vote":0,"channel_points_voting_enabled":false,"channel_points_per_vote":0,"status":"TERMINATED","duration":300,"started_at":"2021-05-06T21:15:08.661352925Z","ended_at":"2021-05-06T21:15:26.894542904Z"}]}`,
+			`{"data":[{"id":"92bdcb5c-6d83-4c75-95d6-fdd34f128d43","broadcaster_id":"145328278","broadcaster_name":"Scorfly","broadcaster_login":"scorfly","title":"Test","winning_outcome_id":"6afe5daf-e54c-48d7-9c57-d07e791c496b","outcomes":[{"id":"6afe5daf-e54c-48d7-9c57-d07e791c496b","title":"choix 1","users":0,"channel_points":0,"top_predictors":null,"color":"BLUE"},{"id":"d8ffec60-f87f-44ac-b7b1-c53001bf2e4b","title":"choix 2","users":0,"channel_points":0,"top_predictors":null,"color":"PINK"}],"prediction_window":300,"status":"RESOLVED","created_at":"2021-05-07T22:15:34.457301028Z","ended_at":"2021-05-07T22:18:14.015776526Z","locked_at":null}]}`,
 		},
 	}
 
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.EndPoll(testCase.EndPollParams)
+		resp, err := c.EndPrediction(testCase.EndPredictionParams)
 		if err != nil {
 			t.Error(err)
 		}
@@ -230,7 +231,7 @@ func TestEndPoll(t *testing.T) {
 		opts: options,
 	}
 
-	_, err := c.EndPoll(&EndPollParams{})
+	_, err := c.EndPrediction(&EndPredictionParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
