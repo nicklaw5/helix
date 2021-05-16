@@ -55,6 +55,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Games
 - [ ] Get Hype Train Events
 - [ ] Check AutoMod Status
+- [x] Manage Held AutoMod Messages
 - [ ] Get Banned Events
 - [x] Get Banned Users
 - [ ] Get Moderators
@@ -62,9 +63,9 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Polls         {beta}
 - [x] Create Poll       {beta}
 - [x] End Poll          {beta}
-- [ ] Get Predictions   {beta}
-- [ ] Create Prediction {beta}
-- [ ] End Prediction    {beta}
+- [x] Get Predictions   {beta}
+- [x] Create Prediction {beta}
+- [x] End Prediction    {beta}
 - [ ] Search Categories
 - [ ] Search Channels
 - [ ] Get Stream Key
