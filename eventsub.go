@@ -21,6 +21,7 @@ type EventSubSubscription struct {
 	Condition EventSubCondition `json:"condition"`
 	Transport EventSubTransport `json:"transport"`
 	CreatedAt Time              `json:"created_at"`
+	Cost      int               `json:"cost"`
 }
 
 // Conditions for a subscription, not all are necessary and some only apply to some subscription types, see https://dev.twitch.tv/docs/eventsub/eventsub-reference
@@ -42,10 +43,10 @@ type EventSubTransport struct {
 
 // Twitch Response for getting all current subscriptions
 type ManyEventSubSubscriptions struct {
-	Total                 int                    `json:"total"`
+	TotalCost             int                    `json:"total_cost"`
+	MaxTotalCost          int                    `json:"max_total_cost"`
 	EventSubSubscriptions []EventSubSubscription `json:"data"`
 	Pagination            Pagination             `json:"pagination"`
-	Limit                 int                    `json:"limit"`
 }
 
 // Response for getting all current subscriptions
@@ -93,13 +94,14 @@ const (
 	EventSubTypeChannelPointsCustomRewardRemove           = "channel.channel_points_custom_reward.remove"
 	EventSubTypeChannelPointsCustomRewardRedemptionAdd    = "channel.channel_points_custom_reward_redemption.add"
 	EventSubTypeChannelPointsCustomRewardRedemptionUpdate = "channel.channel_points_custom_reward_redemption.update"
-	EventSubTypeChannelPollBegin                          = "channel.poll.begin"          /* beta */
-	EventSubTypeChannelPollProgress                       = "channel.poll.progress"       /* beta */
-	EventSubTypeChannelPollEnd                            = "channel.poll.end"            /* beta */
-	EventSubTypeChannelPredictionBegin                    = "channel.prediction.begin"    /* beta */
-	EventSubTypeChannelPredictionProgress                 = "channel.prediction.progress" /* beta */
-	EventSubTypeChannelPredictionLock                     = "channel.prediction.lock"     /* beta */
-	EventSubTypeChannelPredictionEnd                      = "channel.prediction.end"      /* beta */
+	EventSubTypeChannelPollBegin                          = "channel.poll.begin"
+	EventSubTypeChannelPollProgress                       = "channel.poll.progress"
+	EventSubTypeChannelPollEnd                            = "channel.poll.end"
+	EventSubTypeChannelPredictionBegin                    = "channel.prediction.begin"
+	EventSubTypeChannelPredictionProgress                 = "channel.prediction.progress"
+	EventSubTypeChannelPredictionLock                     = "channel.prediction.lock"
+	EventSubTypeChannelPredictionEnd                      = "channel.prediction.end"
+	EventSubExtensionBitsTransactionCreate                = "extension.bits_transaction.create" /* beta */
 	EventSubTypeHypeTrainBegin                            = "channel.hype_train.begin"
 	EventSubTypeHypeTrainProgress                         = "channel.hype_train.progress"
 	EventSubTypeHypeTrainEnd                              = "channel.hype_train.end"
@@ -301,7 +303,18 @@ type EventSubChannelPredictionBeginEvent struct {
 type EventSubChannelPredictionProgressEvent = EventSubChannelPredictionBeginEvent
 
 // Data for a channel channel prediction lock event
-type EventSubChannelPredictionLockEvent = EventSubChannelPredictionBeginEvent
+type EventSubChannelPredictionLockEvent struct {
+	ID                   string            `json:"id"`
+	BroadcasterUserID    string            `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string            `json:"broadcaster_user_login"`
+	BroadcasterUserName  string            `json:"broadcaster_user_name"`
+	Title                string            `json:"title"`
+	WinningOutcomeID     string            `json:"winning_outcome_id"`
+	Outcomes             []EventSubOutcome `json:"outcomes"`
+	Status               string            `json:"status"`
+	StartedAt            Time              `json:"started_at"`
+	LockedAt             Time              `json:"locked_at"`
+}
 
 // Data for a channel channel prediction end event
 type EventSubChannelPredictionEndEvent struct {
@@ -314,8 +327,20 @@ type EventSubChannelPredictionEndEvent struct {
 	Outcomes             []EventSubOutcome `json:"outcomes"`
 	Status               string            `json:"status"`
 	StartedAt            Time              `json:"started_at"`
-	LocksAt              Time              `json:"outcomes"`
 	EndedAt              Time              `json:"eneded_at"`
+}
+
+// Data for an extension bits transaction creation
+type EventSubExtensionBitsTransactionCreateEvent struct {
+	ExtensionClientID    string          `json:"extension_client_id"`
+	ID                   string          `json:"id"`
+	BroadcasterUserID    string          `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string          `json:"broadcaster_user_login"`
+	BroadcasterUserName  string          `json:"broadcaster_user_name"`
+	UserID               string          `json:"user_id"`
+	UserLogin            string          `json:"user_login"`
+	UserName             string          `json:"user_name"`
+	product              EventSubProduct `json:"product"`
 }
 
 // Data for a hype train begin notification
@@ -441,6 +466,14 @@ type EventSubOutcome struct {
 	TopPredictors []EventSubTopPredictor `json:"top_predictors"`
 }
 
+// EventSubProduct ...
+type EventSubProduct struct {
+	Name          string `json:"name"`
+	Bits          int    `json:"bots"`
+	Sku           string `json:"sku"`
+	InDevelopment bool   `json:"in_development"`
+}
+
 // This belongs to a reward redemption and defines the reward redeemed
 type EventSubReward struct {
 	ID     string `json:"id"`
@@ -458,10 +491,10 @@ func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (
 
 	eventSubs := &EventSubSubscriptionsResponse{}
 	resp.HydrateResponseCommon(&eventSubs.ResponseCommon)
-	eventSubs.Data.Total = resp.Data.(*ManyEventSubSubscriptions).Total
+	eventSubs.Data.TotalCost             = resp.Data.(*ManyEventSubSubscriptions).TotalCost
+	eventSubs.Data.MaxTotalCost          = resp.Data.(*ManyEventSubSubscriptions).MaxTotalCost
 	eventSubs.Data.EventSubSubscriptions = resp.Data.(*ManyEventSubSubscriptions).EventSubSubscriptions
-	eventSubs.Data.Pagination = resp.Data.(*ManyEventSubSubscriptions).Pagination
-	eventSubs.Data.Limit = resp.Data.(*ManyEventSubSubscriptions).Limit
+	eventSubs.Data.Pagination            = resp.Data.(*ManyEventSubSubscriptions).Pagination
 
 	return eventSubs, nil
 }

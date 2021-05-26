@@ -83,12 +83,13 @@ type ManyChannelInformation struct {
 
 // ChannelInformation ...
 type ChannelInformation struct {
-	BroadcasterID         string `json:"broadcaster_id"`
-	BroadcasterName    string `json:"broadcaster_name"`
-	BroadcasterLanguage   string `json:"broadcaster_language"`
-	GameID string `json:"game_id"`
-	GameName   string `json:"game_name"`
-	Title      string `json:"title"`
+	BroadcasterID       string `json:"broadcaster_id"`
+	BroadcasterName     string `json:"broadcaster_name"`
+	BroadcasterLanguage string `json:"broadcaster_language"`
+	Delay               string `json:"delay"`
+	GameID              string `json:"game_id"`
+	GameName            string `json:"game_name"`
+	Title               string `json:"title"`
 }
 
 // GetChannelInformation ...

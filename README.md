@@ -37,7 +37,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Channel Information
 - [x] Modify Channel Information
 - [x] Get Channel Editors
-- [ ] Create Custom Rewards
+- [x] Create Custom Rewards
 - [ ] Delete Custom Reward
 - [ ] Get Custom Reward
 - [ ] Get Custom Reward Redemption
@@ -60,12 +60,12 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Banned Users
 - [ ] Get Moderators
 - [ ] Get Moderator Events
-- [x] Get Polls         {beta}
-- [x] Create Poll       {beta}
-- [x] End Poll          {beta}
-- [x] Get Predictions   {beta}
-- [x] Create Prediction {beta}
-- [x] End Prediction    {beta}
+- [x] Get Polls
+- [x] Create Poll
+- [x] End Poll
+- [x] Get Predictions
+- [x] Create Prediction
+- [x] End Prediction
 - [ ] Search Categories
 - [ ] Search Channels
 - [ ] Get Stream Key
