@@ -43,6 +43,8 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [ ] Get Custom Reward Redemption
 - [ ] Update Custom Reward
 - [ ] Update Redemption Status
+- [x] Get Channel Chat Badges
+- [x] Get Global Chat Badges
 - [x] Create Clip
 - [x] Get Clip
 - [x] Get Clips

@@ -82,7 +82,8 @@ const (
 	EventSubTypeChannelUpdate                             = "channel.update"
 	EventSubTypeChannelFollow                             = "channel.follow"
 	EventSubTypeChannelSubscription                       = "channel.subscribe"
-	EventSubTypeChannelUnsubscribe                        = "channel.unsubscribe" /* beta */
+	EventSubTypeChannelSubscriptionEnd                    = "channel.subscription.end"
+	EventSubTypeChannelSubscriptionGift                   = "channel.subscription.gift" /* beta */
 	EventSubTypeChannelCheer                              = "channel.cheer"
 	EventSubTypeChannelRaid                               = "channel.raid"
 	EventSubTypeChannelBan                                = "channel.ban"
@@ -139,6 +140,19 @@ type EventSubChannelSubscribeEvent struct {
 	BroadcasterUserName  string `json:"broadcaster_user_name"`
 	Tier                 string `json:"tier"`
 	IsGift               bool   `json:"is_gift"`
+}
+
+// EventSubChannelSubscriptionGiftEvent
+type EventSubChannelSubscriptionGiftEvent struct {
+	UserID               string `json:"user_id"`
+	UserLogin            string `json:"user_login"`
+	UserName             string `json:"user_name"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	Total                int    `json:"total"`
+	Tier                 string `json:"tier"`
+	CumulativeTotal      int    `json:"cumulative_total"`
 }
 
 // Data for a channel cheer notification
