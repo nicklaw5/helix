@@ -31,6 +31,7 @@ type UserSubscription struct {
 type ManySubscriptions struct {
 	Subscriptions []Subscription `json:"data"`
 	Pagination    Pagination     `json:"pagination"`
+	Total         int            `json:"total"`
 }
 
 // ManyUserSubscription ...
