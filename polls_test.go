@@ -9,10 +9,10 @@ func TestGetPolls(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode   int
-		options      *Options
-		PollsParams  *PollsParams
-		respBody     string
+		statusCode  int
+		options     *Options
+		PollsParams *PollsParams
+		respBody    string
 	}{
 		{
 			http.StatusBadRequest,
@@ -99,10 +99,10 @@ func TestCreatePoll(t *testing.T) {
 			&Options{ClientID: "my-client-id"},
 			&CreatePollParams{
 				BroadcasterID: "145328278",
-				Title: "Test",
+				Title:         "Test",
 				Choices: []PollChoiceParam{
-					PollChoiceParam{ Title: "choix 1" },
-					PollChoiceParam{ Title: "choix 2" },
+					PollChoiceParam{Title: "choix 1"},
+					PollChoiceParam{Title: "choix 2"},
 				},
 				Duration: 30,
 			},
@@ -161,7 +161,6 @@ func TestCreatePoll(t *testing.T) {
 	}
 }
 
-
 func TestEndPoll(t *testing.T) {
 	t.Parallel()
 
@@ -182,8 +181,8 @@ func TestEndPoll(t *testing.T) {
 			&Options{ClientID: "my-client-id"},
 			&EndPollParams{
 				BroadcasterID: "145328278",
-				ID: "25b14b42-d4d8-4756-86ce-842bf76f82a0",
-				Status: "TERMINATED",
+				ID:            "25b14b42-d4d8-4756-86ce-842bf76f82a0",
+				Status:        "TERMINATED",
 			},
 			`{"data":[{"id":"6aee6aae-e536-4eb0-afa5-d64567aec2c6","broadcaster_id":"145328278","broadcaster_name":"Scorfly","broadcaster_login":"scorfly","title":"Test","choices":[{"id":"cdebad56-ea5a-4d7a-8caf-cdf80c71514e","title":"choix 1","votes":0,"channel_points_votes":0,"bits_votes":0},{"id":"e3027452-e3ab-4ee4-bc4a-03d9bac37dcc","title":"choix 2","votes":0,"channel_points_votes":0,"bits_votes":0}],"bits_voting_enabled":false,"bits_per_vote":0,"channel_points_voting_enabled":false,"channel_points_per_vote":0,"status":"TERMINATED","duration":300,"started_at":"2021-05-06T21:15:08.661352925Z","ended_at":"2021-05-06T21:15:26.894542904Z"}]}`,
 		},

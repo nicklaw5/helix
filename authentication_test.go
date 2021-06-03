@@ -615,7 +615,7 @@ func TestValidateToken(t *testing.T) {
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{
 			newMockHandler(0, "", nil),
-	},
+		},
 	}
 	c := &Client{
 		opts: options,

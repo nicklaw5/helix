@@ -56,28 +56,28 @@ func TestGetStreams(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
-    options := &Options{
-        ClientID: "my-client-id",
-        HTTPClient: &badMockHTTPClient{
-            newMockHandler(0, "", nil),
-        },
-    }
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
 
-    c := &Client{
-        opts: options,
-    }
+	c := &Client{
+		opts: options,
+	}
 
-    _, err := c.GetStreams(&StreamsParams{
-        Language: []string{"en"},
-    })
-    if err == nil {
-        t.Error("expected error but got nil")
-    }
+	_, err := c.GetStreams(&StreamsParams{
+		Language: []string{"en"},
+	})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
 
-    if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
-        t.Error("expected error does match return error")
-    }
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }
 
 func TestGetFollowedStreams(t *testing.T) {
@@ -107,7 +107,7 @@ func TestGetFollowedStreams(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetFollowedStream(&FollowedStreamsParams{
-            UserID: testCase.UserID,
+			UserID: testCase.UserID,
 		})
 		if err != nil {
 			t.Error(err)
@@ -127,26 +127,26 @@ func TestGetFollowedStreams(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
-    options := &Options{
-        ClientID: "my-client-id",
-        HTTPClient: &badMockHTTPClient{
-            newMockHandler(0, "", nil),
-        },
-    }
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
 
-    c := &Client{
-        opts: options,
-    }
+	c := &Client{
+		opts: options,
+	}
 
-    _, err := c.GetFollowedStream(&FollowedStreamsParams{
-        UserID: "123456",
-    })
-    if err == nil {
-        t.Error("expected error but got nil")
-    }
+	_, err := c.GetFollowedStream(&FollowedStreamsParams{
+		UserID: "123456",
+	})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
 
-    if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
-        t.Error("expected error does match return error")
-    }
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
 }

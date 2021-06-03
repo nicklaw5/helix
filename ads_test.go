@@ -87,7 +87,7 @@ func TestClient_StartCommercial(t *testing.T) {
 
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{

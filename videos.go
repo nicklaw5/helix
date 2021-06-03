@@ -51,7 +51,7 @@ type VideosParams struct {
 
 // DeleteVideosParams ...
 type DeleteVideosParams struct {
-	IDs    []string `query:"id"` // Limit 5
+	IDs []string `query:"id"` // Limit 5
 }
 
 // VideosResponse ...

@@ -9,10 +9,10 @@ func TestModerateHeldMessage(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode  int
-		options     *Options
-		Params      *HeldMessageModerationParams
-		respBody    string
+		statusCode int
+		options    *Options
+		Params     *HeldMessageModerationParams
+		respBody   string
 	}{
 		{
 			http.StatusBadRequest,
@@ -24,9 +24,9 @@ func TestModerateHeldMessage(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&HeldMessageModerationParams{
-				UserID : "145328278",
-				MsgID  : "19fe2618-df5f-45d3-a210-aeda6f6c6d9e",
-				Action : "145328278",
+				UserID: "145328278",
+				MsgID:  "19fe2618-df5f-45d3-a210-aeda6f6c6d9e",
+				Action: "145328278",
 			},
 			``,
 		},

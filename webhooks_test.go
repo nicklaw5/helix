@@ -294,7 +294,6 @@ func TestGetWebhookTopicValuesFromRequest(t *testing.T) {
 	}
 }
 
-
 func TestFindStringSubmatchMap(t *testing.T) {
 	t.Parallel()
 

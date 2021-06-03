@@ -62,10 +62,10 @@ func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 
 // FollowedStreamsParams ...
 type FollowedStreamsParams struct {
-	After      string   `query:"after"`
-	Before     string   `query:"before"`
-	First      int      `query:"first,20"`   // Limit 100
-	UserID     string   `query:"user_id"`
+	After  string `query:"after"`
+	Before string `query:"before"`
+	First  int    `query:"first,20"` // Limit 100
+	UserID string `query:"user_id"`
 }
 
 // GetFollowedStream : Gets information about active streams belonging to channels
@@ -87,5 +87,3 @@ func (c *Client) GetFollowedStream(params *FollowedStreamsParams) (*StreamsRespo
 
 	return streams, nil
 }
-
-

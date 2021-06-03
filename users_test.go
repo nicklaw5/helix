@@ -465,7 +465,7 @@ func TestUnblockUser(t *testing.T) {
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
 			&UnblockUserParams{
-				TargetUserID:  "",
+				TargetUserID: "",
 			},
 			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"target_user_id\""}`,
 		},
@@ -473,7 +473,7 @@ func TestUnblockUser(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&UnblockUserParams{
-				TargetUserID:  "199340135",
+				TargetUserID: "199340135",
 			},
 			``,
 		},
