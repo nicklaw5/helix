@@ -125,15 +125,15 @@ func (c *Client) GetUsersFollows(params *UsersFollowsParams) (*UsersFollowsRespo
 
 // UserBlocked ...
 type UserBlocked struct {
-	UserID    string `json:"user_id"`
-	UserLogin string `json:"user_login"`
-	DisplayName  string `json:"display_name"`
+	UserID      string `json:"user_id"`
+	UserLogin   string `json:"user_login"`
+	DisplayName string `json:"display_name"`
 }
 
 // ManyUsersBlocked ...
 type ManyUsersBlocked struct {
 	Users      []UserBlocked `json:"data"`
-	Pagination Pagination   `json:"pagination"`
+	Pagination Pagination    `json:"pagination"`
 }
 
 // UsersBlockedResponse ...
@@ -212,4 +212,3 @@ func (c *Client) UnblockUser(params *UnblockUserParams) (*BlockUserResponse, err
 
 	return block, nil
 }
-

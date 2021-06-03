@@ -111,7 +111,7 @@ func TestSearchChannels(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{
@@ -149,12 +149,12 @@ func TestGetChannelInformation(t *testing.T) {
 			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^"}]}`,
 			[]ChannelInformation{
 				{
-					BroadcasterID:         "44445592",
-					BroadcasterName:    "pokimane",
-					BroadcasterLanguage:   "en",
-					GameID: "509658",
-					GameName:   "Just Chatting",
-					Title:      "See you Wednesday 8am for Among Us ^_^",
+					BroadcasterID:       "44445592",
+					BroadcasterName:     "pokimane",
+					BroadcasterLanguage: "en",
+					GameID:              "509658",
+					GameName:            "Just Chatting",
+					Title:               "See you Wednesday 8am for Among Us ^_^",
 				},
 			},
 		},
@@ -217,7 +217,7 @@ func TestGetChannelInformation(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{
@@ -242,19 +242,19 @@ func TestEditChannelInformation(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode    int
-		options       *Options
-		params        *EditChannelInformationParams
-		respBody      string
+		statusCode int
+		options    *Options
+		params     *EditChannelInformationParams
+		respBody   string
 	}{
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&EditChannelInformationParams{
-				BroadcasterID: "123",
-				GameID: "456",
+				BroadcasterID:       "123",
+				GameID:              "456",
 				BroadcasterLanguage: "en",
-				Title: "Test title",
+				Title:               "Test title",
 			},
 			`{"data":[{"game_id":"498566","broadcaster_language":"en","title":"Test Twitch API"}]}`,
 		},
@@ -262,11 +262,11 @@ func TestEditChannelInformation(t *testing.T) {
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
 			&EditChannelInformationParams{
-				BroadcasterID: "789",
-				GameID: "456",
+				BroadcasterID:       "789",
+				GameID:              "456",
 				BroadcasterLanguage: "en",
-				Title: "Test title",
-				Delay: 3,
+				Title:               "Test title",
+				Delay:               3,
 			},
 			`{"error":"Bad Request","status":400,"message":"the broadcaster is not partnered, failed to set delay"}`,
 		},
@@ -274,10 +274,10 @@ func TestEditChannelInformation(t *testing.T) {
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
 			&EditChannelInformationParams{
-				BroadcasterID: "789",
-				GameID: "-1",
+				BroadcasterID:       "789",
+				GameID:              "-1",
 				BroadcasterLanguage: "en",
-				Title: "Test title",
+				Title:               "Test title",
 			},
 			`{"error":"Bad Request","status":400,"message":"invalid game_id"}`,
 		},
@@ -310,7 +310,7 @@ func TestEditChannelInformation(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{

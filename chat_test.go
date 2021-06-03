@@ -83,9 +83,9 @@ func TestGetGlobalChatBadges(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode         int
-		options            *Options
-		respBody           string
+		statusCode int
+		options    *Options
+		respBody   string
 	}{
 		{
 			http.StatusUnauthorized,

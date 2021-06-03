@@ -2,20 +2,20 @@ package helix
 
 // Poll ...
 type Poll struct {
-	ID                         string              `json:"id"`
-	BroadcasterID              string              `json:"broadcaster_id"`
-	BroadcasterLogin           string              `json:"broadcaster_login"`
-	BroadcasterName            string              `json:"broadcaster_name"`
-	Title                      string              `json:"title"`
-	Choices                    []PollChoice        `json:"choices"`
-	BitsVotingEnabled          bool                `json:"bits_voting_enabled"`
-	BitsPerVote                int                 `json:"bits_per_vote"`
-	ChannelPointsVotingEnabled bool                `json:"channel_points_voting_enabled"`
-	ChannelPointsPerVote       int                 `json:"channel_points_per_vote"`
-	Status                     string              `json:"status"`
-	Duration                   int                 `json:"duration"`
-	StartedAt                  Time                `json:"started_at"`
-	EndedAt                    Time                `json:"ended_at"`
+	ID                         string       `json:"id"`
+	BroadcasterID              string       `json:"broadcaster_id"`
+	BroadcasterLogin           string       `json:"broadcaster_login"`
+	BroadcasterName            string       `json:"broadcaster_name"`
+	Title                      string       `json:"title"`
+	Choices                    []PollChoice `json:"choices"`
+	BitsVotingEnabled          bool         `json:"bits_voting_enabled"`
+	BitsPerVote                int          `json:"bits_per_vote"`
+	ChannelPointsVotingEnabled bool         `json:"channel_points_voting_enabled"`
+	ChannelPointsPerVote       int          `json:"channel_points_per_vote"`
+	Status                     string       `json:"status"`
+	Duration                   int          `json:"duration"`
+	StartedAt                  Time         `json:"started_at"`
+	EndedAt                    Time         `json:"ended_at"`
 }
 
 // PollChoice ...
@@ -29,7 +29,7 @@ type PollChoice struct {
 
 // ManyPolls ...
 type ManyPolls struct {
-	Polls []Poll `json:"data"`
+	Polls      []Poll     `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }
 
@@ -124,5 +124,3 @@ func (c *Client) EndPoll(params *EndPollParams) (*PollsResponse, error) {
 
 	return polls, nil
 }
-
-

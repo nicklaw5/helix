@@ -18,27 +18,27 @@ type Prediction struct {
 
 // Outcomes ...
 type Outcomes struct {
-	ID              string         `json:"id"`
-	Title           string         `json:"title"`
-	Users           int            `json:"users"`
-	ChannelPoints   int            `json:"channel_points"`
-	TopPredictors   []TopPredictor `json:"top_predictors"`
-	Color           string         `json:"color"`
+	ID            string         `json:"id"`
+	Title         string         `json:"title"`
+	Users         int            `json:"users"`
+	ChannelPoints int            `json:"channel_points"`
+	TopPredictors []TopPredictor `json:"top_predictors"`
+	Color         string         `json:"color"`
 }
 
 // TopPredictor ...
 type TopPredictor struct {
-	UserID             string `json:"user_id"`
-	UserName           string `json:"user_name"`
-	UserLogin          string `json:"user_login"`
-	ChannelPointsUsed  int    `json:"channel_points_used"`
-	ChannelPointsWon   int    `json:"channel_points_won"`
+	UserID            string `json:"user_id"`
+	UserName          string `json:"user_name"`
+	UserLogin         string `json:"user_login"`
+	ChannelPointsUsed int    `json:"channel_points_used"`
+	ChannelPointsWon  int    `json:"channel_points_won"`
 }
 
 // ManyPredictions ...
 type ManyPredictions struct {
 	Predictions []Prediction `json:"data"`
-	Pagination Pagination `json:"pagination"`
+	Pagination  Pagination   `json:"pagination"`
 }
 
 // PredictionsResponse ...
@@ -129,5 +129,3 @@ func (c *Client) EndPrediction(params *EndPredictionParams) (*PredictionsRespons
 
 	return predictions, nil
 }
-
-

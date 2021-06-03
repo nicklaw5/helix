@@ -118,5 +118,3 @@ func (c *Client) EditChannelInformation(params *EditChannelInformationParams) (*
 
 	return channels, nil
 }
-
-

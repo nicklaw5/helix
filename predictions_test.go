@@ -83,10 +83,10 @@ func TestCreatePrediction(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode       int
-		options          *Options
+		statusCode             int
+		options                *Options
 		CreatePredictionParams *CreatePredictionParams
-		respBody         string
+		respBody               string
 	}{
 		{
 			http.StatusBadRequest,
@@ -99,10 +99,10 @@ func TestCreatePrediction(t *testing.T) {
 			&Options{ClientID: "my-client-id"},
 			&CreatePredictionParams{
 				BroadcasterID: "145328278",
-				Title: "Test",
+				Title:         "Test",
 				Outcomes: []PredictionChoiceParam{
-					PredictionChoiceParam{ Title: "Panda" },
-					PredictionChoiceParam{ Title: "Tiger" },
+					PredictionChoiceParam{Title: "Panda"},
+					PredictionChoiceParam{Title: "Tiger"},
 				},
 				PredictionWindow: 300,
 			},
@@ -161,15 +161,14 @@ func TestCreatePrediction(t *testing.T) {
 	}
 }
 
-
 func TestEndPrediction(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode    int
-		options       *Options
+		statusCode          int
+		options             *Options
 		EndPredictionParams *EndPredictionParams
-		respBody      string
+		respBody            string
 	}{
 		{
 			http.StatusBadRequest,
@@ -181,9 +180,9 @@ func TestEndPrediction(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&EndPredictionParams{
-				BroadcasterID: "145328278",
-				ID: "92bdcb5c-6d83-4c75-95d6-fdd34f128d43",
-				Status: "RESOLVED",
+				BroadcasterID:    "145328278",
+				ID:               "92bdcb5c-6d83-4c75-95d6-fdd34f128d43",
+				Status:           "RESOLVED",
 				WinningOutcomeID: "6afe5daf-e54c-48d7-9c57-d07e791c496b",
 			},
 			`{"data":[{"id":"92bdcb5c-6d83-4c75-95d6-fdd34f128d43","broadcaster_id":"145328278","broadcaster_name":"Scorfly","broadcaster_login":"scorfly","title":"Test","winning_outcome_id":"6afe5daf-e54c-48d7-9c57-d07e791c496b","outcomes":[{"id":"6afe5daf-e54c-48d7-9c57-d07e791c496b","title":"choix 1","users":0,"channel_points":0,"top_predictors":null,"color":"BLUE"},{"id":"d8ffec60-f87f-44ac-b7b1-c53001bf2e4b","title":"choix 2","users":0,"channel_points":0,"top_predictors":null,"color":"PINK"}],"prediction_window":300,"status":"RESOLVED","created_at":"2021-05-07T22:15:34.457301028Z","ended_at":"2021-05-07T22:18:14.015776526Z","locked_at":null}]}`,
