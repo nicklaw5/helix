@@ -300,7 +300,7 @@ type EventSubChannelPointsCustomRewardRedemptionEvent struct {
 	RedeemedAt           Time           `json:"redeemed_at"`
 }
 
-// Data for a channel channel prediction begin event
+// Data for a channel prediction begin event
 type EventSubChannelPredictionBeginEvent struct {
 	ID                   string            `json:"id"`
 	BroadcasterUserID    string            `json:"broadcaster_user_id"`
@@ -309,13 +309,13 @@ type EventSubChannelPredictionBeginEvent struct {
 	Title                string            `json:"title"`
 	Outcomes             []EventSubOutcome `json:"outcomes"`
 	StartedAt            Time              `json:"started_at"`
-	LocksAt              Time              `json:"outcomes"`
+	LockedAt             Time              `json:"locked_at"`
 }
 
-// Data for a channel channel prediction progress event
+// Data for a channel prediction progress event
 type EventSubChannelPredictionProgressEvent = EventSubChannelPredictionBeginEvent
 
-// Data for a channel channel prediction lock event
+// Data for a channel prediction lock event
 type EventSubChannelPredictionLockEvent struct {
 	ID                   string            `json:"id"`
 	BroadcasterUserID    string            `json:"broadcaster_user_id"`
@@ -329,7 +329,7 @@ type EventSubChannelPredictionLockEvent struct {
 	LockedAt             Time              `json:"locked_at"`
 }
 
-// Data for a channel channel prediction end event
+// Data for a channel prediction end event
 type EventSubChannelPredictionEndEvent struct {
 	ID                   string            `json:"id"`
 	BroadcasterUserID    string            `json:"broadcaster_user_id"`
@@ -353,7 +353,7 @@ type EventSubExtensionBitsTransactionCreateEvent struct {
 	UserID               string          `json:"user_id"`
 	UserLogin            string          `json:"user_login"`
 	UserName             string          `json:"user_name"`
-	product              EventSubProduct `json:"product"`
+	Product              EventSubProduct `json:"product"`
 }
 
 // Data for a hype train begin notification

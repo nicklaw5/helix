@@ -6,7 +6,20 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Check for linting issues
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.x
+      - name: Lint
+        run: |
+          go vet .
   build:
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
