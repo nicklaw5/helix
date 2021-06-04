@@ -7,13 +7,14 @@ A Twitch Helix API client written in Go (Golang).
 
 ## Package Status
 
-This project is a work in progress. Twitch has not finished all available endpoints/features for the Helix
-API, but as these get released they are likely to be implemented in this package.
+Twitch is always expanding and improving the available endpoints and features for the Helix API.
+The maintainers of this package will make a best effort approach to implementing new changes
+as they are released by the Twitch team.
 
 ## Documentation & Examples
 
-All documentation and usage examples for this package can be found in the [docs directory](docs). If you are
-looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
+All documentation and usage examples for this package can be found in the [docs directory](docs).
+If you are looking for the Twitch API docs, see the [Twitch Developer website](https://dev.twitch.tv/docs/api).
 
 ## Supported Endpoints & Features
 
@@ -33,7 +34,7 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 - [x] Get Game Analytics
 - [x] Get Bits Leaderboard
 - [x] Get Cheermotes
-- [ ] Get Extension Transactions
+- [x] Get Extension Transactions
 - [x] Get Channel Information
 - [x] Modify Channel Information
 - [x] Get Channel Editors
@@ -109,8 +110,8 @@ looking for the Twitch API docs, see the [Twitch Developer website](https://dev.
 
 ## Quick Usage Example
 
-This is a quick example of how to get users. Note that you don't need to provide both a list of ids and logins,
-one or the other will suffice.
+This is a quick example of how to get users.
+Note that you don't need to provide both a list of ids and logins, one or the other will suffice.
 
 ```go
 client, err := helix.NewClient(&helix.Options{
@@ -154,7 +155,10 @@ ID: 23161357 Name: lirik
 
 ## Contributions
 
-PRs are very much welcome. Where possible, please write tests for any code that is introduced by your PRs.
+PRs are very much welcome.
+All new features should rely solely on the Go standard library.
+No external dependencies should be included in your solutions.
+Where possible, please include tests for any code that is introduced by your PRs.
 
 ## License
 

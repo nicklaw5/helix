@@ -10,6 +10,7 @@ Follow the links below to their respective API usage examples:
 - [Channels](channels_docs.md)
 - [Clips](clips_docs.md)
 - [Entitlement Grants](entitlement_grants_docs.md)
+- [Extensions](extensions_docs.md)
 - [Games](games_docs.md)
 - [Streams](streams_docs.md)
 - [Users](users_docs.md)
