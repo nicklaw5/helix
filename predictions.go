@@ -52,7 +52,7 @@ type PredictionsParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 	ID            string `query:"id"`
 	After         string `query:"after"`
-	First         string `query:"first`
+	First         string `query:"first"`
 }
 
 // GetPredictionsResponse ...
