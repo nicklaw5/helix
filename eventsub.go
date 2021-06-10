@@ -83,7 +83,8 @@ const (
 	EventSubTypeChannelFollow                             = "channel.follow"
 	EventSubTypeChannelSubscription                       = "channel.subscribe"
 	EventSubTypeChannelSubscriptionEnd                    = "channel.subscription.end"
-	EventSubTypeChannelSubscriptionGift                   = "channel.subscription.gift" /* beta */
+	EventSubTypeChannelSubscriptionGift                   = "channel.subscription.gift"    /* beta */
+	EventSubTypeChannelSubscriptionMessage                = "channel.subscription.message" /* beta */
 	EventSubTypeChannelCheer                              = "channel.cheer"
 	EventSubTypeChannelRaid                               = "channel.raid"
 	EventSubTypeChannelBan                                = "channel.ban"
@@ -102,7 +103,7 @@ const (
 	EventSubTypeChannelPredictionProgress                 = "channel.prediction.progress"
 	EventSubTypeChannelPredictionLock                     = "channel.prediction.lock"
 	EventSubTypeChannelPredictionEnd                      = "channel.prediction.end"
-	EventSubExtensionBitsTransactionCreate                = "extension.bits_transaction.create" /* beta */
+	EventSubExtensionBitsTransactionCreate                = "extension.bits_transaction.create"
 	EventSubTypeHypeTrainBegin                            = "channel.hype_train.begin"
 	EventSubTypeHypeTrainProgress                         = "channel.hype_train.progress"
 	EventSubTypeHypeTrainEnd                              = "channel.hype_train.end"
@@ -153,6 +154,22 @@ type EventSubChannelSubscriptionGiftEvent struct {
 	Total                int    `json:"total"`
 	Tier                 string `json:"tier"`
 	CumulativeTotal      int    `json:"cumulative_total"`
+	IsAnonymous          bool   `json:"is_anonymous"`
+}
+
+// EventSubChannelSubscriptionMessageEvent
+type EventSubChannelSubscriptionMessageEvent struct {
+	UserID               string          `json:"user_id"`
+	UserLogin            string          `json:"user_login"`
+	UserName             string          `json:"user_name"`
+	BroadcasterUserID    string          `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string          `json:"broadcaster_user_login"`
+	BroadcasterUserName  string          `json:"broadcaster_user_name"`
+	Tier                 string          `json:"tier"`
+	Message              EventSubMessage `json:"message"`
+	CumulativeTotal      int             `json:"cumulative_total"`
+	StreakMonths         int             `json:"streak_months"`
+	DurationMonths       int             `json:"duration_months"`
 }
 
 // Data for a channel cheer notification
@@ -493,6 +510,19 @@ type EventSubReward struct {
 	Title  string `json:"title"`
 	Cost   int    `json:"cost"`
 	Prompt string `json:"prompt"`
+}
+
+// EventSubMessage
+type EventSubMessage struct {
+	Text   string          `json:"text"`
+	Emotes []EventSubEmote `json:"emotes"`
+}
+
+// EventSubEmote
+type EventSubEmote struct {
+	Begin int    `json:"begin"`
+	End   int    `json:"end"`
+	ID    string `json:"id"`
 }
 
 // Get all EventSub Subscriptions

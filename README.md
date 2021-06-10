@@ -44,6 +44,9 @@ If you are looking for the Twitch API docs, see the [Twitch Developer website](h
 - [ ] Get Custom Reward Redemption
 - [ ] Update Custom Reward
 - [ ] Update Redemption Status
+- [x] Get Channel Emotes
+- [x] Get Global Emotes
+- [x] Get Emote Sets
 - [x] Get Channel Chat Badges
 - [x] Get Global Chat Badges
 - [x] Create Clip
