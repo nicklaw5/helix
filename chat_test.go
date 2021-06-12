@@ -149,3 +149,222 @@ func TestGetGlobalChatBadges(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestGetChannelEmotes(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode             int
+		options                *Options
+		GetChannelEmotesParams *GetChannelEmotesParams
+		respBody               string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetChannelEmotesParams{BroadcasterID: ""},
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&GetChannelEmotesParams{BroadcasterID: "121445595"},
+			`{"data":[{"id":"300678378","name":"scoorfPoko","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/300678378/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/300678378/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1/300678378/3.0"},"tier":"1000","emote_type":"subscriptions","emote_set_id":"1347400"}]}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetChannelEmotes(testCase.GetChannelEmotesParams)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "Missing required parameter \"broadcaster_id\""
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetChannelEmotes(&GetChannelEmotesParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestGetGlobalEmotes(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		respBody   string
+	}{
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id"},
+			`{"error":"Unauthorized","status":401,"message":"OAuth token is missing"}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "my-user-access-token"},
+			`{"data":[{"id":"1220086","name":"TwitchRPG","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/1220086/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/1220086/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1/1220086/3.0"}},{"id":"196892","name":"TwitchUnity","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/196892/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/196892/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1/196892/3.0"}}]}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetGlobalEmotes()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusUnauthorized {
+			if resp.Error != "Unauthorized" {
+				t.Errorf("expected error to be %s, got %s", "Unauthorized", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusUnauthorized {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "OAuth token is missing"
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetGlobalEmotes()
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestGetEmoteSets(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode         int
+		options            *Options
+		GetEmoteSetsParams *GetEmoteSetsParams
+		respBody           string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetEmoteSetsParams{EmoteSetIDs: nil},
+			`{"error":"Bad Request","status":400,"message":"The parameter \"emote_set_id\" was malformed: the value must be greater than or equal to 1"}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&GetEmoteSetsParams{EmoteSetIDs: []string{"300678379"}},
+			`{"data":[{"id":"301147694","name":"sixone3SixDab","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1//3.0"},"emote_type":"subscriptions","emote_set_id":"300678379","owner_id":"44931651"}]}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetEmoteSets(testCase.GetEmoteSetsParams)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "The parameter \"emote_set_id\" was malformed: the value must be greater than or equal to 1"
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetEmoteSets(&GetEmoteSetsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
