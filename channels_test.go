@@ -146,7 +146,7 @@ func TestGetChannelInformation(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			"44445592",
-			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^"}]}`,
+			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^", "delay": 2}]}`,
 			[]ChannelInformation{
 				{
 					BroadcasterID:       "44445592",
@@ -155,6 +155,7 @@ func TestGetChannelInformation(t *testing.T) {
 					GameID:              "509658",
 					GameName:            "Just Chatting",
 					Title:               "See you Wednesday 8am for Among Us ^_^",
+					Delay:               2,
 				},
 			},
 		},
