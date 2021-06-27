@@ -92,12 +92,12 @@ type ManyEmotesWithOwner struct {
 
 // Emote ...
 type Emote struct {
-	ID     string     `json:"id"`
-	Name   string     `json:"name"`
-	Images EmoteImage `json:"images"`
-	Tier   string     `json:"tier"`
-	Type   string     `json:"emote_type"`
-	Set_ID string     `json:"emote_set_id"`
+	ID         string     `json:"id"`
+	Name       string     `json:"name"`
+	Images     EmoteImage `json:"images"`
+	Tier       string     `json:"tier"`
+	EmoteType  string     `json:"emote_type"`
+	EmoteSetId string     `json:"emote_set_id"`
 }
 
 // EmoteWithOwner ...
