@@ -324,7 +324,7 @@ func TestGetEmoteSets(t *testing.T) {
 						Images: EmoteImage{
 							Url1x: "https://static-cdn.jtvnw.net/emoticons/v1/301147694/1.0",
 							Url2x: "https://static-cdn.jtvnw.net/emoticons/v1/301147694/2.0",
-							Url4x: "https://static-cdn.jtvnw.net/emoticons/v1//3.0",
+							Url4x: "https://static-cdn.jtvnw.net/emoticons/v1/301147694/3.0",
 						},
 						Type:   "subscriptions",
 						Set_ID: "300678379",
@@ -332,7 +332,7 @@ func TestGetEmoteSets(t *testing.T) {
 					OwnerID: "44931651",
 				},
 			},
-			`{"data":[{"id":"301147694","name":"sixone3SixDab","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1//3.0"},"emote_type":"subscriptions","emote_set_id":"300678379","owner_id":"44931651"}]}`,
+			`{"data":[{"id":"301147694","name":"sixone3SixDab","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/3.0"},"emote_type":"subscriptions","emote_set_id":"300678379","owner_id":"44931651"}]}`,
 		},
 	}
 
