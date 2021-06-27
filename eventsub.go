@@ -457,9 +457,9 @@ type EventSubGlobalCooldown struct {
 
 // This also belongs to a custom reward and defines the image urls
 type EventSubImage struct {
-	Url1X string `json:"url_1x"`
-	Url2X string `json:"url_2x"`
-	Url4X string `json:"url_4x"`
+	Url1x string `json:"url_1x"`
+	Url2x string `json:"url_2x"`
+	Url4x string `json:"url_4x"`
 }
 
 // This belongs to a hype train and defines a user contribution

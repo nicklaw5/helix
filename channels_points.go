@@ -48,9 +48,9 @@ type ChannelCustomReward struct {
 
 // RewardImage ...
 type RewardImage struct {
-	Url1 string `json:"url_1x"`
-	Url2 string `json:"url_2x"`
-	Url4 string `json:"url_4x"`
+	Url1x string `json:"url_1x"`
+	Url2x string `json:"url_2x"`
+	Url4x string `json:"url_4x"`
 }
 
 // MaxPerUserPerStreamSettings ...
