@@ -1,6 +1,5 @@
 package helix
 
-// Clip ...
 type Clip struct {
 	ID              string  `json:"id"`
 	URL             string  `json:"url"`
@@ -19,19 +18,16 @@ type Clip struct {
 	ThumbnailURL    string  `json:"thumbnail_url"`
 }
 
-// ManyClips ...
 type ManyClips struct {
 	Clips      []Clip     `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }
 
-// ClipsResponse ...
 type ClipsResponse struct {
 	ResponseCommon
 	Data ManyClips
 }
 
-// ClipsParams ...
 type ClipsParams struct {
 	// One of the below
 	BroadcasterID string   `query:"broadcaster_id"`
@@ -61,18 +57,15 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	return clips, nil
 }
 
-// ClipEditURL ...
 type ClipEditURL struct {
 	ID      string `json:"id"`
 	EditURL string `json:"edit_url"`
 }
 
-// ManyClipEditURLs ...
 type ManyClipEditURLs struct {
 	ClipEditURLs []ClipEditURL `json:"data"`
 }
 
-// CreateClipResponse ...
 type CreateClipResponse struct {
 	ResponseCommon
 	Data ManyClipEditURLs
@@ -90,7 +83,6 @@ func (ccr *CreateClipResponse) GetClipsCreationRateLimitRemaining() int {
 	return ccr.convertHeaderToInt(ccr.Header.Get("Ratelimit-Helixclipscreation-Remaining"))
 }
 
-// CreateClipParams ...
 type CreateClipParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 

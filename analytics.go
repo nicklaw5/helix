@@ -1,6 +1,5 @@
 package helix
 
-// ExtensionAnalytic ...
 type ExtensionAnalytic struct {
 	ExtensionID string    `json:"extension_id"`
 	URL         string    `json:"URL"`
@@ -8,19 +7,16 @@ type ExtensionAnalytic struct {
 	DateRange   DateRange `json:"date_range"`
 }
 
-// ManyExtensionAnalytics ...
 type ManyExtensionAnalytics struct {
 	ExtensionAnalytics []ExtensionAnalytic `json:"data"`
 	Pagination         Pagination          `json:"pagination"`
 }
 
-// ExtensionAnalyticsResponse ...
 type ExtensionAnalyticsResponse struct {
 	ResponseCommon
 	Data ManyExtensionAnalytics
 }
 
-// ExtensionAnalyticsParams ...
 type ExtensionAnalyticsParams struct {
 	ExtensionID string `query:"extension_id"`
 	First       int    `query:"first,20"`
@@ -45,7 +41,6 @@ func (c *Client) GetExtensionAnalytics(params *ExtensionAnalyticsParams) (*Exten
 	return users, nil
 }
 
-// GameAnalytic ...
 type GameAnalytic struct {
 	GameID    string    `json:"game_id"`
 	URL       string    `json:"URL"`
@@ -53,19 +48,16 @@ type GameAnalytic struct {
 	DateRange DateRange `json:"date_range"`
 }
 
-// ManyGameAnalytics ...
 type ManyGameAnalytics struct {
 	GameAnalytics []GameAnalytic `json:"data"`
 	Pagination    Pagination     `json:"pagination"`
 }
 
-// GameAnalyticsResponse ...
 type GameAnalyticsResponse struct {
 	ResponseCommon
 	Data ManyGameAnalytics
 }
 
-// GameAnalyticsParams ...
 type GameAnalyticsParams struct {
 	GameID    string `query:"game_id"`
 	First     int    `query:"first,20"`

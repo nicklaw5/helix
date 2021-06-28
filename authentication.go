@@ -11,7 +11,6 @@ var authPaths = map[string]string{
 	"validate": "/validate",
 }
 
-// AuthorizationURLParams ...
 type AuthorizationURLParams struct {
 	ResponseType string   // (Required) Options: "code" or "token"
 	Scopes       []string // (Required)
@@ -19,7 +18,6 @@ type AuthorizationURLParams struct {
 	ForceVerify  bool     // (Optional)
 }
 
-// GetAuthorizationURL ...
 func (c *Client) GetAuthorizationURL(params *AuthorizationURLParams) string {
 	url := AuthBaseURL + "/authorize"
 	url += "?response_type=" + params.ResponseType
@@ -41,7 +39,6 @@ func (c *Client) GetAuthorizationURL(params *AuthorizationURLParams) string {
 	return url
 }
 
-// AccessCredentials ...
 type AccessCredentials struct {
 	AccessToken  string   `json:"access_token"`
 	RefreshToken string   `json:"refresh_token"`
@@ -49,13 +46,11 @@ type AccessCredentials struct {
 	Scopes       []string `json:"scope"`
 }
 
-// AppAccessTokenResponse ...
 type AppAccessTokenResponse struct {
 	ResponseCommon
 	Data AccessCredentials
 }
 
-// RequestAppAccessToken ...
 func (c *Client) RequestAppAccessToken(scopes []string) (*AppAccessTokenResponse, error) {
 	opts := c.opts
 	data := &accessTokenRequestData{
@@ -81,7 +76,6 @@ func (c *Client) RequestAppAccessToken(scopes []string) (*AppAccessTokenResponse
 	return token, nil
 }
 
-// UserAccessTokenResponse ...
 type UserAccessTokenResponse struct {
 	ResponseCommon
 	Data AccessCredentials
@@ -96,7 +90,6 @@ type accessTokenRequestData struct {
 	Scopes       string `query:"scope"`
 }
 
-// RequestUserAccessToken ...
 func (c *Client) RequestUserAccessToken(code string) (*UserAccessTokenResponse, error) {
 	opts := c.opts
 	data := &accessTokenRequestData{
@@ -122,7 +115,6 @@ func (c *Client) RequestUserAccessToken(code string) (*UserAccessTokenResponse, 
 	return token, nil
 }
 
-// RefreshTokenResponse ...
 type RefreshTokenResponse struct {
 	ResponseCommon
 	Data AccessCredentials
@@ -163,7 +155,6 @@ func (c *Client) RefreshUserAccessToken(refreshToken string) (*RefreshTokenRespo
 	return refresh, nil
 }
 
-// RevokeAccessTokenResponse ...
 type RevokeAccessTokenResponse struct {
 	ResponseCommon
 }
@@ -195,7 +186,6 @@ func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenRe
 	return revoke, nil
 }
 
-// ValidateTokenResponse ...
 type ValidateTokenResponse struct {
 	ResponseCommon
 	Data validateTokenDetails

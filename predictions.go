@@ -16,7 +16,6 @@ type Prediction struct {
 	LockedAt             Time       `json:"locked_at"`
 }
 
-// Outcomes ...
 type Outcomes struct {
 	ID            string         `json:"id"`
 	Title         string         `json:"title"`
@@ -26,7 +25,6 @@ type Outcomes struct {
 	Color         string         `json:"color"`
 }
 
-// TopPredictor ...
 type TopPredictor struct {
 	UserID            string `json:"user_id"`
 	UserName          string `json:"user_name"`
@@ -35,19 +33,16 @@ type TopPredictor struct {
 	ChannelPointsWon  int    `json:"channel_points_won"`
 }
 
-// ManyPredictions ...
 type ManyPredictions struct {
 	Predictions []Prediction `json:"data"`
 	Pagination  Pagination   `json:"pagination"`
 }
 
-// PredictionsResponse ...
 type PredictionsResponse struct {
 	ResponseCommon
 	Data ManyPredictions
 }
 
-// PredictionsParams ...
 type PredictionsParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 	ID            string `query:"id"`
@@ -55,13 +50,11 @@ type PredictionsParams struct {
 	First         string `query:"first"`
 }
 
-// GetPredictionsResponse ...
 type GetPredictionsResponse struct {
 	ResponseCommon
 	Data ManyPredictions
 }
 
-// GetPredictions ...
 // Required scope: channel:read:predictions
 func (c *Client) GetPredictions(params *PredictionsParams) (*PredictionsResponse, error) {
 	resp, err := c.get("/predictions", &ManyPredictions{}, params)
@@ -77,7 +70,6 @@ func (c *Client) GetPredictions(params *PredictionsParams) (*PredictionsResponse
 	return predictions, nil
 }
 
-// CreatePredictionParams ...
 type CreatePredictionParams struct {
 	BroadcasterID    string                  `json:"broadcaster_id"`
 	Title            string                  `json:"title"`             // Maximum: 45 characters.
@@ -85,12 +77,10 @@ type CreatePredictionParams struct {
 	PredictionWindow int                     `json:"prediction_window"` // Minimum: 1. Maximum: 1800.
 }
 
-// PredictionChoiceParam ...
 type PredictionChoiceParam struct {
 	Title string `json:"title"` // Maximum: 25 characters.
 }
 
-// CreatePrediction ...
 // Required scope: channel:manage:predictions
 func (c *Client) CreatePrediction(params *CreatePredictionParams) (*PredictionsResponse, error) {
 	resp, err := c.postAsJSON("/predictions", &ManyPredictions{}, params)
@@ -106,7 +96,6 @@ func (c *Client) CreatePrediction(params *CreatePredictionParams) (*PredictionsR
 	return predictions, nil
 }
 
-// EndPredictionParams ...
 type EndPredictionParams struct {
 	BroadcasterID    string `json:"broadcaster_id"`
 	ID               string `json:"id"`
@@ -114,7 +103,6 @@ type EndPredictionParams struct {
 	WinningOutcomeID string `json:"winning_outcome_id"`
 }
 
-// EndPrediction ...
 // Required scope: channel:manage:predictions
 func (c *Client) EndPrediction(params *EndPredictionParams) (*PredictionsResponse, error) {
 	resp, err := c.patchAsJSON("/predictions", &ManyPredictions{}, params)

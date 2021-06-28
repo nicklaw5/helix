@@ -1,6 +1,5 @@
 package helix
 
-// GetDropEntitlementsParams ...
 type GetDropEntitlementsParams struct {
 	ID     string `query:"id"`
 	UserID string `query:"user_id"`
@@ -9,7 +8,6 @@ type GetDropEntitlementsParams struct {
 	First  int    `query:"first,20"` // Limit 1000
 }
 
-// Entitlement ...
 type Entitlement struct {
 	ID        string `json:"id"`
 	BenefitID string `json:"benefit_id"`
@@ -18,18 +16,15 @@ type Entitlement struct {
 	GameID    string `json:"game_id"`
 }
 
-// ManyEntitlements ...
 type ManyEntitlements struct {
 	Entitlements []Entitlement `json:"data"`
 }
 
-// ManyEntitlementsWithPagination ...
 type ManyEntitlementsWithPagination struct {
 	ManyEntitlements
 	Pagination `json:"pagination"`
 }
 
-// GetDropsEntitlementsResponse ...
 type GetDropsEntitlementsResponse struct {
 	ResponseCommon
 	Data ManyEntitlementsWithPagination

@@ -2,7 +2,6 @@ package helix
 
 import "time"
 
-// Stream ...
 type Stream struct {
 	ID           string    `json:"id"`
 	UserID       string    `json:"user_id"`
@@ -20,19 +19,16 @@ type Stream struct {
 	ThumbnailURL string    `json:"thumbnail_url"`
 }
 
-// ManyStreams ...
 type ManyStreams struct {
 	Streams    []Stream   `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }
 
-// StreamsResponse ...
 type StreamsResponse struct {
 	ResponseCommon
 	Data ManyStreams
 }
 
-// StreamsParams ...
 type StreamsParams struct {
 	After      string   `query:"after"`
 	Before     string   `query:"before"`
@@ -60,7 +56,6 @@ func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 	return streams, nil
 }
 
-// FollowedStreamsParams ...
 type FollowedStreamsParams struct {
 	After  string `query:"after"`
 	Before string `query:"before"`

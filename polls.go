@@ -1,6 +1,5 @@
 package helix
 
-// Poll ...
 type Poll struct {
 	ID                         string       `json:"id"`
 	BroadcasterID              string       `json:"broadcaster_id"`
@@ -18,7 +17,6 @@ type Poll struct {
 	EndedAt                    Time         `json:"ended_at"`
 }
 
-// PollChoice ...
 type PollChoice struct {
 	ID                 string `json:"id"`
 	Title              string `json:"title"`
@@ -27,19 +25,16 @@ type PollChoice struct {
 	Votes              int    `json:"votes"`
 }
 
-// ManyPolls ...
 type ManyPolls struct {
 	Polls      []Poll     `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }
 
-// PollsResponse ...
 type PollsResponse struct {
 	ResponseCommon
 	Data ManyPolls
 }
 
-// PollsParams ...
 type PollsParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 	ID            string `query:"id"`
@@ -47,13 +42,11 @@ type PollsParams struct {
 	First         string `query:"first"`
 }
 
-// GetPollsResponse ...
 type GetPollsResponse struct {
 	ResponseCommon
 	Data ManyPolls
 }
 
-// GetPolls ...
 // Required scope: channel:read:polls
 func (c *Client) GetPolls(params *PollsParams) (*PollsResponse, error) {
 	resp, err := c.get("/polls", &ManyPolls{}, params)
@@ -69,7 +62,6 @@ func (c *Client) GetPolls(params *PollsParams) (*PollsResponse, error) {
 	return polls, nil
 }
 
-// CreatePollParams ...
 type CreatePollParams struct {
 	BroadcasterID              string            `json:"broadcaster_id"`
 	Title                      string            `json:"title"`                         // Maximum: 60 characters.
@@ -81,12 +73,10 @@ type CreatePollParams struct {
 	ChannelPointsPerVote       int               `json:"channel_points_per_vote"`       // Minimum: 0. Maximum: 1000000.
 }
 
-// PollChoiceParam ...
 type PollChoiceParam struct {
 	Title string `json:"title"` // Maximum: 25 characters.
 }
 
-// CreatePoll ...
 // Required scope: channel:manage:polls
 func (c *Client) CreatePoll(params *CreatePollParams) (*PollsResponse, error) {
 	resp, err := c.postAsJSON("/polls", &ManyPolls{}, params)
@@ -102,14 +92,12 @@ func (c *Client) CreatePoll(params *CreatePollParams) (*PollsResponse, error) {
 	return polls, nil
 }
 
-// EndPollParams ...
 type EndPollParams struct {
 	BroadcasterID string `json:"broadcaster_id"`
 	ID            string `json:"id"`
 	Status        string `json:"status"`
 }
 
-// EndPoll ...
 // Required scope: channel:manage:polls
 func (c *Client) EndPoll(params *EndPollParams) (*PollsResponse, error) {
 	resp, err := c.patchAsJSON("/polls", &ManyPolls{}, params)

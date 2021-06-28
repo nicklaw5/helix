@@ -1,9 +1,7 @@
 package helix
 
-// AdLengthEnum ...
 type AdLengthEnum int
 
-// AdLen30 ...
 const (
 	_ AdLengthEnum = iota * 30
 	AdLen30
@@ -14,25 +12,21 @@ const (
 	AdLen180
 )
 
-// StartCommercialParams ...
 type StartCommercialParams struct {
 	BroadcasterID string       `query:"broadcaster_id"`
 	Length        AdLengthEnum `query:"length"`
 }
 
-// AdDetails ...
 type AdDetails struct {
 	Length     AdLengthEnum `json:"length"`
 	Message    string       `json:"message"`
 	RetryAfter int          `json:"retry_after"`
 }
 
-// ManyAdDetails ...
 type ManyAdDetails struct {
 	AdDetails []AdDetails `json:"data"`
 }
 
-// StartCommercialResponse ...
 type StartCommercialResponse struct {
 	ResponseCommon
 	Data ManyAdDetails

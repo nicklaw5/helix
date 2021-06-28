@@ -1,28 +1,23 @@
 package helix
 
-// GetChatBadgeParams ...
 type GetChatBadgeParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 }
 
-// GetChatBadgeResponse ...
 type GetChatBadgeResponse struct {
 	ResponseCommon
 	Data ManyChatBadge
 }
 
-// ManyChatBadge ...
 type ManyChatBadge struct {
 	Badges []ChatBadge `json:"data"`
 }
 
-// ChatBadge ...
 type ChatBadge struct {
 	SetID    string         `json:"set_id"`
 	Versions []BadgeVersion `json:"versions"`
 }
 
-// BadgeVersion ...
 type BadgeVersion struct {
 	ID         string `json:"id"`
 	ImageUrl1x string `json:"image_url_1x"`
@@ -30,7 +25,6 @@ type BadgeVersion struct {
 	ImageUrl4x string `json:"image_url_4x"`
 }
 
-// GetChannelChatBadges ...
 func (c *Client) GetChannelChatBadges(params *GetChatBadgeParams) (*GetChatBadgeResponse, error) {
 	resp, err := c.get("/chat/badges", &ManyChatBadge{}, params)
 	if err != nil {
@@ -44,7 +38,6 @@ func (c *Client) GetChannelChatBadges(params *GetChatBadgeParams) (*GetChatBadge
 	return channels, nil
 }
 
-// GetGlobalChatBadges ...
 func (c *Client) GetGlobalChatBadges() (*GetChatBadgeResponse, error) {
 	resp, err := c.get("/chat/badges/global", &ManyChatBadge{}, nil)
 	if err != nil {
@@ -58,39 +51,32 @@ func (c *Client) GetGlobalChatBadges() (*GetChatBadgeResponse, error) {
 	return channels, nil
 }
 
-// GetChannelEmotesParams ...
 type GetChannelEmotesParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 }
 
-// GetEmoteSetsParams ...
 type GetEmoteSetsParams struct {
 	EmoteSetIDs []string `query:"emote_set_id"` // Minimum: 1. Maximum: 25.
 }
 
-// GetChannelEmotesResponse ...
 type GetChannelEmotesResponse struct {
 	ResponseCommon
 	Data ManyEmotes
 }
 
-// GetEmoteSetsResponse ...
 type GetEmoteSetsResponse struct {
 	ResponseCommon
 	Data ManyEmotesWithOwner
 }
 
-// ManyEmotes ...
 type ManyEmotes struct {
 	Emotes []Emote `json:"data"`
 }
 
-// EmoteSets ...
 type ManyEmotesWithOwner struct {
 	Emotes []EmoteWithOwner `json:"data"`
 }
 
-// Emote ...
 type Emote struct {
 	ID         string     `json:"id"`
 	Name       string     `json:"name"`
@@ -100,20 +86,17 @@ type Emote struct {
 	EmoteSetId string     `json:"emote_set_id"`
 }
 
-// EmoteWithOwner ...
 type EmoteWithOwner struct {
 	Emote
 	OwnerID string `json:"owner_id"`
 }
 
-// EmoteImage ...
 type EmoteImage struct {
 	Url1x string `json:"url_1x"`
 	Url2x string `json:"url_2x"`
 	Url4x string `json:"url_4x"`
 }
 
-// GetChannelChatEmotes ...
 func (c *Client) GetChannelEmotes(params *GetChannelEmotesParams) (*GetChannelEmotesResponse, error) {
 	resp, err := c.get("/chat/emotes", &ManyEmotes{}, params)
 	if err != nil {
@@ -127,7 +110,6 @@ func (c *Client) GetChannelEmotes(params *GetChannelEmotesParams) (*GetChannelEm
 	return emotes, nil
 }
 
-// GetGlobalEmotes ...
 func (c *Client) GetGlobalEmotes() (*GetChannelEmotesResponse, error) {
 	resp, err := c.get("/chat/emotes/global", &ManyEmotes{}, nil)
 	if err != nil {
