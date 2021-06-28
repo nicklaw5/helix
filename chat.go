@@ -74,9 +74,20 @@ type GetChannelEmotesResponse struct {
 	Data ManyEmotes
 }
 
+// GetEmoteSetsResponse ...
+type GetEmoteSetsResponse struct {
+	ResponseCommon
+	Data ManyEmotesWithOwner
+}
+
 // ManyEmotes ...
 type ManyEmotes struct {
 	Emotes []Emote `json:"data"`
+}
+
+// EmoteSets ...
+type ManyEmotesWithOwner struct {
+	Emotes []EmoteWithOwner `json:"data"`
 }
 
 // Emote ...
@@ -87,6 +98,12 @@ type Emote struct {
 	Tier   string     `json:"tier"`
 	Type   string     `json:"emote_type"`
 	Set_ID string     `json:"emote_set_id"`
+}
+
+// EmoteWithOwner ...
+type EmoteWithOwner struct {
+	Emote
+	OwnerID string `json:"owner_id"`
 }
 
 // EmoteImage ...
@@ -125,15 +142,15 @@ func (c *Client) GetGlobalEmotes() (*GetChannelEmotesResponse, error) {
 }
 
 // GetEmoteSets
-func (c *Client) GetEmoteSets(params *GetEmoteSetsParams) (*GetChannelEmotesResponse, error) {
-	resp, err := c.get("/chat/emotes/set", &ManyEmotes{}, params)
+func (c *Client) GetEmoteSets(params *GetEmoteSetsParams) (*GetEmoteSetsResponse, error) {
+	resp, err := c.get("/chat/emotes/set", &ManyEmotesWithOwner{}, params)
 	if err != nil {
 		return nil, err
 	}
 
-	emotes := &GetChannelEmotesResponse{}
+	emotes := &GetEmoteSetsResponse{}
 	resp.HydrateResponseCommon(&emotes.ResponseCommon)
-	emotes.Data.Emotes = resp.Data.(*ManyEmotes).Emotes
+	emotes.Data.Emotes = resp.Data.(*ManyEmotesWithOwner).Emotes
 
 	return emotes, nil
 }

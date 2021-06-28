@@ -302,19 +302,37 @@ func TestGetEmoteSets(t *testing.T) {
 		statusCode         int
 		options            *Options
 		GetEmoteSetsParams *GetEmoteSetsParams
+		expectedEmotes     []EmoteWithOwner
 		respBody           string
 	}{
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
 			&GetEmoteSetsParams{EmoteSetIDs: nil},
+			nil,
 			`{"error":"Bad Request","status":400,"message":"The parameter \"emote_set_id\" was malformed: the value must be greater than or equal to 1"}`,
 		},
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&GetEmoteSetsParams{EmoteSetIDs: []string{"300678379"}},
-			`{"data":[{"id":"301147694","name":"sixone3SixDab","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1//3.0"},"emote_type":"subscriptions","emote_set_id":"300678379","owner_id":"44931651"}]}`,
+			[]EmoteWithOwner{
+				{
+					Emote: Emote{
+						ID:   "301147694",
+						Name: "sixone3SixDab",
+						Images: EmoteImage{
+							Url1x: "https://static-cdn.jtvnw.net/emoticons/v1/301147694/1.0",
+							Url2x: "https://static-cdn.jtvnw.net/emoticons/v1/301147694/2.0",
+							Url4x: "https://static-cdn.jtvnw.net/emoticons/v1/301147694/3.0",
+						},
+						Type:   "subscriptions",
+						Set_ID: "300678379",
+					},
+					OwnerID: "44931651",
+				},
+			},
+			`{"data":[{"id":"301147694","name":"sixone3SixDab","images":{"url_1x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/1.0","url_2x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/2.0","url_4x":"https://static-cdn.jtvnw.net/emoticons/v1/301147694/3.0"},"emote_type":"subscriptions","emote_set_id":"300678379","owner_id":"44931651"}]}`,
 		},
 	}
 
@@ -345,6 +363,17 @@ func TestGetEmoteSets(t *testing.T) {
 			}
 
 			continue
+		}
+
+		if len(resp.Data.Emotes) != len(testCase.expectedEmotes) {
+			t.Errorf("returned emotes were different lengths")
+		} else {
+			for i, expectedEmote := range testCase.expectedEmotes {
+				actualEmote := resp.Data.Emotes[i]
+				if expectedEmote != actualEmote {
+					t.Errorf("mismatching emotes %#v != %#v", expectedEmote, actualEmote)
+				}
+			}
 		}
 	}
 
