@@ -1,11 +1,9 @@
 package helix
 
-// ChannelEditorParams ...
 type ChannelEditorsParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 }
 
-// ManyChannelEditors ...
 type ManyChannelEditors struct {
 	ChannelEditors []ChannelEditor `json:"data"`
 }
@@ -17,7 +15,6 @@ type ChannelEditor struct {
 	CreatedAt Time   `json:"created_at"`
 }
 
-// ChannelEditorsResponse ...
 type ChannelEditorsResponse struct {
 	ResponseCommon
 	Data ManyChannelEditors

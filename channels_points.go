@@ -1,6 +1,5 @@
 package helix
 
-// ChannelCustomRewardsParams ...
 type ChannelCustomRewardsParams struct {
 	BroadcasterID                     string `query:"broadcaster_id"`
 	Title                             string `json:"title"`
@@ -18,12 +17,10 @@ type ChannelCustomRewardsParams struct {
 	ShouldRedemptionsSkipRequestQueue bool   `json:"should_redemptions_skip_request_queue"`
 }
 
-// ChannelCustomRewards ...
 type ManyChannelCustomRewards struct {
 	ChannelCustomRewards []ChannelCustomReward `json:"data"`
 }
 
-// ChannelCustomReward ...
 type ChannelCustomReward struct {
 	BroadcasterID                     string                      `json:"broadcaster_id"`
 	BroadcasterLogin                  string                      `json:"broadcaster_login"`
@@ -46,32 +43,27 @@ type ChannelCustomReward struct {
 	CooldownExpiresAt                 string                      `json:"cooldown_expires_at"`
 }
 
-// RewardImage ...
 type RewardImage struct {
 	Url1x string `json:"url_1x"`
 	Url2x string `json:"url_2x"`
 	Url4x string `json:"url_4x"`
 }
 
-// MaxPerUserPerStreamSettings ...
 type MaxPerUserPerStreamSettings struct {
 	IsEnabled           bool `json:"is_enabled"`
 	MaxPerUserPerStream int  `json:"max_per_user_per_stream"`
 }
 
-// MaxPerStreamSettings ...
 type MaxPerStreamSettings struct {
 	IsEnabled    bool `json:"is_enabled"`
 	MaxPerStream int  `json:"max_per_stream"`
 }
 
-// GlobalCooldownSettings ...
 type GlobalCooldownSettings struct {
 	IsEnabled             bool `json:"is_enabled"`
 	GlobalCooldownSeconds int  `json:"global_cooldown_seconds"`
 }
 
-// ChannelCustomRewardResponse ...
 type ChannelCustomRewardResponse struct {
 	ResponseCommon
 	Data ManyChannelCustomRewards

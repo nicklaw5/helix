@@ -269,13 +269,11 @@ type EventSubChannelPollEndEvent struct {
 	EndedAt              Time                        `json:"ended_at"`
 }
 
-// EventSubBitVoting ...
 type EventSubBitVoting struct {
 	IsEnabled     bool `json:"is_enabled"`
 	AmountPerVote int  `json:"amount_per_vote"`
 }
 
-// ChannelPointsVoting ...
 type EventSubChannelPointsVoting = EventSubBitVoting
 
 // Data for a channel points custom reward notification
@@ -496,7 +494,6 @@ type EventSubOutcome struct {
 	TopPredictors []EventSubTopPredictor `json:"top_predictors"`
 }
 
-// EventSubProduct ...
 type EventSubProduct struct {
 	Name          string `json:"name"`
 	Bits          int    `json:"bots"`

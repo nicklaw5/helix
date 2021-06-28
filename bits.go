@@ -2,7 +2,6 @@ package helix
 
 import "time"
 
-// UserBitTotal ...
 type UserBitTotal struct {
 	UserID    string `json:"user_id"`
 	UserLogin string `json:"user_login"`
@@ -11,20 +10,17 @@ type UserBitTotal struct {
 	Score     int    `json:"score"`
 }
 
-// ManyUserBitTotals ...
 type ManyUserBitTotals struct {
 	Total         int            `json:"total"`
 	DateRange     DateRange      `json:"date_range"`
 	UserBitTotals []UserBitTotal `json:"data"`
 }
 
-// BitsLeaderboardResponse ...
 type BitsLeaderboardResponse struct {
 	ResponseCommon
 	Data ManyUserBitTotals
 }
 
-// BitsLeaderboardParams ...
 type BitsLeaderboardParams struct {
 	Count     int       `query:"count,10"`   // Maximum 100
 	Period    string    `query:"period,all"` // "all" (default), "day", "week", "month" and "year"
@@ -51,12 +47,10 @@ func (c *Client) GetBitsLeaderboard(params *BitsLeaderboardParams) (*BitsLeaderb
 	return bits, nil
 }
 
-// CheermotesParams ...
 type CheermotesParams struct {
 	BroadcasterID string `query:"broadcaster_id"` // optional
 }
 
-// TierImages ...
 type TierImages struct {
 	Image1   string `json:"1"`
 	Image1_5 string `json:"1.5"`
@@ -65,19 +59,16 @@ type TierImages struct {
 	Image4   string `json:"4"`
 }
 
-// TierImageTypes ...
 type TierImageTypes struct {
 	Animated TierImages `json:"animated"`
 	Static   TierImages `json:"static"`
 }
 
-// CheermoteTierImages ...
 type CheermoteTierImages struct {
 	Dark  TierImageTypes `json:"dark"`
 	Light TierImageTypes `json:"light"`
 }
 
-// CheermoteTiers ...
 type CheermoteTiers struct {
 	MinBits        uint                `json:"min_bits"`
 	ID             string              `json:"id"`
@@ -87,7 +78,6 @@ type CheermoteTiers struct {
 	ShowInBitsCard bool                `json:"show_in_bits_card"`
 }
 
-// Cheermotes ...
 type Cheermotes struct {
 	Prefix       string           `json:"prefix"`
 	Tiers        []CheermoteTiers `json:"tiers"`
@@ -97,18 +87,15 @@ type Cheermotes struct {
 	IsCharitable bool             `json:"is_charitable"`
 }
 
-// ManyCheermotes ...
 type ManyCheermotes struct {
 	Cheermotes []Cheermotes `json:"data"`
 }
 
-// CheermotesResponse ...
 type CheermotesResponse struct {
 	ResponseCommon
 	Data ManyCheermotes
 }
 
-// GetCheermotes ...
 func (c *Client) GetCheermotes(params *CheermotesParams) (*CheermotesResponse, error) {
 	resp, err := c.get("/bits/cheermotes", &ManyCheermotes{}, params)
 	if err != nil {

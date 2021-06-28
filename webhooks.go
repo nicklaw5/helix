@@ -5,27 +5,23 @@ import (
 	"regexp"
 )
 
-// WebhookSubscription ...
 type WebhookSubscription struct {
 	Topic     string `json:"topic"`
 	Callback  string `json:"callback"`
 	ExpiresAt Time   `json:"expires_at"`
 }
 
-// ManyWebhookSubscriptions ...
 type ManyWebhookSubscriptions struct {
 	Total                int                   `json:"total"`
 	WebhookSubscriptions []WebhookSubscription `json:"data"`
 	Pagination           Pagination            `json:"pagination"`
 }
 
-// WebhookSubscriptionsResponse ...
 type WebhookSubscriptionsResponse struct {
 	ResponseCommon
 	Data ManyWebhookSubscriptions
 }
 
-// WebhookSubscriptionsParams ...
 type WebhookSubscriptionsParams struct {
 	After string `query:"after"`
 	First int    `query:"first,20"` // Limit 100
@@ -48,12 +44,10 @@ func (c *Client) GetWebhookSubscriptions(params *WebhookSubscriptionsParams) (*W
 	return webhooks, nil
 }
 
-// WebhookSubscriptionResponse ...
 type WebhookSubscriptionResponse struct {
 	ResponseCommon
 }
 
-// WebhookSubscriptionPayload ...
 type WebhookSubscriptionPayload struct {
 	Mode         string `json:"hub.mode"`
 	Topic        string `json:"hub.topic"`
@@ -62,7 +56,6 @@ type WebhookSubscriptionPayload struct {
 	Secret       string `json:"hub.secret,omitempty"`
 }
 
-// PostWebhookSubscription ...
 func (c *Client) PostWebhookSubscription(payload *WebhookSubscriptionPayload) (*WebhookSubscriptionResponse, error) {
 	resp, err := c.postAsJSON("/webhooks/hub", nil, payload)
 	if err != nil {

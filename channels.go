@@ -51,12 +51,10 @@ func (c *Client) SearchChannels(params *SearchChannelsParams) (*SearchChannelsRe
 	return channels, nil
 }
 
-// GetChannelInformationParams ...
 type GetChannelInformationParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 }
 
-// EditChannelInformationParams ...
 type EditChannelInformationParams struct {
 	BroadcasterID       string `query:"broadcaster_id" json:"-"`
 	GameID              string `json:"game_id"`
@@ -65,23 +63,19 @@ type EditChannelInformationParams struct {
 	Delay               int    `json:"delay,omitempty"`
 }
 
-// GetChannelInformationResponse ...
 type GetChannelInformationResponse struct {
 	ResponseCommon
 	Data ManyChannelInformation
 }
 
-// EditChannelInformationResponse ...
 type EditChannelInformationResponse struct {
 	ResponseCommon
 }
 
-// ManyChannelInformation ...
 type ManyChannelInformation struct {
 	Channels []ChannelInformation `json:"data"`
 }
 
-// ChannelInformation ...
 type ChannelInformation struct {
 	BroadcasterID       string `json:"broadcaster_id"`
 	BroadcasterName     string `json:"broadcaster_name"`
@@ -92,7 +86,6 @@ type ChannelInformation struct {
 	Delay               int    `json:"delay"`
 }
 
-// GetChannelInformation ...
 func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*GetChannelInformationResponse, error) {
 	resp, err := c.get("/channels", &ManyChannelInformation{}, params)
 	if err != nil {
@@ -106,7 +99,6 @@ func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*Ge
 	return channels, nil
 }
 
-// EditChannelInformation ...
 func (c *Client) EditChannelInformation(params *EditChannelInformationParams) (*EditChannelInformationResponse, error) {
 	resp, err := c.patchAsJSON("/channels", &EditChannelInformationResponse{}, params)
 	if err != nil {

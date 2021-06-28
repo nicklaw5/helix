@@ -1,6 +1,5 @@
 package helix
 
-// UserExtension ...
 type UserExtension struct {
 	CanActivate bool     `json:"can_activate"`
 	ID          string   `json:"id"`
@@ -9,12 +8,10 @@ type UserExtension struct {
 	Version     string   `json:"version"`
 }
 
-// ManyUserExtensions ...
 type ManyUserExtensions struct {
 	UserExtensions []UserExtension `json:"data"`
 }
 
-// UserExtensionsResponse ...
 type UserExtensionsResponse struct {
 	ResponseCommon
 	Data ManyUserExtensions
@@ -37,7 +34,6 @@ func (c *Client) GetUserExtensions() (*UserExtensionsResponse, error) {
 	return userExtensions, nil
 }
 
-// UserActiveExtensionInfo ...
 type UserActiveExtensionInfo struct {
 	Active  bool   `json:"active"`
 	ID      string `json:"id"`
@@ -47,25 +43,21 @@ type UserActiveExtensionInfo struct {
 	Y       int    `json:"y"`
 }
 
-// UserActiveExtension ...
 type UserActiveExtension struct {
 	Component map[string]UserActiveExtensionInfo `json:"component"`
 	Overlay   map[string]UserActiveExtensionInfo `json:"overlay"`
 	Panel     map[string]UserActiveExtensionInfo `json:"panel"`
 }
 
-// UserActiveExtensionSet ...
 type UserActiveExtensionSet struct {
 	UserActiveExtensions UserActiveExtension `json:"data"`
 }
 
-// UserActiveExtensionsResponse ...
 type UserActiveExtensionsResponse struct {
 	ResponseCommon
 	Data UserActiveExtensionSet
 }
 
-// UserActiveExtensionsParams ...
 type UserActiveExtensionsParams struct {
 	UserID string `query:"user_id"` // Optional, limit 1
 }
@@ -87,7 +79,6 @@ func (c *Client) GetUserActiveExtensions(params *UserActiveExtensionsParams) (*U
 	return userActiveExtensions, nil
 }
 
-// UpdateUserExtensionsPayload ...
 type UpdateUserExtensionsPayload struct {
 	Component map[string]UserActiveExtensionInfo `json:"component,omitempty"`
 	Overlay   map[string]UserActiveExtensionInfo `json:"overlay,omitempty"`
