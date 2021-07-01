@@ -105,7 +105,7 @@ func TestClient_GetBitsLeaderboard(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{
@@ -619,7 +619,7 @@ func TestClient_GetCheermotes(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{

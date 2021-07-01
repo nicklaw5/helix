@@ -14,36 +14,30 @@ const (
 	INTERNAL_ERROR                              = "INTERNAL_ERROR"
 )
 
-// CodesParams ...
 type CodesParams struct {
 	// One of the below
 	UserID string   `query:"user_id"`
 	Codes  []string `query:"code"` // Limit 20
 }
 
-// CodeStatus ...
 type CodeStatus struct {
 	Code   string                `json:"code"`
 	Status EntitlementCodeStatus `json:"status"`
 }
 
-// ManyCodes ...
 type ManyCodes struct {
 	Codes []CodeStatus `json:"data"`
 }
 
-// CodeResponse ...
 type CodeResponse struct {
 	ResponseCommon
 	Data ManyCodes
 }
 
-/*
-GetEntitlementCodeStatus ...
-Per https://dev.twitch.tv/docs/api/reference#get-code-status
-Access is controlled via an app access token on the calling service. The client ID associated with the app access token must be approved by Twitch as part of a contracted arrangement.
-Callers with an app access token are authorized to redeem codes on behalf of any Twitch user account.
-*/
+// GetEntitlementCodeStatus
+// Per https://dev.twitch.tv/docs/api/reference#get-code-status
+// Access is controlled via an app access token on the calling service. The client ID associated with the app access token must be approved by Twitch as part of a contracted arrangement.
+// Callers with an app access token are authorized to redeem codes on behalf of any Twitch user account.
 func (c *Client) GetEntitlementCodeStatus(params *CodesParams) (*CodeResponse, error) {
 	resp, err := c.get("/entitlements/codes", &ManyCodes{}, params)
 	if err != nil {
@@ -57,12 +51,10 @@ func (c *Client) GetEntitlementCodeStatus(params *CodesParams) (*CodeResponse, e
 	return codes, nil
 }
 
-/*
-RedeemEntitlementCode ...
-Per https://dev.twitch.tv/docs/api/reference/#redeem-code
-Access is controlled via an app access token on the calling service. The client ID associated with the app access token must be approved by Twitch.
-Callers with an app access token are authorized to redeem codes on behalf of any Twitch user account.
-*/
+// RedeemEntitlementCode
+// Per https://dev.twitch.tv/docs/api/reference/#redeem-code
+// Access is controlled via an app access token on the calling service. The client ID associated with the app access token must be approved by Twitch.
+// Callers with an app access token are authorized to redeem codes on behalf of any Twitch user account.
 func (c *Client) RedeemEntitlementCode(params *CodesParams) (*CodeResponse, error) {
 	resp, err := c.post("/entitlements/code", &ManyCodes{}, params)
 	if err != nil {

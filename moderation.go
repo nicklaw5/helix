@@ -1,6 +1,5 @@
 package helix
 
-// Ban ...
 // ExpiresAt must be parsed manually since an empty string means perma ban
 type Ban struct {
 	UserID    string `json:"user_id"`
@@ -9,19 +8,16 @@ type Ban struct {
 	ExpiresAt Time   `json:"expires_at"`
 }
 
-// ManyBans ...
 type ManyBans struct {
 	Bans       []Ban      `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }
 
-// BannedUsersResponse ...
 type BannedUsersResponse struct {
 	ResponseCommon
 	Data ManyBans
 }
 
-// BannedUsersParams ...
 // BroadcasterID must match the auth tokens user_id
 type BannedUsersParams struct {
 	BroadcasterID string `query:"broadcaster_id"`

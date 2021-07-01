@@ -1,6 +1,5 @@
 package helix
 
-// Video ...
 type Video struct {
 	ID            string              `json:"id"`
 	UserID        string              `json:"user_id"`
@@ -21,19 +20,16 @@ type Video struct {
 	MutedSegments []VideoMutedSegment `json:"muted_segments"`
 }
 
-// VideoMutedSegment ...
 type VideoMutedSegment struct {
 	Duration int `json:"duration"`
 	Offest   int `json:"offset"`
 }
 
-// ManyVideos ...
 type ManyVideos struct {
 	Videos     []Video    `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }
 
-// VideosParams ...
 type VideosParams struct {
 	IDs    []string `query:"id"`      // Limit 100
 	UserID string   `query:"user_id"` // Limit 1
@@ -49,18 +45,15 @@ type VideosParams struct {
 	Type     string `query:"type,all"`   // "all" (default), "upload", "archive", and "highlight"
 }
 
-// DeleteVideosParams ...
 type DeleteVideosParams struct {
-	IDs    []string `query:"id"` // Limit 5
+	IDs []string `query:"id"` // Limit 5
 }
 
-// VideosResponse ...
 type VideosResponse struct {
 	ResponseCommon
 	Data ManyVideos
 }
 
-// DeleteVideosResponse ...
 type DeleteVideosResponse struct {
 	ResponseCommon
 }

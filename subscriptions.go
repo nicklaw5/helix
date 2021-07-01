@@ -1,6 +1,5 @@
 package helix
 
-// Subscription ...
 type Subscription struct {
 	BroadcasterID    string `json:"broadcaster_id"`
 	BroadcasterLogin string `json:"broadcaster_login"`
@@ -16,7 +15,6 @@ type Subscription struct {
 	UserLogin        string `json:"user_login"`
 }
 
-// UserSubscription ...
 type UserSubscription struct {
 	BroadcasterID    string `json:"broadcaster_id"`
 	BroadcasterLogin string `json:"broadcaster_login"`
@@ -27,30 +25,26 @@ type UserSubscription struct {
 	Tier             string `json:"tier"`
 }
 
-// ManySubscriptions ...
 type ManySubscriptions struct {
 	Subscriptions []Subscription `json:"data"`
 	Pagination    Pagination     `json:"pagination"`
+	Total         int            `json:"total"`
 }
 
-// ManyUserSubscription ...
 type ManyUserSubscriptions struct {
 	UserSubscriptions []UserSubscription `json:"data"`
 }
 
-// SubscriptionsResponse ...
 type SubscriptionsResponse struct {
 	ResponseCommon
 	Data ManySubscriptions
 }
 
-// UserSubscriptionResponse ...
 type UserSubscriptionResponse struct {
 	ResponseCommon
 	Data ManyUserSubscriptions
 }
 
-// SubscriptionsParams ...
 type SubscriptionsParams struct {
 	BroadcasterID string   `query:"broadcaster_id"` // Limit 1
 	UserID        []string `query:"user_id"`        // Limit 100
@@ -59,7 +53,6 @@ type SubscriptionsParams struct {
 	First         int      `query:"first,20"` // Limit 100
 }
 
-// UserSubscriptionsParams ...
 type UserSubscriptionsParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 	UserID        string `query:"user_id"`

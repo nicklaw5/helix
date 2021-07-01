@@ -72,7 +72,7 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{
@@ -164,7 +164,7 @@ func TestRemoveEventSubSubscriptions(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{

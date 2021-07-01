@@ -5,17 +5,14 @@ type entitlementUploadURLRequest struct {
 	Type       string `query:"type"`
 }
 
-// EntitlementsUploadURL ...
 type EntitlementsUploadURL struct {
 	URL string `json:"url"`
 }
 
-// ManyEntitlementsUploadURLs ...
 type ManyEntitlementsUploadURLs struct {
 	URLs []EntitlementsUploadURL `json:"data"`
 }
 
-// EntitlementsUploadResponse ...
 type EntitlementsUploadResponse struct {
 	ResponseCommon
 	Data ManyEntitlementsUploadURLs

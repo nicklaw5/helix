@@ -1,6 +1,5 @@
 package helix
 
-// Marker ...
 type Marker struct {
 	ID              string `json:"id"`
 	CreatedAt       Time   `json:"created_at"`
@@ -9,13 +8,11 @@ type Marker struct {
 	URL             string `json:"URL"`
 }
 
-// VideoMarker ...
 type VideoMarker struct {
 	VideoID string   `json:"video_id"`
 	Markers []Marker `json:"markers"`
 }
 
-// StreamMarker ...
 type StreamMarker struct {
 	UserID    string        `json:"user_id"`
 	UserName  string        `json:"user_name"`
@@ -23,13 +20,11 @@ type StreamMarker struct {
 	Videos    []VideoMarker `json:"videos"`
 }
 
-// ManyStreamMarkers ...
 type ManyStreamMarkers struct {
 	StreamMarkers []StreamMarker `json:"data"`
 	Pagination    Pagination     `json:"pagination"`
 }
 
-// StreamMarkersResponse ...
 type StreamMarkersResponse struct {
 	ResponseCommon
 	Data ManyStreamMarkers
@@ -68,7 +63,6 @@ func (c *Client) GetStreamMarkers(params *StreamMarkersParams) (*StreamMarkersRe
 	return markers, nil
 }
 
-// CreateStreamMarker ...
 type CreateStreamMarker struct {
 	ID              string `json:"id"`
 	CreatedAt       Time   `json:"created_at"`
@@ -76,18 +70,15 @@ type CreateStreamMarker struct {
 	PositionSeconds int    `json:"position_seconds"`
 }
 
-// ManyCreateStreamMarkers ...
 type ManyCreateStreamMarkers struct {
 	CreateStreamMarkers []CreateStreamMarker `json:"data"`
 }
 
-// CreateStreamMarkerResponse ...
 type CreateStreamMarkerResponse struct {
 	ResponseCommon
 	Data ManyCreateStreamMarkers
 }
 
-// CreateStreamMarkerParams ...
 type CreateStreamMarkerParams struct {
 	UserID string `query:"user_id"`
 

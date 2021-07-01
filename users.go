@@ -2,7 +2,6 @@ package helix
 
 import "time"
 
-// User ...
 type User struct {
 	ID              string `json:"id"`
 	Login           string `json:"login"`
@@ -16,18 +15,15 @@ type User struct {
 	Email           string `json:"email"`
 }
 
-// ManyUsers ...
 type ManyUsers struct {
 	Users []User `json:"data"`
 }
 
-// UsersResponse ...
 type UsersResponse struct {
 	ResponseCommon
 	Data ManyUsers
 }
 
-// UsersParams ...
 type UsersParams struct {
 	IDs    []string `query:"id"`    // Limit 100
 	Logins []string `query:"login"` // Limit 100
@@ -51,7 +47,6 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	return users, nil
 }
 
-// UpdateUserParams ...
 type UpdateUserParams struct {
 	Description string `query:"description"`
 }
@@ -73,7 +68,6 @@ func (c *Client) UpdateUser(params *UpdateUserParams) (*UsersResponse, error) {
 	return users, nil
 }
 
-// UserFollow ...
 type UserFollow struct {
 	FromID     string    `json:"from_id"`
 	FromLogin  string    `json:"from_login"`
@@ -83,20 +77,17 @@ type UserFollow struct {
 	FollowedAt time.Time `json:"followed_at"`
 }
 
-// ManyFollows ...
 type ManyFollows struct {
 	Total      int          `json:"total"`
 	Follows    []UserFollow `json:"data"`
 	Pagination Pagination   `json:"pagination"`
 }
 
-// UsersFollowsResponse ...
 type UsersFollowsResponse struct {
 	ResponseCommon
 	Data ManyFollows
 }
 
-// UsersFollowsParams ...
 type UsersFollowsParams struct {
 	After  string `query:"after"`
 	First  int    `query:"first,20"` // Limit 100
@@ -123,26 +114,22 @@ func (c *Client) GetUsersFollows(params *UsersFollowsParams) (*UsersFollowsRespo
 	return users, nil
 }
 
-// UserBlocked ...
 type UserBlocked struct {
-	UserID    string `json:"user_id"`
-	UserLogin string `json:"user_login"`
-	DisplayName  string `json:"display_name"`
+	UserID      string `json:"user_id"`
+	UserLogin   string `json:"user_login"`
+	DisplayName string `json:"display_name"`
 }
 
-// ManyUsersBlocked ...
 type ManyUsersBlocked struct {
 	Users      []UserBlocked `json:"data"`
-	Pagination Pagination   `json:"pagination"`
+	Pagination Pagination    `json:"pagination"`
 }
 
-// UsersBlockedResponse ...
 type UsersBlockedResponse struct {
 	ResponseCommon
 	Data ManyUsersBlocked
 }
 
-// UsersBlockedParams ...
 type UsersBlockedParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 	After         string `query:"after"`
@@ -166,12 +153,10 @@ func (c *Client) GetUsersBlocked(params *UsersBlockedParams) (*UsersBlockedRespo
 	return users, nil
 }
 
-// BlockUserResponse ...
 type BlockUserResponse struct {
 	ResponseCommon
 }
 
-// BlockUserParams ...
 type BlockUserParams struct {
 	TargetUserID  string `query:"target_user_id"`
 	SourceContext string `query:"source_context"` // Valid values: "chat", "whisper"
@@ -193,7 +178,6 @@ func (c *Client) BlockUser(params *BlockUserParams) (*BlockUserResponse, error) 
 	return block, nil
 }
 
-// UnblockUserParams ...
 type UnblockUserParams struct {
 	TargetUserID string `query:"target_user_id"`
 }
@@ -212,4 +196,3 @@ func (c *Client) UnblockUser(params *UnblockUserParams) (*BlockUserResponse, err
 
 	return block, nil
 }
-

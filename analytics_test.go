@@ -72,7 +72,7 @@ func TestGetExtensionAnalytics(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{
@@ -156,7 +156,7 @@ func TestGetGameAnalytics(t *testing.T) {
 		}
 	}
 
-    // Test with HTTP Failure
+	// Test with HTTP Failure
 	options := &Options{
 		ClientID: "my-client-id",
 		HTTPClient: &badMockHTTPClient{

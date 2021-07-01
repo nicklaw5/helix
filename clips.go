@@ -1,37 +1,33 @@
 package helix
 
-// Clip ...
 type Clip struct {
-	ID              string             `json:"id"`
-	URL             string             `json:"url"`
-	EmbedURL        string             `json:"embed_url"`
-	BroadcasterID   string             `json:"broadcaster_id"`
-	BroadcasterName string             `json:"broadcaster_name"`
-	CreatorID       string             `json:"creator_id"`
-	CreatorName     string             `json:"creator_name"`
-	Duration        float64            `json:"duration"`
-	VideoID         string             `json:"video_id"`
-	GameID          string             `json:"game_id"`
-	Language        string             `json:"language"`
-	Title           string             `json:"title"`
-	ViewCount       int                `json:"view_count"`
-	CreatedAt       string             `json:"created_at"`
-	ThumbnailURL    string             `json:"thumbnail_url"`
+	ID              string  `json:"id"`
+	URL             string  `json:"url"`
+	EmbedURL        string  `json:"embed_url"`
+	BroadcasterID   string  `json:"broadcaster_id"`
+	BroadcasterName string  `json:"broadcaster_name"`
+	CreatorID       string  `json:"creator_id"`
+	CreatorName     string  `json:"creator_name"`
+	Duration        float64 `json:"duration"`
+	VideoID         string  `json:"video_id"`
+	GameID          string  `json:"game_id"`
+	Language        string  `json:"language"`
+	Title           string  `json:"title"`
+	ViewCount       int     `json:"view_count"`
+	CreatedAt       string  `json:"created_at"`
+	ThumbnailURL    string  `json:"thumbnail_url"`
 }
 
-// ManyClips ...
 type ManyClips struct {
 	Clips      []Clip     `json:"data"`
 	Pagination Pagination `json:"pagination"`
 }
 
-// ClipsResponse ...
 type ClipsResponse struct {
 	ResponseCommon
 	Data ManyClips
 }
 
-// ClipsParams ...
 type ClipsParams struct {
 	// One of the below
 	BroadcasterID string   `query:"broadcaster_id"`
@@ -61,18 +57,15 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	return clips, nil
 }
 
-// ClipEditURL ...
 type ClipEditURL struct {
 	ID      string `json:"id"`
 	EditURL string `json:"edit_url"`
 }
 
-// ManyClipEditURLs ...
 type ManyClipEditURLs struct {
 	ClipEditURLs []ClipEditURL `json:"data"`
 }
 
-// CreateClipResponse ...
 type CreateClipResponse struct {
 	ResponseCommon
 	Data ManyClipEditURLs
@@ -90,7 +83,6 @@ func (ccr *CreateClipResponse) GetClipsCreationRateLimitRemaining() int {
 	return ccr.convertHeaderToInt(ccr.Header.Get("Ratelimit-Helixclipscreation-Remaining"))
 }
 
-// CreateClipParams ...
 type CreateClipParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 

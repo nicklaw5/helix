@@ -22,19 +22,16 @@ const (
 	AuthBaseURL = "https://id.twitch.tv/oauth2"
 )
 
-// HTTPClient ...
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// Client ...
 type Client struct {
 	mu           sync.RWMutex
 	opts         *Options
 	lastResponse *Response
 }
 
-// Options ...
 type Options struct {
 	ClientID        string
 	ClientSecret    string
@@ -53,10 +50,8 @@ type DateRange struct {
 	EndedAt   Time `json:"ended_at"`
 }
 
-// RateLimitFunc ...
 type RateLimitFunc func(*Response) error
 
-// ResponseCommon ...
 type ResponseCommon struct {
 	StatusCode   int
 	Header       http.Header
@@ -86,7 +81,6 @@ func (rc *ResponseCommon) GetRateLimitReset() int {
 	return rc.convertHeaderToInt(rc.Header.Get("RateLimit-Reset"))
 }
 
-// Response ...
 type Response struct {
 	ResponseCommon
 	Data interface{}
@@ -101,7 +95,6 @@ func (r *Response) HydrateResponseCommon(rc *ResponseCommon) {
 	rc.ErrorMessage = r.ResponseCommon.ErrorMessage
 }
 
-// Pagination ...
 type Pagination struct {
 	Cursor string `json:"cursor"`
 }
@@ -424,7 +417,6 @@ func (c *Client) GetAppAccessToken() string {
 	return c.opts.AppAccessToken
 }
 
-// SetAppAccessToken ...
 func (c *Client) SetAppAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -436,21 +428,18 @@ func (c *Client) GetUserAccessToken() string {
 	return c.opts.UserAccessToken
 }
 
-// SetUserAccessToken ...
 func (c *Client) SetUserAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.opts.UserAccessToken = accessToken
 }
 
-// SetUserAgent ...
 func (c *Client) SetUserAgent(userAgent string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.opts.UserAgent = userAgent
 }
 
-// SetRedirectURI ...
 func (c *Client) SetRedirectURI(uri string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
