@@ -117,8 +117,7 @@ func eventsubFollow(w http.ResponseWriter, r *http.Request) {
         return
     }
     var followEvent helix.EventSubChannelFollowEvent
-    s, _ := vals.Event.MarshalJSON()
-    err = json.NewDecoder(bytes.NewReader(s)).Decode(&followEvent)
+    err = json.NewDecoder(bytes.NewReader(vals.Event)).Decode(&followEvent)
 
     log.Printf("got follow webhook: %s follows %s\n", followEvent.UserName, followEvent.BroadcasterUserName)
     w.WriteHeader(200)
