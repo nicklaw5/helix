@@ -44,10 +44,10 @@ if err != nil {
 resp, err := client.CreateEventSubSubscription(&helix.EventSubSubscription{
     Type: helix.EventSubTypeChannelFollow,
     Version: "1",
-    Condition &helix.EventSubCondition{
+    Condition: helix.EventSubCondition{
         BroadcasterUserID: "1337",
     },
-    Transport &helix.EventSubTransport{
+    Transport: helix.EventSubTransport{
         Method: "webhook",
         Callback: "https://example.com/follow",
         Secret: "s3cre7w0rd",
@@ -80,7 +80,6 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
-
 
 ## Example for handling a notification
 
@@ -118,8 +117,7 @@ func eventsubFollow(w http.ResponseWriter, r *http.Request) {
         return
     }
     var followEvent helix.EventSubChannelFollowEvent
-    s, _ := vals.Event.MarshalJSON()
-    err = json.NewDecoder(bytes.NewReader(s)).Decode(&followEvent)
+    err = json.NewDecoder(bytes.NewReader(vals.Event)).Decode(&followEvent)
 
     log.Printf("got follow webhook: %s follows %s\n", followEvent.UserName, followEvent.BroadcasterUserName)
     w.WriteHeader(200)
