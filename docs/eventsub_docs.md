@@ -44,10 +44,10 @@ if err != nil {
 resp, err := client.CreateEventSubSubscription(&helix.EventSubSubscription{
     Type: helix.EventSubTypeChannelFollow,
     Version: "1",
-    Condition &helix.EventSubCondition{
+    Condition: helix.EventSubCondition{
         BroadcasterUserID: "1337",
     },
-    Transport &helix.EventSubTransport{
+    Transport: helix.EventSubTransport{
         Method: "webhook",
         Callback: "https://example.com/follow",
         Secret: "s3cre7w0rd",
@@ -80,7 +80,6 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
-
 
 ## Example for handling a notification
 
