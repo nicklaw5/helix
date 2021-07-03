@@ -83,8 +83,8 @@ const (
 	EventSubTypeChannelFollow                             = "channel.follow"
 	EventSubTypeChannelSubscription                       = "channel.subscribe"
 	EventSubTypeChannelSubscriptionEnd                    = "channel.subscription.end"
-	EventSubTypeChannelSubscriptionGift                   = "channel.subscription.gift"    /* beta */
-	EventSubTypeChannelSubscriptionMessage                = "channel.subscription.message" /* beta */
+	EventSubTypeChannelSubscriptionGift                   = "channel.subscription.gift"
+	EventSubTypeChannelSubscriptionMessage                = "channel.subscription.message"
 	EventSubTypeChannelCheer                              = "channel.cheer"
 	EventSubTypeChannelRaid                               = "channel.raid"
 	EventSubTypeChannelBan                                = "channel.ban"

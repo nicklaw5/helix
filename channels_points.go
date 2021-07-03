@@ -17,6 +17,17 @@ type ChannelCustomRewardsParams struct {
 	ShouldRedemptionsSkipRequestQueue bool   `json:"should_redemptions_skip_request_queue"`
 }
 
+type DeleteCustomRewardsParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+	ID            string `query:"id"`
+}
+
+type GetCustomRewardsParams struct {
+	BroadcasterID         string `query:"broadcaster_id"`
+	ID                    string `query:"id"`
+	OnlyManageableRewards bool   `query:"only_manageable_rewards"`
+}
+
 type ManyChannelCustomRewards struct {
 	ChannelCustomRewards []ChannelCustomReward `json:"data"`
 }
@@ -69,6 +80,11 @@ type ChannelCustomRewardResponse struct {
 	Data ManyChannelCustomRewards
 }
 
+// Response for removing a custom reward
+type DeleteCustomRewardsResponse struct {
+	ResponseCommon
+}
+
 // CreateCustomReward : Creates a Custom Reward on a channel.
 // Required scope: channel:manage:redemptions
 func (c *Client) CreateCustomReward(params *ChannelCustomRewardsParams) (*ChannelCustomRewardResponse, error) {
@@ -82,4 +98,33 @@ func (c *Client) CreateCustomReward(params *ChannelCustomRewardsParams) (*Channe
 	reward.Data.ChannelCustomRewards = resp.Data.(*ManyChannelCustomRewards).ChannelCustomRewards
 
 	return reward, nil
+}
+
+// DeleteCustomRewards : Deletes a Custom Rewards on a channel
+// Required scope: channel:manage:redemptions
+func (c *Client) DeleteCustomRewards(params *DeleteCustomRewardsParams) (*DeleteCustomRewardsResponse, error) {
+	resp, err := c.delete("/channel_points/custom_rewards", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	reward := &DeleteCustomRewardsResponse{}
+	resp.HydrateResponseCommon(&reward.ResponseCommon)
+
+	return reward, nil
+}
+
+// GetCustomRewards : Get Custom Rewards on a channel
+// Required scope: channel:read:redemptions
+func (c *Client) GetCustomRewards(params *GetCustomRewardsParams) (*ChannelCustomRewardResponse, error) {
+	resp, err := c.get("/channel_points/custom_rewards", &ManyChannelCustomRewards{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	rewards := &ChannelCustomRewardResponse{}
+	resp.HydrateResponseCommon(&rewards.ResponseCommon)
+	rewards.Data.ChannelCustomRewards = resp.Data.(*ManyChannelCustomRewards).ChannelCustomRewards
+
+	return rewards, nil
 }

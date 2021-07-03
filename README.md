@@ -39,8 +39,8 @@ If you are looking for the Twitch API docs, see the [Twitch Developer website](h
 - [x] Modify Channel Information
 - [x] Get Channel Editors
 - [x] Create Custom Rewards
-- [ ] Delete Custom Reward
-- [ ] Get Custom Reward
+- [x] Delete Custom Reward
+- [x] Get Custom Reward
 - [ ] Get Custom Reward Redemption
 - [ ] Update Custom Reward
 - [ ] Update Redemption Status
@@ -55,6 +55,7 @@ If you are looking for the Twitch API docs, see the [Twitch Developer website](h
 - [x] Create Entitlement Grants Upload URL
 - [x] Get Code Status
 - [x] Get Drops Entitlements
+- [ ] Update Drops Entitlements
 - [x] Redeem Code
 - [x] Create / Remove / List EventSub Subscriptions
 - [x] Get Top Games
@@ -72,6 +73,12 @@ If you are looking for the Twitch API docs, see the [Twitch Developer website](h
 - [x] Get Predictions
 - [x] Create Prediction
 - [x] End Prediction
+- [ ] Get Channel Stream Schedule
+- [ ] Get Channel iCalendar
+- [ ] Update Channel Stream Schedule
+- [ ] Create Channel Stream Schedule Segment
+- [ ] Update Channel Stream Schedule Segment
+- [ ] Delete Channel Stream Schedule Segment
 - [ ] Search Categories
 - [ ] Search Channels
 - [ ] Get Stream Key
@@ -89,8 +96,6 @@ If you are looking for the Twitch API docs, see the [Twitch Developer website](h
 - [x] Get Users
 - [x] Update User
 - [x] Get Users Follows
-- [ ] Create User Follows
-- [ ] Delete User Follows
 - [x] Get User Block List
 - [x] Block User
 - [x] UnBlock User
