@@ -20,7 +20,7 @@ type Time struct {
 
 // UnmarshalJSON is our custom datetime unmarshaller. Twitch sometimes
 // returns datetimes as empty strings, which casuses issues with the native time
-// UnmarshalJSON method when decoding the JSON string. Here we hanlde that scenario,
+// UnmarshalJSON method when decoding the JSON string. Here we handle that scenario,
 // by returning a zero time value for any JSON time field that is either an
 // empty string or "null".
 func (t *Time) UnmarshalJSON(b []byte) (err error) {
