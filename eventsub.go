@@ -31,6 +31,7 @@ type EventSubCondition struct {
 	ToBroadcasterUserID   string `json:"to_broadcaster_user_id"`
 	RewardID              string `json:"reward_id"`
 	ClientID              string `json:"client_id"`
+	ExtensionClientID     string `json:"extension_client_id"`
 	UserID                string `json:"user_id"`
 }
 
@@ -557,6 +558,11 @@ func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*Eve
 	if payload.Transport.Method == "webhook" && !strings.HasPrefix(payload.Transport.Callback, "https://") {
 		return nil, fmt.Errorf("error: callback must use https")
 	}
+
+	if payload.Transport.Secret != "" && (len(payload.Transport.Secret) < 10 || len(payload.Transport.Secret) > 100) {
+		return nil, fmt.Errorf("error: secret must be between 10 and 100 characters")
+	}
+
 	callbackUrl, err := url.Parse(payload.Transport.Callback)
 	if err != nil {
 		return nil, err
