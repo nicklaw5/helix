@@ -189,16 +189,72 @@ func TestCreateEventSubSubscriptions(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode int
-		options    *Options
-		params     *EventSubSubscription
-		respBody   string
+		statusCode    int
+		options       *Options
+		params        *EventSubSubscription
+		respBody      string
+		validationErr string
 	}{
 		{
 			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id"},
 			&EventSubSubscription{},
 			`{"error":"Unauthorized","status":401,"message":"OAuth token is missing"}`,
+			"",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&EventSubSubscription{
+				Type:    "channel.follow",
+				Version: "1",
+				Condition: EventSubCondition{
+					BroadcasterUserID: "12345678",
+				},
+				Transport: EventSubTransport{
+					Method:   "webhook",
+					Callback: "https://example.com/eventsub/follow",
+					Secret:   "111",
+				},
+			},
+			`{"error":"Bad Request","status":400,"message":"secret must be between 10 and 100 characters"}`,
+			"error: secret must be between 10 and 100 characters",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&EventSubSubscription{
+				Type:    "channel.follow",
+				Version: "1",
+				Condition: EventSubCondition{
+					BroadcasterUserID: "12345678",
+				},
+				Transport: EventSubTransport{
+					Method:   "webhook",
+					Callback: "http://example.com/eventsub/follow",
+					Secret:   "s3cr37w0rd",
+				},
+			},
+			`{"error":"Bad Request","status":400,"message":"call back must be https protocol"}`,
+			"error: callback must use https",
+		},
+		{
+			http.StatusConflict,
+			&Options{ClientID: "my-client-id"},
+			&EventSubSubscription{
+				Type:    "channel.follow",
+				Version: "1",
+				Condition: EventSubCondition{
+					BroadcasterUserID: "12345678",
+				},
+				Transport: EventSubTransport{
+					Method:   "webhook",
+					Callback: "https://example.com/eventsub/follow",
+					Secret:   "s3cr37w0rd",
+				},
+			},
+			`{"error":"Conflict","status":409,"message":"subscription already exists"}`,
+			"",
 		},
 		{
 			http.StatusOK,
@@ -216,6 +272,7 @@ func TestCreateEventSubSubscriptions(t *testing.T) {
 				},
 			},
 			`{"data":[{"id":"4d06fabc-4cf4-4e99-a60f-b457d5c69305","status":"webhook_callback_verification_pending","type":"channel.follow","version":"1","condition":{"broadcaster_user_id":"12345678"},"created_at":"2021-03-10T23:38:50.311154721Z","transport":{"method":"webhook","callback":"https://example.com/eventsub/follow"},"cost":1}],"limit":10000,"total":1,"max_total_cost":10000,"total_cost":1}`,
+			"",
 		},
 	}
 
@@ -224,6 +281,10 @@ func TestCreateEventSubSubscriptions(t *testing.T) {
 
 		resp, err := c.CreateEventSubSubscription(testCase.params)
 		if err != nil {
+			if err.Error() == testCase.validationErr {
+				continue
+			}
+
 			t.Error(err)
 		}
 
@@ -241,6 +302,22 @@ func TestCreateEventSubSubscriptions(t *testing.T) {
 			}
 
 			expectedErrMsg := "OAuth token is missing"
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+		if resp.StatusCode == http.StatusConflict {
+			if resp.Error != "Conflict" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Conflict", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusConflict {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusUnauthorized, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "subscription already exists"
 			if resp.ErrorMessage != expectedErrMsg {
 				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
 			}
