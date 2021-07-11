@@ -29,7 +29,7 @@ func TestGetUsers(t *testing.T) {
 			&Options{ClientID: "my-client-id"},
 			[]string{"26301881"},
 			[]string{"summit1g"},
-			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"Wtf do i write here? Click my stream, or i scream.","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823},{"id":"26490481","login":"summit1g","display_name":"summit1g","type":"","broadcaster_type":"partner","description":"I'm a competitive CounterStrike player who likes to play casually now and many other games. You will mostly see me play CS, H1Z1,and single player games at night. There will be many othergames played on this stream in the future as they come out:D","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/200cea12142f2384-profile_image-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/summit1g-channel_offline_image-e2f9a1df9e695ec1-1920x1080.png","view_count":202707885}]}`,
+			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"Wtf do i write here? Click my stream, or i scream.","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823,"created_at":"2011-11-22T04:40:56.75883Z"},{"id":"26490481","login":"summit1g","display_name":"summit1g","type":"","broadcaster_type":"partner","description":"I'm a competitive CounterStrike player who likes to play casually now and many other games. You will mostly see me play CS, H1Z1,and single player games at night. There will be many othergames played on this stream in the future as they come out:D","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/200cea12142f2384-profile_image-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/summit1g-channel_offline_image-e2f9a1df9e695ec1-1920x1080.png","view_count":202707885,"created_at":"2011-12-01T06:33:31.487567Z"}]}`,
 			[]string{"sodapoppin", "summit1g"},
 		},
 	}
@@ -114,7 +114,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"new description","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823}]}`,
+			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"new description","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823,"created_at":"2011-11-22T04:40:56.75883Z"}]}`,
 			"new description",
 		},
 	}
