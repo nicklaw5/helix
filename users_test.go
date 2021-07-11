@@ -114,7 +114,7 @@ func TestUpdateUser(t *testing.T) {
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"new description","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823}]}`,
+			`{"data":[{"id":"26301881","login":"sodapoppin","display_name":"sodapoppin","type":"","broadcaster_type":"partner","description":"new description","profile_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-profile_image-10049b6200f90c14-300x300.png","offline_image_url":"https://static-cdn.jtvnw.net/jtv_user_pictures/sodapoppin-channel_offline_image-2040c6fcacec48db-1920x1080.jpeg","view_count":190154823,"created_at":"2011-11-22T04:40:56.75883Z"}]}`,
 			"new description",
 		},
 	}
