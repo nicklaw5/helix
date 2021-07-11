@@ -59,6 +59,8 @@ type EventSubSubscriptionsResponse struct {
 // Parameter for filtering subscriptions, currently only the status is filterable
 type EventSubSubscriptionsParams struct {
 	Status string `query:"status"`
+	Type   string `query:"type,omitempty"`
+	After  string `query:"after,omitempty"`
 }
 
 // Parameter for removing a subscription.
