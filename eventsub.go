@@ -467,7 +467,7 @@ type EventSubContribution struct {
 	UserLogin string `json:"user_login"`
 	UserName  string `json:"user_name"`
 	Type      string `json:"type"`
-	Total     string `json:"total"`
+	Total     int64  `json:"total"`
 }
 
 // This belong to an outcome and defines user reward
