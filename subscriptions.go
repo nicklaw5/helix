@@ -72,6 +72,7 @@ func (c *Client) GetSubscriptions(params *SubscriptionsParams) (*SubscriptionsRe
 	resp.HydrateResponseCommon(&subscriptions.ResponseCommon)
 	subscriptions.Data.Subscriptions = resp.Data.(*ManySubscriptions).Subscriptions
 	subscriptions.Data.Pagination = resp.Data.(*ManySubscriptions).Pagination
+	subscriptions.Data.Total = resp.Data.(*ManySubscriptions).Total
 
 	return subscriptions, nil
 }

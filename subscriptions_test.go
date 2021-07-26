@@ -59,6 +59,11 @@ func TestGetSubscriptions(t *testing.T) {
 
 			continue
 		}
+
+		if resp.Data.Total != 1 {
+			t.Errorf("expected total field to be 1 got %d", resp.Data.Total)
+		}
+
 	}
 
 	// Test with HTTP Failure
