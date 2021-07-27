@@ -40,8 +40,8 @@ client, err := helix.NewClient(&helix.Options{
 })
 
 
-// see docs below to see what permissions and roles you can pass 
-claims, err := client.ExtensionCreateClaims(broadcasterID, ExternalRole, client.FormBroadcastSendPubSubPermissions(), 0)
+// see docs below to see what pub-sub permissions you can pass 
+claims, err := client.ExtensionCreateClaims(broadcasterID, client.FormBroadcastSendPubSubPermissions(), 0)
 if err != nil {
     // handle err
 }
