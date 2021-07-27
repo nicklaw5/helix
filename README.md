@@ -105,16 +105,16 @@ If you are looking for the Twitch API docs, see the [Twitch Developer website](h
 - [x] Get Videos
 - [x] Delete Videos
 - [x] Get Webhook Subscriptions
-- [ ] Create Extension Secret
-- [ ] Get Extension Secret
+- [x] Create Extension Secret
+- [x] Get Extension Secret
 - [ ] Revoke Extension Secrets
 - [ ] Get Live Channels with Extension Activated
-- [ ] Set Extension Required Configuration
-- [ ] Set Extension Configuration Segment
+- [x] Set Extension Required Configuration
+- [x] Set Extension Configuration Segment
 - [ ] Get Extension Channel Configuration
-- [ ] Get Extension Configuration Segment
-- [ ] Send Extension PubSub Message
-- [ ] Send Extension Chat Message
+- [x] Get Extension Configuration Segment
+- [x] Send Extension PubSub Message
+- [x] Send Extension Chat Message
 
 ## Quick Usage Example
 

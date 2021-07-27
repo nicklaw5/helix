@@ -42,6 +42,15 @@ type Options struct {
 	HTTPClient      HTTPClient
 	RateLimitFunc   RateLimitFunc
 	APIBaseURL      string
+	ExtensionOpts   ExtensionOptions
+}
+
+type ExtensionOptions struct {
+	OwnerUserID          string
+	Secret               string
+	Version              string
+	ConfigurationVersion string
+	SignedJWTToken       string
 }
 
 // DateRange is a generic struct used by various responses.
@@ -394,6 +403,9 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 	if opts.UserAccessToken != "" {
 		bearerToken = opts.UserAccessToken
 	}
+	if opts.ExtensionOpts.SignedJWTToken != "" {
+		bearerToken = opts.ExtensionOpts.SignedJWTToken
+	}
 
 	authType := "Bearer"
 	// Token validation requires different type of Auth
@@ -432,6 +444,17 @@ func (c *Client) SetUserAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.opts.UserAccessToken = accessToken
+}
+
+// GetAppAccessToken returns the current app access token.
+func (c *Client) GetExtensionSignedJWTToken() string {
+	return c.opts.ExtensionOpts.SignedJWTToken
+}
+
+func (c *Client) SetExtensionSignedJWTToken(jwt string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.opts.ExtensionOpts.SignedJWTToken = jwt
 }
 
 func (c *Client) SetUserAgent(userAgent string) {
