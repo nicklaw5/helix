@@ -60,7 +60,7 @@ If you are looking for the Twitch API docs, see the [Twitch Developer website](h
 - [x] Create / Remove / List EventSub Subscriptions
 - [x] Get Top Games
 - [x] Get Games
-- [ ] Get Hype Train Events
+- [x] Get Hype Train Events
 - [ ] Check AutoMod Status
 - [x] Manage Held AutoMod Messages
 - [ ] Get Banned Events
