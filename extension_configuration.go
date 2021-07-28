@@ -1,5 +1,7 @@
 package helix
 
+import "fmt"
+
 // SegmentType A segment configuration type
 type ExtensionSegmentType string
 
@@ -15,17 +17,17 @@ func (s ExtensionSegmentType) String() string {
 }
 
 type ExtensionConfigurationParams struct {
-	Segment     ExtensionSegmentType `json:"segment"`
-	ExtensionId string               `json:"extension-id"`
-	Version     string               `json:"version"`
-	Content     string               `json:"content"`
-}
-
-type ExtensionConfigurationSegment struct {
 	Segment       ExtensionSegmentType `json:"segment"`
+	ExtensionId   string               `json:"extension-id"`
 	BroadcasterID string               `json:"broadcaster_id,omitempty"` // populated if segment is of type 'developer' || 'broadcaster'
 	Version       string               `json:"version"`
 	Content       string               `json:"content"`
+}
+
+type ExtensionConfigurationSegment struct {
+	Segment ExtensionSegmentType `json:"segment"`
+	Version string               `json:"version"`
+	Content string               `json:"content"`
 }
 
 type ExtensionGetConfigurationParams struct {
@@ -35,7 +37,6 @@ type ExtensionGetConfigurationParams struct {
 }
 
 type ExtensionSetRequiredConfigurationParams struct {
-	BroadcasterID         string `json:"-" query:"broadcaster_id"`
 	ExtensionID           string `json:"extension_id"`
 	ExtensionVersion      string `json:"extension_version"`
 	RequiredConfiguration string `json:"required_configuration"`
@@ -60,6 +61,14 @@ type ExtensionSetConfigurationResponse struct {
 
 // https://dev.twitch.tv/docs/extensions/reference/#set-extension-configuration-segment
 func (c *Client) SetExtensionSegmentConfig(params *ExtensionConfigurationParams) (*ExtensionSetConfigurationResponse, error) {
+	if params.BroadcasterID != "" {
+		switch params.Segment {
+		case DeveloperSegment, BroadcasterSegment:
+		default:
+			return nil, fmt.Errorf("error: developer or broadcaster extension configuration segment type must be provided")
+		}
+	}
+
 	resp, err := c.putAsJSON("/extensions/configurations", &ManyPolls{}, params)
 	if err != nil {
 		return nil, err
