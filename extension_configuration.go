@@ -50,7 +50,7 @@ type ExtensionGetConfigurationSegmentResponse struct {
 }
 
 type ManyExtensionConfigurationSegments struct {
-	Segments []ExtensionConfigurationSegment
+	Segments []ExtensionConfigurationSegment `json:"data"`
 }
 
 type ExtensionSetConfigurationResponse struct {
