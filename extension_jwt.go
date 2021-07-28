@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 // RoleType The user role type
@@ -144,7 +144,7 @@ func (c *Client) ExtensionJWTVerify(token string) (claims *TwitchJWTClaims, err 
 
 func (c *Client) validateExtensionOpts() error {
 	if c.opts.ExtensionOpts.OwnerUserID == "" {
-		return fmt.Errorf("extension secret is empty")
+		return fmt.Errorf("extension owner id is empty")
 	}
 
 	if c.opts.ExtensionOpts.Secret == "" {

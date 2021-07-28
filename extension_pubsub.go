@@ -3,12 +3,6 @@ package helix
 // PublishType The Pub/Sub broadcast type
 type ExtensionPubSubPublishType string
 
-type pubSubNotification struct {
-	Message     string                       `json:"message"`
-	Targets     []ExtensionPubSubPublishType `json:"targets"`
-	ContentType string                       `json:"content_type"`
-}
-
 // Types of Pub/Sub Permissions or targets
 const (
 	ExtensionPubSubGenericPublish   ExtensionPubSubPublishType = "*"
