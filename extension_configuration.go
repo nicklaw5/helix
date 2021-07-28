@@ -29,8 +29,9 @@ type ExtensionConfigurationSegment struct {
 }
 
 type ExtensionGetConfigurationParams struct {
-	ExtensionID string                 `query:"extension_id"`
-	Segment     []ExtensionSegmentType `query:"segment"`
+	ExtensionID   string                 `query:"extension_id"`
+	BroadcasterID string                 `query:"broadcaster_id"`
+	Segment       []ExtensionSegmentType `query:"segment"`
 }
 
 type ExtensionSetRequiredConfigurationParams struct {
