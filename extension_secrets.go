@@ -52,7 +52,7 @@ func (c *Client) CreateExtensionSecret(params *ExtensionSecretCreationParams) (*
 	return events, nil
 }
 
-func (c *Client) GetExtensionSecret(params *GetExtensionSecretParams) (*GetExtensionSecretResponse, error) {
+func (c *Client) GetExtensionSecrets(params *GetExtensionSecretParams) (*GetExtensionSecretResponse, error) {
 	resp, err := c.postAsJSON("/extensions/jwt/secrets", &ManyExtensionSecrets{}, params)
 	if err != nil {
 		return nil, err
