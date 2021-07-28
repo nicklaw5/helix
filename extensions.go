@@ -41,6 +41,17 @@ type ExtensionTransactionsParams struct {
 	First       int      `query:"first,20"`     // Optional, Limit 100
 }
 
+type SendExtensionMessageParams struct {
+	BroadcasterID string `query:"broadcaster_id" json:"-"`
+	Text          string `json:"text"`
+	Version       string `json:"version"`
+	ExtensionID   string `json:"extension_id"`
+}
+
+type SendExtensionMessageResponse struct {
+	ResponseCommon
+}
+
 // GetExtensionTransactions allows extension back end servers to fetch a list of transactions that
 // have occurred for their extension across all of Twitch. A transaction is a record of a user
 // exchanging Bits for an in-Extension digital good.
@@ -57,4 +68,17 @@ func (c *Client) GetExtensionTransactions(params *ExtensionTransactionsParams) (
 	extTxnResp.Data.ExtensionTransactions = resp.Data.(*ManyExtensionTransactions).ExtensionTransactions
 	extTxnResp.Data.Pagination = resp.Data.(*ManyExtensionTransactions).Pagination
 	return extTxnResp, nil
+}
+
+func (c *Client) SendExtensionChatMessage(params *SendExtensionMessageParams) (*SendExtensionMessageResponse, error) {
+
+	resp, err := c.postAsJSON("/extensions/chat", &SendExtensionMessageResponse{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	sndExtMsgResp := &SendExtensionMessageResponse{}
+	resp.HydrateResponseCommon(&sndExtMsgResp.ResponseCommon)
+
+	return sndExtMsgResp, nil
 }
