@@ -14,9 +14,13 @@ type GetExtensionSecretResponse struct {
 	ResponseCommon
 }
 
-type ManyExtensionSecrets struct {
+type SecretsInformation struct {
 	Version int      `json:"format_version"`
 	Secrets []Secret `json:"secrets"`
+}
+
+type ManyExtensionSecrets struct {
+	SecretInfo []SecretsInformation `json:"data"`
 }
 
 // Secret information about a generated secret
@@ -43,8 +47,7 @@ func (c *Client) CreateExtensionSecret(params *ExtensionSecretCreationParams) (*
 
 	events := &ExtensionSecretCreationResponse{}
 	resp.HydrateResponseCommon(&events.ResponseCommon)
-	events.Data.Secrets = resp.Data.(*ManyExtensionSecrets).Secrets
-	events.Data.Version = resp.Data.(*ManyExtensionSecrets).Version
+	events.Data.SecretInfo = resp.Data.(*ManyExtensionSecrets).SecretInfo
 
 	return events, nil
 }
@@ -57,8 +60,7 @@ func (c *Client) GetExtensionSecret(params *GetExtensionSecretParams) (*GetExten
 
 	events := &GetExtensionSecretResponse{}
 	resp.HydrateResponseCommon(&events.ResponseCommon)
-	events.Data.Secrets = resp.Data.(*ManyExtensionSecrets).Secrets
-	events.Data.Version = resp.Data.(*ManyExtensionSecrets).Version
+	events.Data.SecretInfo = resp.Data.(*ManyExtensionSecrets).SecretInfo
 
 	return events, nil
 }
