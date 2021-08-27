@@ -197,7 +197,7 @@ type EventSubChannelUpdateEvent struct {
 	Language             string `json:"language"`
 	CategoryID           string `json:"category_id"`
 	CategoryName         string `json:"category_name"`
-	IsMature             string `json:"is_mature"`
+	IsMature             bool   `json:"is_mature"`
 }
 
 // Data for a channel unban notification
