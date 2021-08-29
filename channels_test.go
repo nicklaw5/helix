@@ -172,7 +172,7 @@ func TestGetChannelInformation(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetChannelInformation(&GetChannelInformationParams{
-			BroadcasterID: testCase.BroadcasterID,
+			BroadcasterIDs: []string{testCase.BroadcasterID},
 		})
 		if err != nil {
 			t.Error(err)
