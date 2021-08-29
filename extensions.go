@@ -1,5 +1,7 @@
 package helix
 
+import "fmt"
+
 type ExtensionTransaction struct {
 	ID               string `json:"id"`
 	Timestamp        Time   `json:"timestamp"`
@@ -41,6 +43,17 @@ type ExtensionTransactionsParams struct {
 	First       int      `query:"first,20"`     // Optional, Limit 100
 }
 
+type ExtensionSendChatMessageParams struct {
+	BroadcasterID    string `query:"broadcaster_id" json:"-"`
+	Text             string `json:"text"` // Limit 280
+	ExtensionVersion string `json:"extension_version"`
+	ExtensionID      string `json:"extension_id"`
+}
+
+type ExtensionSendChatMessageResponse struct {
+	ResponseCommon
+}
+
 // GetExtensionTransactions allows extension back end servers to fetch a list of transactions that
 // have occurred for their extension across all of Twitch. A transaction is a record of a user
 // exchanging Bits for an in-Extension digital good.
@@ -57,4 +70,30 @@ func (c *Client) GetExtensionTransactions(params *ExtensionTransactionsParams) (
 	extTxnResp.Data.ExtensionTransactions = resp.Data.(*ManyExtensionTransactions).ExtensionTransactions
 	extTxnResp.Data.Pagination = resp.Data.(*ManyExtensionTransactions).Pagination
 	return extTxnResp, nil
+}
+
+// SendExtensionChatMessage  Sends a specified chat message to a specified channel.
+// The message will appear in the channel’s chat as a normal message,
+// The author of the message is the Extension name.
+//
+// see https://dev.twitch.tv/docs/api/reference#send-extension-chat-message
+func (c *Client) SendExtensionChatMessage(params *ExtensionSendChatMessageParams) (*ExtensionSendChatMessageResponse, error) {
+
+	if len(params.Text) > 280 {
+		return nil, fmt.Errorf("error: chat message length exceeds 280 characters")
+	}
+
+	if params.BroadcasterID == "" {
+		return nil, fmt.Errorf("error: broadcaster ID must be specified")
+	}
+
+	resp, err := c.postAsJSON("/extensions/chat", &ExtensionSendChatMessageResponse{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	sndExtMsgResp := &ExtensionSendChatMessageResponse{}
+	resp.HydrateResponseCommon(&sndExtMsgResp.ResponseCommon)
+
+	return sndExtMsgResp, nil
 }
