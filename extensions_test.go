@@ -99,3 +99,91 @@ func TestGetExtensionTransactions(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestExtensionSendChatMessage(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		params        *ExtensionSendChatMessageParams
+		respBody      string
+		validationErr string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&ExtensionSendChatMessageParams{
+				Text:             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore",
+				BroadcasterID:    "100249558",
+				ExtensionVersion: "0.0.1",
+				ExtensionID:      "my-ext-id",
+			},
+			`{"error":"Bad Request","status":400,"message":"text exceeds 280 characters"}`,
+			"error: chat message length exceeds 280 characters",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&ExtensionSendChatMessageParams{
+				Text:             "welcome to the stream",
+				ExtensionVersion: "0.0.1",
+				ExtensionID:      "my-ext-id",
+			},
+			`{"error":"Bad Request","status":400,"message":"missing broadcaster id"}`,
+			"error: broadcaster ID must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{
+				ClientID: "my-client-id",
+				ExtensionOpts: ExtensionOptions{
+					Secret:      "my-ext-secret",
+					OwnerUserID: "ext-owner-id",
+				},
+			},
+			&ExtensionSendChatMessageParams{
+				ExtensionID:      "my-ext-id",
+				Text:             "welcome to the stream!",
+				ExtensionVersion: "0.0.1",
+				BroadcasterID:    "100249558",
+			},
+			"",
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.SendExtensionChatMessage(testCase.params)
+		if err != nil {
+			if err.Error() == testCase.validationErr {
+				continue
+			}
+
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusUnauthorized {
+			if resp.Error != "Unauthorized" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Unauthorized", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusUnauthorized {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", http.StatusUnauthorized, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "JWT token is missing"
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+}

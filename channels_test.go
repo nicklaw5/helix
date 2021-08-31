@@ -239,7 +239,7 @@ func TestGetChannelInformation(t *testing.T) {
 
 		for i, channel := range resp.Data.Channels {
 			if channel.BroadcasterID != testCase.parsed[i].BroadcasterID {
-				t.Errorf("Expected struct field BroadcasterID = %s, was %s", testCase.parsed[i].BroadcasterID, channel.BroadcasterID)
+				t.Errorf("Expected struct field ChannelID = %s, was %s", testCase.parsed[i].BroadcasterID, channel.BroadcasterID)
 			}
 
 			if channel.BroadcasterName != testCase.parsed[i].BroadcasterName {

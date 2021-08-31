@@ -13,7 +13,7 @@ type User struct {
 	OfflineImageURL string `json:"offline_image_url"`
 	ViewCount       int    `json:"view_count"`
 	Email           string `json:"email"`
-	CreatedAt       Time `json:"created_at"`
+	CreatedAt       Time   `json:"created_at"`
 }
 
 type ManyUsers struct {
