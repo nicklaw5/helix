@@ -5,11 +5,22 @@ A Twitch Helix API client written in Go (Golang).
 [![Tests and Coverage](https://github.com/nicklaw5/helix/workflows/Tests%20and%20Coverage/badge.svg)](https://github.com/nicklaw5/helix/actions?query=workflow%3A%22Tests+and+Coverage%22)
 [![Coverage Status](https://coveralls.io/repos/github/nicklaw5/helix/badge.svg)](https://coveralls.io/github/nicklaw5/helix)
 
-## Package Status
-
 Twitch is always expanding and improving the available endpoints and features for the Helix API.
 The maintainers of this package will make a best effort approach to implementing new changes
 as they are released by the Twitch team.
+
+## Getting Started
+
+```shell
+go get github.com/nicklaw5/helix/v2
+```
+
+## Supported Go Versions
+
+Our support of Go versions is aligned with [Go's version release policy](https://golang.org/doc/devel/release#policy).
+So we will support a major version of Go until there are two newer major releases.
+We no longer support building this package with unsupported Go versions, as these contain security
+vulnerabilities which will not be fixed.
 
 ## Documentation & Examples
 
