@@ -9,16 +9,16 @@ import (
 )
 
 // RoleType The user role type
-type roleType string
+type RoleType string
 
 // Types of user roles used within the JWT Claims
-// TODO expose these when helix supports them
 const (
-	BroadcasterRole roleType = "broadcaster"
-	ExternalRole    roleType = "external"
-	ModeratorRole   roleType = "moderator"
-	ViewerRole      roleType = "viewer"
+	BroadcasterRole RoleType = "broadcaster"
+	ExternalRole    RoleType = "external"
+	ModeratorRole   RoleType = "moderator"
+	ViewerRole      RoleType = "viewer"
 
+	// toAllChannels this 'channelID' is used for sending global pubsub messages
 	toAllChannels = "all"
 )
 
@@ -35,21 +35,25 @@ type TwitchJWTClaims struct {
 	OpaqueUserID string             `json:"opaque_user_id,omitempty"`
 	UserID       string             `json:"user_id"`
 	ChannelID    string             `json:"channel_id,omitempty"`
-	Role         roleType           `json:"role"`
+	Role         RoleType           `json:"role"`
 	Unlinked     bool               `json:"is_unlinked,omitempty"`
 	Permissions  *PubSubPermissions `json:"pubsub_perms"`
 	jwt.StandardClaims
 }
 
+type ExtensionCreateClaimsParams struct {
+	// ChannelID if this value is empty it will default to 'all'
+	ChannelID string
+	// PubSub is the pubsub permission to attach to the claim
+	PubSub *PubSubPermissions
+	// Expiration is the epoch of jwt expiration, default 3 minutes from time.Now
+	Expiration int64
+}
+
 // CreateClaims will construct a claims suitable for generating a JWT token,
-// containing necessary information required by the Twitch API.
-// @param BroadcasterID if this value is empty it will default to 'all'
-// @param pubsub the pubsub permission to attach to the claim
-// @param expiration the epoch of jwt expiration, default 3 minutes from time.Now
+// containing necessary information required by the Twitch Helix Extension API endpoints.
 func (c *Client) ExtensionCreateClaims(
-	broadcasterID string,
-	pubsub *PubSubPermissions,
-	expiration int64,
+	params *ExtensionCreateClaimsParams,
 ) (
 	*TwitchJWTClaims,
 	error,
@@ -60,21 +64,22 @@ func (c *Client) ExtensionCreateClaims(
 	}
 
 	// default expiration to 3 minutes
-	if expiration == 0 {
-		expiration = time.Now().Add(time.Minute*3).UnixNano() / int64(time.Millisecond)
+	if params.Expiration == 0 {
+		params.Expiration = time.Now().Add(time.Minute*3).UnixNano() / int64(time.Millisecond)
 	}
 
-	if broadcasterID == "" {
-		broadcasterID = toAllChannels
+	// default channelID to 'all'
+	if params.ChannelID == "" {
+		params.ChannelID = toAllChannels
 	}
 
 	claims := &TwitchJWTClaims{
 		UserID:      c.opts.ExtensionOpts.OwnerUserID,
-		ChannelID:   broadcasterID,
+		ChannelID:   params.ChannelID,
 		Role:        ExternalRole,
-		Permissions: pubsub,
+		Permissions: params.PubSub,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiration,
+			ExpiresAt: params.Expiration,
 		},
 	}
 

@@ -11,7 +11,7 @@ func TestValidateJwtParameters(t *testing.T) {
 	t.Parallel()
 	c := newMockClient(&Options{}, newMockHandler(http.StatusOK, "", nil))
 
-	_, err := c.ExtensionCreateClaims("", c.FormBroadcastSendPubSubPermissions(), 0)
+	err := c.validateExtensionOpts()
 	if err == nil {
 		t.Errorf("expected to get an error got nil")
 	}
@@ -23,7 +23,7 @@ func TestValidateJwtParameters(t *testing.T) {
 		ExtensionOpts: ExtensionOptions{OwnerUserID: "100249558"},
 	}, newMockHandler(http.StatusOK, "", nil))
 
-	_, err = c.ExtensionCreateClaims("", c.FormBroadcastSendPubSubPermissions(), 0)
+	err = c.validateExtensionOpts()
 	if err == nil {
 		t.Errorf("expected to get an error got nil")
 	}
@@ -43,19 +43,30 @@ func TestCreateClaims(t *testing.T) {
 		},
 	}, newMockHandler(http.StatusOK, "", nil))
 
-	claims, err := c.ExtensionCreateClaims("", c.FormBroadcastSendPubSubPermissions(), 0)
+	channelID := "1337"
+	params := &ExtensionCreateClaimsParams{
+		ChannelID:  channelID,
+		PubSub:     c.FormBroadcastSendPubSubPermissions(),
+		Expiration: 0,
+	}
+
+	claims, err := c.ExtensionCreateClaims(params)
 	if err != nil {
 		t.Errorf("unexpected error generating claims %s", err)
 	}
 	if claims.UserID != userId {
 		t.Errorf("claims userId doesn't match got %s expected %s", claims.UserID, userId)
 	}
+	if claims.ChannelID != channelID {
+		t.Errorf("claims broadcasterId doesn't match got %s expected %s", claims.ChannelID, channelID)
+	}
 	if claims.ExpiresAt < time.Now().Add(4*time.Minute).UnixNano() && claims.ExpiresAt > time.Now().Add(-2*time.Minute).UnixNano() {
 		t.Errorf("claims expiry less than 3 minutes")
 	}
 
 	expiration := time.Now().Add(10*time.Minute).UnixNano() / int64(time.Millisecond)
-	claims, err = c.ExtensionCreateClaims("100249558", c.FormBroadcastSendPubSubPermissions(), expiration)
+	params.Expiration = expiration
+	claims, err = c.ExtensionCreateClaims(params)
 	if err != nil {
 		t.Errorf("unexpected error generating claims %s", err)
 	}
@@ -77,7 +88,12 @@ func TestSignClaimsToJWT(t *testing.T) {
 		},
 	}, newMockHandler(http.StatusOK, "", nil))
 
-	claims, err := c.ExtensionCreateClaims("100249558", c.FormBroadcastSendPubSubPermissions(), 0)
+	params := &ExtensionCreateClaimsParams{
+		ChannelID:  "1337",
+		PubSub:     c.FormBroadcastSendPubSubPermissions(),
+		Expiration: 0,
+	}
+	claims, err := c.ExtensionCreateClaims(params)
 	if err != nil {
 		t.Errorf("unexpected error generating claims %s", err)
 	}
@@ -101,11 +117,18 @@ func TestVerifyJWT(t *testing.T) {
 		},
 	}, newMockHandler(http.StatusOK, "", nil))
 
-	broadcasterId := "1337"
-	claims, err := c.ExtensionCreateClaims(broadcasterId, c.FormBroadcastSendPubSubPermissions(), 0)
+	channelID := "1337"
+	params := &ExtensionCreateClaimsParams{
+		ChannelID:  channelID,
+		PubSub:     c.FormBroadcastSendPubSubPermissions(),
+		Expiration: 0,
+	}
+
+	claims, err := c.ExtensionCreateClaims(params)
 	if err != nil {
 		t.Errorf("unexpected error generating claims %s", err)
 	}
+
 	jwt, err := c.ExtensionJWTSign(claims)
 	if err != nil {
 		t.Errorf("failed to sign claims %s", err)
@@ -119,14 +142,40 @@ func TestVerifyJWT(t *testing.T) {
 		t.Errorf("unexpected error verifying JWT err:%s", err)
 	}
 
+	claims, err = c.ExtensionJWTVerify("abcd")
+	if err != nil && !strings.Contains(err.Error(), "token contains an invalid number of segments") {
+		t.Errorf("unexpected error verifying JWT err:%s", err)
+	}
+
 	claims, err = c.ExtensionJWTVerify(jwt)
 	if err != nil && !strings.Contains(err.Error(), "JWT token string missing") {
 		t.Errorf("unexpected error verifying JWT err:%s", err)
 	}
-	if claims.ChannelID != broadcasterId {
-		t.Errorf("found unexpected broadcaster in claims got:%s expected:%s", claims.ChannelID, broadcasterId)
+	if claims.ChannelID != channelID {
+		t.Errorf("found unexpected broadcaster in claims got:%s expected:%s", claims.ChannelID, channelID)
 	}
 	if claims.UserID != userId {
 		t.Errorf("found unexpected userId in claims got:%s expected:%s", claims.UserID, userId)
+	}
+
+	// generate expired claims to vefiry expiration behaviour
+	params.Expiration = time.Now().Add(-10 * time.Minute).Unix()
+
+	claims, err = c.ExtensionCreateClaims(params)
+	if err != nil {
+		t.Errorf("unexpected error generating claims %s", err)
+	}
+
+	jwt, err = c.ExtensionJWTSign(claims)
+	if err != nil {
+		t.Errorf("failed to sign claims %s", err)
+	}
+	if jwt == "" {
+		t.Errorf("JWT token is empty")
+	}
+
+	claims, err = c.ExtensionJWTVerify(jwt)
+	if err != nil && !strings.Contains(err.Error(), "token is expired by 10m") {
+		t.Errorf("unexpected error verifying JWT err:%s", err)
 	}
 }

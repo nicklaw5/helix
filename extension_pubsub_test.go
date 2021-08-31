@@ -78,14 +78,14 @@ func TestExtensionSendPubSubMessage(t *testing.T) {
 	testCases := []struct {
 		statusCode    int
 		options       *Options
-		params        *SendExtensionPubSubMessageParams
+		params        *ExtensionSendPubSubMessageParams
 		respBody      string
 		validationErr string
 	}{
 		{
 			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id"},
-			&SendExtensionPubSubMessageParams{},
+			&ExtensionSendPubSubMessageParams{},
 			`{"error":"Unauthorized","status":401,"message":"JWT token is missing"}`,
 			"",
 		},
@@ -98,7 +98,7 @@ func TestExtensionSendPubSubMessage(t *testing.T) {
 					OwnerUserID: "ext-owner-id",
 				},
 			},
-			&SendExtensionPubSubMessageParams{
+			&ExtensionSendPubSubMessageParams{
 				BroadcasterID: "100249558",
 				Message:       "{}",
 				Target:        []ExtensionPubSubPublishType{ExtensionPubSubBroadcastPublish},

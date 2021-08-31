@@ -17,11 +17,12 @@ func (s ExtensionSegmentType) String() string {
 }
 
 type ExtensionSetConfigurationParams struct {
-	Segment       ExtensionSegmentType `json:"segment"`
-	ExtensionID   string               `json:"extension-id"`
-	BroadcasterID string               `json:"broadcaster_id,omitempty"` // populated if segment is of type 'developer' || 'broadcaster'
-	Version       string               `json:"version"`
-	Content       string               `json:"content"`
+	Segment     ExtensionSegmentType `json:"segment"`
+	ExtensionID string               `json:"extension-id"`
+	// BroadcasterID is only populated if segment is of type 'developer' || 'broadcaster'
+	BroadcasterID string `json:"broadcaster_id,omitempty"`
+	Version       string `json:"version"`
+	Content       string `json:"content"`
 }
 
 type ExtensionConfigurationSegment struct {
