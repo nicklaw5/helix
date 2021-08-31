@@ -1,14 +1,45 @@
 package helix
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"golang.org/x/oauth2"
 )
 
 var authPaths = map[string]string{
 	"token":    "/token",
 	"revoke":   "/revoke",
 	"validate": "/validate",
+	"userinfo": "/userinfo",
+}
+
+type OIDCAuth struct {
+	oauth2.Token
+	RawIDToken string        `json:"raw_id_token"`
+	IDToken    *oidc.IDToken `json:"id_token"`
+	Claims     *OIDCClaims   `json:"claims"`
+}
+
+type IDToken struct {
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+}
+
+type OIDCClaims struct {
+	IDToken  IDToken       `json:"id_token"`
+	UserInfo UserInfoClaim `json:"userinfo"`
+}
+
+type UserInfoClaim struct {
+	Email    string `json:"email"`
+	Username string `json:"preferred_username"`
+	Picture  string `json:"picture"`
+	Updated  string `json:"updated_at"`
 }
 
 type AuthorizationURLParams struct {
@@ -223,4 +254,90 @@ func (c *Client) ValidateToken(accessToken string) (bool, *ValidateTokenResponse
 	resp.HydrateResponseCommon(&tokenResp.ResponseCommon)
 
 	return isValid, tokenResp, nil
+}
+
+func (c *Client) RequestUserOIDCAccessToken(
+	code string,
+	scopes []string,
+) (
+	resp *OIDCAuth,
+	err error,
+) {
+	resp = &OIDCAuth{}
+
+	provider, err := oidc.NewProvider(context.Background(), AuthBaseURL)
+	if err != nil {
+		return
+	}
+
+	oauth2Config := oauth2.Config{
+		ClientID:     c.opts.ClientID,
+		ClientSecret: c.opts.ClientSecret,
+		RedirectURL:  c.opts.RedirectURI,
+		Endpoint:     provider.Endpoint(),
+		// "openid" is a required scope for OpenID Connect flows.
+		Scopes: append([]string{oidc.ScopeOpenID}, scopes...),
+	}
+
+	verifier := provider.Verifier(&oidc.Config{ClientID: c.opts.ClientID})
+
+	oauth2Token, err := oauth2Config.Exchange(context.Background(), code)
+	if err != nil {
+		return
+	}
+	resp.Token = *oauth2Token
+
+	// Extract the ID Token from OAuth2 token.
+	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
+	if !ok {
+		err = fmt.Errorf("id_token is MISSING validate twitch auth req")
+		return
+	}
+	resp.RawIDToken = rawIDToken
+
+	idToken, err := verifier.Verify(context.Background(), rawIDToken)
+	if err != nil {
+		err = fmt.Errorf("failed to verify id_token err:%s", err)
+		return
+	}
+	resp.IDToken = idToken
+
+	claims := &OIDCClaims{}
+	err = idToken.Claims(&claims.IDToken)
+	if err != nil {
+		return
+	}
+	resp.Claims = claims
+
+	return
+}
+
+func (c *Client) UserInfoFromAccessToken(
+	token string,
+) (
+	claim UserInfoClaim,
+	err error,
+) {
+	provider, err := oidc.NewProvider(context.Background(), AuthBaseURL)
+	if err != nil {
+		return
+	}
+
+	userInfo, err := provider.UserInfo(
+		context.Background(),
+		oauth2.StaticTokenSource(&oauth2.Token{
+			AccessToken:  token,
+			TokenType:    "",
+			RefreshToken: "",
+			Expiry:       time.Time{},
+		}),
+	)
+	if err != nil {
+		return
+	}
+
+	// unmarshal user info claims
+	err = userInfo.Claims(&claim)
+
+	return
 }
