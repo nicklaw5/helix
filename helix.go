@@ -46,11 +46,9 @@ type Options struct {
 }
 
 type ExtensionOptions struct {
-	OwnerUserID          string
-	Secret               string
-	Version              string
-	ConfigurationVersion string
-	SignedJWTToken       string
+	OwnerUserID    string
+	Secret         string
+	SignedJWTToken string
 }
 
 // DateRange is a generic struct used by various responses.

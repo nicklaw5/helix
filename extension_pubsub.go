@@ -50,24 +50,24 @@ func (c *Client) FormGenericPubSubPermissions() *PubSubPermissions {
 	}
 }
 
-type SendExtensionPubSubMessageParams struct {
+type ExtensionSendPubSubMessageParams struct {
 	BroadcasterID     string                       `json:"broadcaster_id"`
 	Message           string                       `json:"message"`
 	Target            []ExtensionPubSubPublishType `json:"target"`
 	IsGlobalBroadcast bool                         `json:"is_global_broadcast"`
 }
 
-type SendExtensionPubSubMessageResponse struct {
+type ExtensionSendPubSubMessageResponse struct {
 	ResponseCommon
 }
 
-func (c *Client) SendExtensionPubSubMessage(params *SendExtensionPubSubMessageParams) (*SendExtensionPubSubMessageResponse, error) {
-	resp, err := c.postAsJSON("/extensions/pubsub", &SendExtensionPubSubMessageResponse{}, params)
+func (c *Client) SendExtensionPubSubMessage(params *ExtensionSendPubSubMessageParams) (*ExtensionSendPubSubMessageResponse, error) {
+	resp, err := c.postAsJSON("/extensions/pubsub", &ExtensionSendPubSubMessageResponse{}, params)
 	if err != nil {
 		return nil, err
 	}
 
-	sndExtPubSubMsgRsp := &SendExtensionPubSubMessageResponse{}
+	sndExtPubSubMsgRsp := &ExtensionSendPubSubMessageResponse{}
 	resp.HydrateResponseCommon(&sndExtPubSubMsgRsp.ResponseCommon)
 
 	return sndExtPubSubMsgRsp, nil

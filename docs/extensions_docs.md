@@ -3,26 +3,25 @@
 ## Extension Helix Requests
 
 ### Generate PUBSUB JWT Permissions
-> relevant PUBSUB permission must be passed to the 'ExtensionCreateClaims()' func, in order to correctly publish a pubsub message of a particular type
+Relevant PUBSUB permission must be passed to the 'ExtensionCreateClaims()' func, in order to correctly publish a pubsub message of a particular type.
 
-Broadcast pubsub type
+Broadcast pubsub type:
 ```go
 client.FormBroadcastSendPubSubPermissions()
 ```
 
-Global pubsub type
+Global pubsub type:
 ```go
 perms := client.FormGlobalSendPubSubPermissions()
 ```
 
-Whisper User type
+Whisper User type:
 ```go
 client.FormWhisperSendPubSubPermissions(userId)
 ```
 
 ### JWT ROLES
-> Note:- Currently only the 'external' role is supported by helix endpoints
-
+Note: Currently only the 'external' role is supported by helix endpoints.
 
 ### EBS JWT
 this is used to set the correct header for any Extension helix requests
@@ -77,7 +76,7 @@ if err != nil {
     // handle error
 }
 
-// set the JWT token to be used as in the Auth bearer header
+// Set the JWT token to be used as in the Auth bearer header.
 jwt := client.ExtensionJWTSign(claims)
 client.SetExtensionSignedJWTToken(jwt)
 

@@ -136,16 +136,18 @@ func TestGetChannelInformation(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode    int
-		options       *Options
-		BroadcasterID string
-		respBody      string
-		parsed        []ChannelInformation
+		statusCode     int
+		options        *Options
+		BroadcasterID  string
+		BroadcasterIDs []string
+		respBody       string
+		parsed         []ChannelInformation
 	}{
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			"44445592",
+			[]string{},
 			`{"data":[{"broadcaster_id":"44445592","broadcaster_login":"pokimane","broadcaster_name":"pokimane","broadcaster_language":"en","game_id":"509658","game_name":"Just Chatting","title":"See you Wednesday 8am for Among Us ^_^", "delay": 2}]}`,
 			[]ChannelInformation{
 				{
@@ -163,7 +165,43 @@ func TestGetChannelInformation(t *testing.T) {
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
 			"9999999999999999999",
+			[]string{},
 			`{"error":"Bad Request","status":400,"message":"Invalid broadcasterID"}`,
+			[]ChannelInformation{},
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"",
+			[]string{"99631238", "11148817"},
+			`{"data":[{"broadcaster_id":"11148817","broadcaster_name":"pajlada","broadcaster_language":"en","game_id":"509670","game_name":"Science \u0026 Technology","title":"Programming.S04E71.1440p.MP4-XD.NVENC","delay":0},{"broadcaster_id":"99631238","broadcaster_name":"zneix","broadcaster_language":"en","game_id":"509670","game_name":"Science \u0026 Technology","title":"sunday coding, ranting and gaming (serious sam 4 later)","delay":0}]}`,
+			[]ChannelInformation{
+				{
+					BroadcasterID:       "11148817",
+					BroadcasterName:     "pajlada",
+					BroadcasterLanguage: "en",
+					GameID:              "509670",
+					GameName:            "Science & Technology",
+					Title:               "Programming.S04E71.1440p.MP4-XD.NVENC",
+					Delay:               0,
+				},
+				{
+					BroadcasterID:       "99631238",
+					BroadcasterName:     "zneix",
+					BroadcasterLanguage: "en",
+					GameID:              "509670",
+					GameName:            "Science & Technology",
+					Title:               "sunday coding, ranting and gaming (serious sam 4 later)",
+					Delay:               0,
+				},
+			},
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"",
+			[]string{"99631238", "forsen"},
+			`{"error": "Bad Request","status": 400,"message": "broadcaster_id \"forsen\" must be numeric"}`,
 			[]ChannelInformation{},
 		},
 	}
@@ -171,9 +209,17 @@ func TestGetChannelInformation(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.GetChannelInformation(&GetChannelInformationParams{
-			BroadcasterID: testCase.BroadcasterID,
-		})
+		var resp *GetChannelInformationResponse
+		var err error
+		if testCase.BroadcasterID != "" {
+			resp, err = c.GetChannelInformation(&GetChannelInformationParams{
+				BroadcasterID: testCase.BroadcasterID,
+			})
+		} else {
+			resp, err = c.GetChannelInformation(&GetChannelInformationParams{
+				BroadcasterIDs: testCase.BroadcasterIDs,
+			})
+		}
 		if err != nil {
 			t.Error(err)
 		}
@@ -193,7 +239,7 @@ func TestGetChannelInformation(t *testing.T) {
 
 		for i, channel := range resp.Data.Channels {
 			if channel.BroadcasterID != testCase.parsed[i].BroadcasterID {
-				t.Errorf("Expected struct field BroadcasterID = %s, was %s", testCase.parsed[i].BroadcasterID, channel.BroadcasterID)
+				t.Errorf("Expected struct field ChannelID = %s, was %s", testCase.parsed[i].BroadcasterID, channel.BroadcasterID)
 			}
 
 			if channel.BroadcasterName != testCase.parsed[i].BroadcasterName {

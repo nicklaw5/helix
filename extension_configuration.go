@@ -7,21 +7,22 @@ type ExtensionSegmentType string
 
 // Types of segments datastores for the configuration service
 const (
-	BroadcasterSegment ExtensionSegmentType = "broadcaster"
-	DeveloperSegment   ExtensionSegmentType = "developer"
-	GlobalSegment      ExtensionSegmentType = "global"
+	ExtensionConfigrationBroadcasterSegment ExtensionSegmentType = "broadcaster"
+	ExtensionConfigurationDeveloperSegment  ExtensionSegmentType = "developer"
+	ExtensionConfigurationGlobalSegment     ExtensionSegmentType = "global"
 )
 
 func (s ExtensionSegmentType) String() string {
 	return string(s)
 }
 
-type ExtensionConfigurationParams struct {
-	Segment       ExtensionSegmentType `json:"segment"`
-	ExtensionId   string               `json:"extension-id"`
-	BroadcasterID string               `json:"broadcaster_id,omitempty"` // populated if segment is of type 'developer' || 'broadcaster'
-	Version       string               `json:"version"`
-	Content       string               `json:"content"`
+type ExtensionSetConfigurationParams struct {
+	Segment     ExtensionSegmentType `json:"segment"`
+	ExtensionID string               `json:"extension-id"`
+	// BroadcasterID is only populated if segment is of type 'developer' || 'broadcaster'
+	BroadcasterID string `json:"broadcaster_id,omitempty"`
+	Version       string `json:"version"`
+	Content       string `json:"content"`
 }
 
 type ExtensionConfigurationSegment struct {
@@ -33,13 +34,15 @@ type ExtensionConfigurationSegment struct {
 type ExtensionGetConfigurationParams struct {
 	ExtensionID   string                 `query:"extension_id"`
 	BroadcasterID string                 `query:"broadcaster_id"`
-	Segment       []ExtensionSegmentType `query:"segment"`
+	Segments      []ExtensionSegmentType `query:"segment"`
 }
 
 type ExtensionSetRequiredConfigurationParams struct {
+	BroadcasterID         string `query:"broadcaster_id" json:"-"`
 	ExtensionID           string `json:"extension_id"`
+	RequiredConfiguration string `json:"required_version"`
 	ExtensionVersion      string `json:"extension_version"`
-	RequiredConfiguration string `json:"required_configuration"`
+	ConfigurationVersion  string `json:"configuration_version"`
 }
 
 type ExtensionSetRequiredConfigurationResponse struct {
@@ -60,12 +63,12 @@ type ExtensionSetConfigurationResponse struct {
 }
 
 // https://dev.twitch.tv/docs/extensions/reference/#set-extension-configuration-segment
-func (c *Client) SetExtensionSegmentConfig(params *ExtensionConfigurationParams) (*ExtensionSetConfigurationResponse, error) {
+func (c *Client) SetExtensionSegmentConfig(params *ExtensionSetConfigurationParams) (*ExtensionSetConfigurationResponse, error) {
 	if params.BroadcasterID != "" {
 		switch params.Segment {
-		case DeveloperSegment, BroadcasterSegment:
+		case ExtensionConfigurationDeveloperSegment, ExtensionConfigrationBroadcasterSegment:
 		default:
-			return nil, fmt.Errorf("error: developer or broadcaster extension configuration segment type must be provided")
+			return nil, fmt.Errorf("error: developer or broadcaster extension configuration segment type must be provided for broadcasters")
 		}
 	}
 
@@ -81,6 +84,17 @@ func (c *Client) SetExtensionSegmentConfig(params *ExtensionConfigurationParams)
 }
 
 func (c *Client) GetExtensionConfigurationSegment(params *ExtensionGetConfigurationParams) (*ExtensionGetConfigurationSegmentResponse, error) {
+
+	if params.BroadcasterID != "" {
+		for _, segment := range params.Segments {
+			switch segment {
+			case ExtensionConfigurationDeveloperSegment, ExtensionConfigrationBroadcasterSegment:
+			default:
+				return nil, fmt.Errorf("error: only developer or broadcaster extension configuration segment type must be provided for broadcasters")
+			}
+		}
+	}
+
 	resp, err := c.get("/extensions/configurations", &ManyExtensionConfigurationSegments{}, params)
 	if err != nil {
 		return nil, err

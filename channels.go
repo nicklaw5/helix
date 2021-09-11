@@ -52,7 +52,9 @@ func (c *Client) SearchChannels(params *SearchChannelsParams) (*SearchChannelsRe
 }
 
 type GetChannelInformationParams struct {
-	BroadcasterID string `query:"broadcaster_id"`
+	// Deprecated: BroadcasterID will be removed in a future version. Use BroadcasterIDs instead.
+	BroadcasterID  string   `query:"broadcaster_id"`
+	BroadcasterIDs []string `query:"broadcaster_id"` // Limit 100
 }
 
 type EditChannelInformationParams struct {

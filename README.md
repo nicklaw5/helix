@@ -164,8 +164,6 @@ ID: 23161357 Name: lirik
 ## Contributions
 
 PRs are very much welcome.
-All new features should rely solely on the Go standard library.
-No external dependencies should be included in your solutions.
 Where possible, please include tests for any code that is introduced by your PRs.
 
 ## License

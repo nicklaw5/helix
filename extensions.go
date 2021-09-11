@@ -1,5 +1,7 @@
 package helix
 
+import "fmt"
+
 type ExtensionTransaction struct {
 	ID               string `json:"id"`
 	Timestamp        Time   `json:"timestamp"`
@@ -41,14 +43,14 @@ type ExtensionTransactionsParams struct {
 	First       int      `query:"first,20"`     // Optional, Limit 100
 }
 
-type SendExtensionMessageParams struct {
-	BroadcasterID string `query:"broadcaster_id" json:"-"`
-	Text          string `json:"text"`
-	Version       string `json:"version"`
-	ExtensionID   string `json:"extension_id"`
+type ExtensionSendChatMessageParams struct {
+	BroadcasterID    string `query:"broadcaster_id" json:"-"`
+	Text             string `json:"text"` // Limit 280
+	ExtensionVersion string `json:"extension_version"`
+	ExtensionID      string `json:"extension_id"`
 }
 
-type SendExtensionMessageResponse struct {
+type ExtensionSendChatMessageResponse struct {
 	ResponseCommon
 }
 
@@ -70,14 +72,27 @@ func (c *Client) GetExtensionTransactions(params *ExtensionTransactionsParams) (
 	return extTxnResp, nil
 }
 
-func (c *Client) SendExtensionChatMessage(params *SendExtensionMessageParams) (*SendExtensionMessageResponse, error) {
+// SendExtensionChatMessage  Sends a specified chat message to a specified channel.
+// The message will appear in the channel’s chat as a normal message,
+// The author of the message is the Extension name.
+//
+// see https://dev.twitch.tv/docs/api/reference#send-extension-chat-message
+func (c *Client) SendExtensionChatMessage(params *ExtensionSendChatMessageParams) (*ExtensionSendChatMessageResponse, error) {
 
-	resp, err := c.postAsJSON("/extensions/chat", &SendExtensionMessageResponse{}, params)
+	if len(params.Text) > 280 {
+		return nil, fmt.Errorf("error: chat message length exceeds 280 characters")
+	}
+
+	if params.BroadcasterID == "" {
+		return nil, fmt.Errorf("error: broadcaster ID must be specified")
+	}
+
+	resp, err := c.postAsJSON("/extensions/chat", &ExtensionSendChatMessageResponse{}, params)
 	if err != nil {
 		return nil, err
 	}
 
-	sndExtMsgResp := &SendExtensionMessageResponse{}
+	sndExtMsgResp := &ExtensionSendChatMessageResponse{}
 	resp.HydrateResponseCommon(&sndExtMsgResp.ResponseCommon)
 
 	return sndExtMsgResp, nil
