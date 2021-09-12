@@ -22,6 +22,7 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
 ## Get Extensions Analytics
 
 ```go

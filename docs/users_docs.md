@@ -72,7 +72,7 @@ fmt.Printf("%+v\n", resp)
 
 This is an example of how to get users blocked
 
-```
+```go
 client, err := helix.NewClient(&helix.Options{
     ClientID: "your-client-id",
 })
@@ -94,7 +94,7 @@ fmt.Printf("%+v\n", resp)
 
 This is an example of how to block user
 
-```
+```go
 client, err := helix.NewClient(&helix.Options{
     ClientID: "your-client-id",
 })
@@ -118,7 +118,7 @@ fmt.Printf("%+v\n", resp)
 
 This is an example of how to unblock user
 
-```
+```go
 client, err := helix.NewClient(&helix.Options{
     ClientID: "your-client-id",
 })
