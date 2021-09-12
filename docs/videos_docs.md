@@ -47,5 +47,3 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
-
-

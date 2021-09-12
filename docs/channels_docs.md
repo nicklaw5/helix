@@ -58,7 +58,7 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.GetChannelInformation(&helix.GetChannelInformationParams{
+resp, err := client.EditChannelInformation(&helix.EditChannelInformationParams{
     BroadcasterID       : "123456",
     GameID              : "456789",
     BroadcasterLanguage : "en",

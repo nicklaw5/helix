@@ -26,6 +26,7 @@ fmt.Printf("%+v\n", resp)
 This is an example of how to get active user extensions
 
 Using UserAccessToken:
+
 ```go
 client, err := helix.NewClient(&helix.Options{
     ClientID: "your-client-id",
@@ -44,6 +45,7 @@ fmt.Printf("%+v\n", resp)
 ```
 
 Using user_id query parameter:
+
 ```go
 client, err := helix.NewClient(&helix.Options{
     ClientID: "your-client-id",

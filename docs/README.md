@@ -28,8 +28,50 @@ Follow the links below to their respective API usage examples:
 
 ## Getting Started
 
-```bash
-go get -u github.com/nicklaw5/helix
+```shell
+go get -u github.com/nicklaw5/helix/v2
+```
+
+main.go:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    panic(err)
+}
+
+resp, err := client.GetUsers(&helix.UsersParams{
+    IDs:    []string{"26301881", "18074328"},
+    Logins: []string{"summit1g", "lirik"},
+})
+if err != nil {
+    panic(err)
+}
+
+fmt.Printf("Status code: %d\n", resp.StatusCode)
+fmt.Printf("Rate limit: %d\n", resp.GetRateLimit())
+fmt.Printf("Rate limit remaining: %d\n", resp.GetRateLimitRemaining())
+fmt.Printf("Rate limit reset: %d\n\n", resp.GetRateLimitReset())
+
+for _, user := range resp.Data.Users {
+    fmt.Printf("ID: %s Name: %s\n", user.ID, user.DisplayName)
+}
+```
+
+Output:
+
+```txt
+Status code: 200
+Rate limit: 800
+Rate limit remaining: 799
+Rate limit reset: 1631019126
+
+ID: 26301881 Name: sodapoppin
+ID: 18074328 Name: destiny
+ID: 26490481 Name: summit1g
+ID: 23161357 Name: lirik
 ```
 
 ## Creating A New API Client
@@ -121,11 +163,9 @@ Also note from above that the `ResponseCommon` struct includes the header result
 ## Request Rate Limiting
 
 Twitch enforces strict request rate limits for their API. See
-[their documentation](https://dev.twitch.tv/docs/api/guide) for the specific rate limit values. At the
-time of writing this, requests are limited to 30 points per minute if a Bearer token is not provided or
-800 points per minute if a Bearer token is provided.
+[their documentation](https://dev.twitch.tv/docs/api/guide) for the specifics regarding rate limits.
 
-There are a number of helper methods on the response object for retrieving rate limit headers are integers.
+There are a number of helper methods on the response object for retrieving rate limit headers as integers.
 These include:
 
 - `Response.GetRateLimit()`
@@ -135,7 +175,7 @@ These include:
 - `Response.GetClipsCreationRateLimitRemaining()` (only available when called `client.CreateClip()`)
 
 This package also allows users to provide a rate limit callback of their own which will be executed just
-before a request is sent. That way you can provide some sort of functionality for limiting the requests sent
+before a request is sent. That way you can provide functionality for limiting the requests sent
 and prevent spamming Twitch with requests.
 
 The below snippet provides an example of how you might structure your rate limit callback to approach limiting

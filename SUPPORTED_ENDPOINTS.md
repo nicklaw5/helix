@@ -1,0 +1,99 @@
+# Supported Endpoints & Features
+
+**Authentication:**
+
+- [x] Generate Authorization URL ("code" or "token" authorization)
+- [x] Get App Access Tokens (OAuth Client Credentials Flow)
+- [x] Get User Access Tokens (OAuth Authorization Code Flow)
+- [x] Refresh User Access Tokens
+- [x] Revoke User Access Tokens
+- [x] Validate Access Token
+
+**API Endpoint:**
+
+- [x] Start Commercial
+- [x] Get Extension Analytics
+- [x] Get Game Analytics
+- [x] Get Bits Leaderboard
+- [x] Get Cheermotes
+- [x] Get Extension Transactions
+- [x] Get Channel Information
+- [x] Modify Channel Information
+- [x] Get Channel Editors
+- [x] Create Custom Rewards
+- [x] Delete Custom Reward
+- [x] Get Custom Reward
+- [ ] Get Custom Reward Redemption
+- [ ] Update Custom Reward
+- [ ] Update Redemption Status
+- [x] Get Channel Emotes
+- [x] Get Global Emotes
+- [x] Get Emote Sets
+- [x] Get Channel Chat Badges
+- [x] Get Global Chat Badges
+- [x] Create Clip
+- [x] Get Clip
+- [x] Get Clips
+- [x] Create Entitlement Grants Upload URL
+- [x] Get Code Status
+- [x] Get Drops Entitlements
+- [ ] Update Drops Entitlements
+- [x] Redeem Code
+- [x] Create / Remove / List EventSub Subscriptions
+- [x] Get Top Games
+- [x] Get Games
+- [x] Get Hype Train Events
+- [ ] Check AutoMod Status
+- [x] Manage Held AutoMod Messages
+- [ ] Get Banned Events
+- [x] Get Banned Users
+- [ ] Get Moderators
+- [ ] Get Moderator Events
+- [x] Get Polls
+- [x] Create Poll
+- [x] End Poll
+- [x] Get Predictions
+- [x] Create Prediction
+- [x] End Prediction
+- [ ] Get Channel Stream Schedule
+- [ ] Get Channel iCalendar
+- [ ] Update Channel Stream Schedule
+- [ ] Create Channel Stream Schedule Segment
+- [ ] Update Channel Stream Schedule Segment
+- [ ] Delete Channel Stream Schedule Segment
+- [ ] Search Categories
+- [ ] Search Channels
+- [ ] Get Stream Key
+- [x] Get Streams
+- [x] Get Followed Streams
+- [x] Create Stream Marker
+- [x] Get Stream Markers
+- [x] Get Broadcaster Subscriptions
+- [x] Check User Subscription
+- [ ] Get All Stream Tags
+- [ ] Get Stream Tags
+- [ ] Replace Stream Tags
+- [ ] Get Channel Teams
+- [ ] Get Teams
+- [x] Get Users
+- [x] Update User
+- [x] Get Users Follows
+- [x] Get User Block List
+- [x] Block User
+- [x] UnBlock User
+- [ ] Get User Extensions
+- [ ] Get User Active Extensions
+- [ ] Update User Extensions
+- [x] Get Videos
+- [x] Delete Videos
+- [x] Get Webhook Subscriptions
+- [x] Create Extension Secret
+- [x] Get Extension Secret
+- [ ] Revoke Extension Secrets
+- [ ] Get Live Channels with Extension Activated
+- [x] Set Extension Required Configuration
+- [x] Set Extension Configuration Segment
+- [ ] Get Extension Channel Configuration
+- [x] Get Extension Configuration Segment
+- [x] Send Extension PubSub Message
+- [x] Send Extension Chat Message
