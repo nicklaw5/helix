@@ -36,7 +36,7 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.CheckUserSubsription(&helix.UserSubscriptionsParams{
+resp, err := client.CheckUserSubscription(&helix.UserSubscriptionsParams{
     BroadcasterID: "29776980",
     UserID:        "145328278",
 })
