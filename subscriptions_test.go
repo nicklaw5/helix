@@ -116,7 +116,7 @@ func TestChechUserSubscription(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.CheckUserSubsription(&UserSubscriptionsParams{
+		resp, err := c.CheckUserSubscription(&UserSubscriptionsParams{
 			BroadcasterID: testCase.BroadcasterID,
 			UserID:        testCase.UserID,
 		})
@@ -154,7 +154,7 @@ func TestChechUserSubscription(t *testing.T) {
 		opts: options,
 	}
 
-	_, err := c.CheckUserSubsription(&UserSubscriptionsParams{})
+	_, err := c.CheckUserSubscription(&UserSubscriptionsParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
