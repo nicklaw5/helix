@@ -1,7 +1,5 @@
 module github.com/jackmcguire1/helix
 
-go 1.15
+go 1.17
 
-require (
-	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
-)
+require github.com/golang-jwt/jwt/v4 v4.0.0

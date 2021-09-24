@@ -77,10 +77,10 @@ func (c *Client) GetSubscriptions(params *SubscriptionsParams) (*SubscriptionsRe
 	return subscriptions, nil
 }
 
-// CheckUserSubsription Check if a specific user is subscribed to a specific channel
+// CheckUserSubscription Check if a specific user is subscribed to a specific channel
 //
 // Required scope: user:read:subscriptions
-func (c *Client) CheckUserSubsription(params *UserSubscriptionsParams) (*UserSubscriptionResponse, error) {
+func (c *Client) CheckUserSubscription(params *UserSubscriptionsParams) (*UserSubscriptionResponse, error) {
 	resp, err := c.get("/subscriptions/user", &ManyUserSubscriptions{}, params)
 	if err != nil {
 		return nil, err
