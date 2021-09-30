@@ -327,7 +327,7 @@ type EventSubChannelPredictionBeginEvent struct {
 	Title                string            `json:"title"`
 	Outcomes             []EventSubOutcome `json:"outcomes"`
 	StartedAt            Time              `json:"started_at"`
-	LockedAt             Time              `json:"locked_at"`
+	LocksAt              Time              `json:"locks_at"`
 }
 
 // Data for a channel prediction progress event
