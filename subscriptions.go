@@ -29,6 +29,7 @@ type ManySubscriptions struct {
 	Subscriptions []Subscription `json:"data"`
 	Pagination    Pagination     `json:"pagination"`
 	Total         int            `json:"total"`
+	Points        int            `json:"points"`
 }
 
 type ManyUserSubscriptions struct {
@@ -73,6 +74,7 @@ func (c *Client) GetSubscriptions(params *SubscriptionsParams) (*SubscriptionsRe
 	subscriptions.Data.Subscriptions = resp.Data.(*ManySubscriptions).Subscriptions
 	subscriptions.Data.Pagination = resp.Data.(*ManySubscriptions).Pagination
 	subscriptions.Data.Total = resp.Data.(*ManySubscriptions).Total
+	subscriptions.Data.Points = resp.Data.(*ManySubscriptions).Points
 
 	return subscriptions, nil
 }
