@@ -20,7 +20,7 @@ func TestGetSubscriptions(t *testing.T) {
 			&Options{ClientID: "my-client-id", UserAccessToken: "my-access-token"},
 			"123",
 			[]string{},
-			`{"data": [{"broadcaster_id":"123","broadcaster_login":"test_user","broadcaster_name":"test_user","is_gift":true,"gifter_id":"456","gifter_login":"another_user","gifter_name":"Another_User","tier":"3000","plan_name":"The Ninjas","user_id":"123","user_id":"123","user_login":"test_user","user_name":"test_user"}],"pagination":{"cursor":"xxxx"},"total":1}`,
+			`{"data": [{"broadcaster_id":"123","broadcaster_login":"test_user","broadcaster_name":"test_user","is_gift":true,"gifter_id":"456","gifter_login":"another_user","gifter_name":"Another_User","tier":"3000","plan_name":"The Ninjas","user_id":"123","user_id":"123","user_login":"test_user","user_name":"test_user"}],"pagination":{"cursor":"xxxx"},"total":1,"points":6}`,
 		},
 		{
 			http.StatusBadRequest,
@@ -62,6 +62,10 @@ func TestGetSubscriptions(t *testing.T) {
 
 		if resp.Data.Total != 1 {
 			t.Errorf("expected total field to be 1 got %d", resp.Data.Total)
+		}
+
+		if resp.Data.Points != 6 {
+			t.Errorf("expected points field to be 6 got %d", resp.Data.Points)
 		}
 
 	}
