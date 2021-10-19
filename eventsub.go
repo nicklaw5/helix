@@ -477,7 +477,7 @@ type EventSubTopPredictor struct {
 	UserID            string `json:"user_id"`
 	UserLogin         string `json:"user_login"`
 	UserName          string `json:"user_name"`
-	ChannelPointWon   string `json:"channel_points_won"`
+	ChannelPointWon   int    `json:"channel_points_won"`
 	ChannelPointsUsed int    `json:"channel_points_used"`
 }
 
