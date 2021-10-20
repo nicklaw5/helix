@@ -82,6 +82,9 @@ const (
 	EventSubStatusAuthorizationRevoked         = "authorization_revoked"
 	EventSubStatusUserRemoved                  = "user_removed"
 
+	EventSubTypeChannelGoalBegin                          = "channel.goal.begin"
+	EventSubTypeChannelGoalProgress                       = "channel.goal.progress"
+	EventSubTypeChannelGoalEnd                            = "channel.goal.end"
 	EventSubTypeChannelUpdate                             = "channel.update"
 	EventSubTypeChannelFollow                             = "channel.follow"
 	EventSubTypeChannelSubscription                       = "channel.subscribe"
@@ -523,6 +526,44 @@ type EventSubEmote struct {
 	Begin int    `json:"begin"`
 	End   int    `json:"end"`
 	ID    string `json:"id"`
+}
+
+type EventSubChannelGoalStartEvent struct {
+	ID                   string `json:"id"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	Type                 string `json:"type"`
+	Description          string `json:"description"`
+	CurrentAmount        int    `json:"current_amount"`
+	TargetAmount         int    `json:"target_amount"`
+	StartedAt            Time   `json:"started_at"`
+}
+
+type EventSubChannelGoalProgressEvent struct {
+	ID                   string `json:"id"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	Type                 string `json:"type"`
+	Description          string `json:"description"`
+	CurrentAmount        int    `json:"current_amount"`
+	TargetAmount         int    `json:"target_amount"`
+	StartedAt            Time   `json:"started_at"`
+}
+
+type EventSubChannelGoalEndEvent struct {
+	ID                   string `json:"id"`
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	Type                 string `json:"type"`
+	Description          string `json:"description"`
+	IsAchieved           bool   `json:"is_achieved"`
+	CurrentAmount        int    `json:"current_amount"`
+	TargetAmount         int    `json:"target_amount"`
+	StartedAt            Time   `json:"started_at"`
+	EndedAt              Time   `json:"ended_at"`
 }
 
 // Get all EventSub Subscriptions
