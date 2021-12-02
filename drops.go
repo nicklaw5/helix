@@ -58,8 +58,8 @@ type UpdateDropsEntitlementsResponse struct {
 // Filtering by FulfillmentStatus returns all of the entitlements with the specified fulfillment status.
 // Entitlements are digital items that users are entitled to use. Twitch entitlements are granted based on viewership
 // engagement with a content creator, based on the game developers' campaign.
-func (c *Client) GetDropsEntitlements(params *GetDropEntitlementsParams) (*GetDropsEntitlementsResponse, error) {
-	resp, err := c.get("/entitlements/drops", &ManyEntitlementsWithPagination{}, params)
+func (c *Client) GetDropsEntitlements(params *GetDropEntitlementsParams, opts ...Options) (*GetDropsEntitlementsResponse, error) {
+	resp, err := c.get("/entitlements/drops", &ManyEntitlementsWithPagination{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +81,8 @@ func (c *Client) GetDropsEntitlements(params *GetDropEntitlementsParams) (*GetDr
 // operation should be retried again later.
 // Entitlements are digital items that users are entitled to use. Twitch entitlements are granted based on viewership
 // engagement with a content creator, based on the game developers' campaign.
-func (c *Client) UpdateDropsEntitlements(params *UpdateDropsEntitlementsParams) (*UpdateDropsEntitlementsResponse, error) {
-	resp, err := c.patchAsJSON("/entitlements/drops", &ManyUpdatedEntitlementSet{}, params)
+func (c *Client) UpdateDropsEntitlements(params *UpdateDropsEntitlementsParams, opts ...Options) (*UpdateDropsEntitlementsResponse, error) {
+	resp, err := c.patchAsJSON("/entitlements/drops", &ManyUpdatedEntitlementSet{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -25,8 +25,8 @@ type BadgeVersion struct {
 	ImageUrl4x string `json:"image_url_4x"`
 }
 
-func (c *Client) GetChannelChatBadges(params *GetChatBadgeParams) (*GetChatBadgeResponse, error) {
-	resp, err := c.get("/chat/badges", &ManyChatBadge{}, params)
+func (c *Client) GetChannelChatBadges(params *GetChatBadgeParams, opts ...Options) (*GetChatBadgeResponse, error) {
+	resp, err := c.get("/chat/badges", &ManyChatBadge{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +38,8 @@ func (c *Client) GetChannelChatBadges(params *GetChatBadgeParams) (*GetChatBadge
 	return channels, nil
 }
 
-func (c *Client) GetGlobalChatBadges() (*GetChatBadgeResponse, error) {
-	resp, err := c.get("/chat/badges/global", &ManyChatBadge{}, nil)
+func (c *Client) GetGlobalChatBadges(opts ...Options) (*GetChatBadgeResponse, error) {
+	resp, err := c.get("/chat/badges/global", &ManyChatBadge{}, nil, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +97,8 @@ type EmoteImage struct {
 	Url4x string `json:"url_4x"`
 }
 
-func (c *Client) GetChannelEmotes(params *GetChannelEmotesParams) (*GetChannelEmotesResponse, error) {
-	resp, err := c.get("/chat/emotes", &ManyEmotes{}, params)
+func (c *Client) GetChannelEmotes(params *GetChannelEmotesParams, opts ...Options) (*GetChannelEmotesResponse, error) {
+	resp, err := c.get("/chat/emotes", &ManyEmotes{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +110,8 @@ func (c *Client) GetChannelEmotes(params *GetChannelEmotesParams) (*GetChannelEm
 	return emotes, nil
 }
 
-func (c *Client) GetGlobalEmotes() (*GetChannelEmotesResponse, error) {
-	resp, err := c.get("/chat/emotes/global", &ManyEmotes{}, nil)
+func (c *Client) GetGlobalEmotes(opts ...Options) (*GetChannelEmotesResponse, error) {
+	resp, err := c.get("/chat/emotes/global", &ManyEmotes{}, nil, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +124,8 @@ func (c *Client) GetGlobalEmotes() (*GetChannelEmotesResponse, error) {
 }
 
 // GetEmoteSets
-func (c *Client) GetEmoteSets(params *GetEmoteSetsParams) (*GetEmoteSetsResponse, error) {
-	resp, err := c.get("/chat/emotes/set", &ManyEmotesWithOwner{}, params)
+func (c *Client) GetEmoteSets(params *GetEmoteSetsParams, opts ...Options) (*GetEmoteSetsResponse, error) {
+	resp, err := c.get("/chat/emotes/set", &ManyEmotesWithOwner{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -42,8 +42,8 @@ type StreamsParams struct {
 
 // GetStreams returns a list of live channels based on the search parameters.
 // To query offline channels, use SearchChannels.
-func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
-	resp, err := c.get("/streams", &ManyStreams{}, params)
+func (c *Client) GetStreams(params *StreamsParams, opts ...Options) (*StreamsResponse, error) {
+	resp, err := c.get("/streams", &ManyStreams{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +69,8 @@ type FollowedStreamsParams struct {
 // may be duplicate or missing streams, as viewers join and leave streams.
 //
 // Required scope: user:read:follows
-func (c *Client) GetFollowedStream(params *FollowedStreamsParams) (*StreamsResponse, error) {
-	resp, err := c.get("/streams/followed", &ManyStreams{}, params)
+func (c *Client) GetFollowedStream(params *FollowedStreamsParams, opts ...Options) (*StreamsResponse, error) {
+	resp, err := c.get("/streams/followed", &ManyStreams{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

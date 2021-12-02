@@ -39,8 +39,8 @@ type GetExtensionSecretParams struct {
 	ExtensionID string `query:"extension_id"`
 }
 
-func (c *Client) CreateExtensionSecret(params *ExtensionSecretCreationParams) (*ExtensionSecretCreationResponse, error) {
-	resp, err := c.post("/extensions/jwt/secrets", &ManyExtensionSecrets{}, params)
+func (c *Client) CreateExtensionSecret(params *ExtensionSecretCreationParams, opts ...Options) (*ExtensionSecretCreationResponse, error) {
+	resp, err := c.post("/extensions/jwt/secrets", &ManyExtensionSecrets{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +52,8 @@ func (c *Client) CreateExtensionSecret(params *ExtensionSecretCreationParams) (*
 	return events, nil
 }
 
-func (c *Client) GetExtensionSecrets(params *GetExtensionSecretParams) (*GetExtensionSecretResponse, error) {
-	resp, err := c.postAsJSON("/extensions/jwt/secrets", &ManyExtensionSecrets{}, params)
+func (c *Client) GetExtensionSecrets(params *GetExtensionSecretParams, opts ...Options) (*GetExtensionSecretResponse, error) {
+	resp, err := c.postAsJSON("/extensions/jwt/secrets", &ManyExtensionSecrets{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

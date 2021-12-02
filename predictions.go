@@ -56,8 +56,8 @@ type GetPredictionsResponse struct {
 }
 
 // Required scope: channel:read:predictions
-func (c *Client) GetPredictions(params *PredictionsParams) (*PredictionsResponse, error) {
-	resp, err := c.get("/predictions", &ManyPredictions{}, params)
+func (c *Client) GetPredictions(params *PredictionsParams, opts ...Options) (*PredictionsResponse, error) {
+	resp, err := c.get("/predictions", &ManyPredictions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +82,8 @@ type PredictionChoiceParam struct {
 }
 
 // Required scope: channel:manage:predictions
-func (c *Client) CreatePrediction(params *CreatePredictionParams) (*PredictionsResponse, error) {
-	resp, err := c.postAsJSON("/predictions", &ManyPredictions{}, params)
+func (c *Client) CreatePrediction(params *CreatePredictionParams, opts ...Options) (*PredictionsResponse, error) {
+	resp, err := c.postAsJSON("/predictions", &ManyPredictions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +104,8 @@ type EndPredictionParams struct {
 }
 
 // Required scope: channel:manage:predictions
-func (c *Client) EndPrediction(params *EndPredictionParams) (*PredictionsResponse, error) {
-	resp, err := c.patchAsJSON("/predictions", &ManyPredictions{}, params)
+func (c *Client) EndPrediction(params *EndPredictionParams, opts ...Options) (*PredictionsResponse, error) {
+	resp, err := c.patchAsJSON("/predictions", &ManyPredictions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

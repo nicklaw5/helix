@@ -22,13 +22,13 @@ type EntitlementsUploadResponse struct {
 // file and notify users that they have an entitlement. Entitlements are digital
 // items that users are entitled to use. Twitch entitlements are granted to users
 // gratis or as part of a purchase on Twitch.
-func (c *Client) CreateEntitlementsUploadURL(manifestID, entitlementType string) (*EntitlementsUploadResponse, error) {
+func (c *Client) CreateEntitlementsUploadURL(manifestID, entitlementType string, opts ...Options) (*EntitlementsUploadResponse, error) {
 	data := &entitlementUploadURLRequest{
 		ManifestID: manifestID,
 		Type:       entitlementType,
 	}
 
-	resp, err := c.post("/entitlements/upload", &ManyEntitlementsUploadURLs{}, data)
+	resp, err := c.post("/entitlements/upload", &ManyEntitlementsUploadURLs{}, data, opts...)
 	if err != nil {
 		return nil, err
 	}

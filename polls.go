@@ -48,8 +48,8 @@ type GetPollsResponse struct {
 }
 
 // Required scope: channel:read:polls
-func (c *Client) GetPolls(params *PollsParams) (*PollsResponse, error) {
-	resp, err := c.get("/polls", &ManyPolls{}, params)
+func (c *Client) GetPolls(params *PollsParams, opts ...Options) (*PollsResponse, error) {
+	resp, err := c.get("/polls", &ManyPolls{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +78,8 @@ type PollChoiceParam struct {
 }
 
 // Required scope: channel:manage:polls
-func (c *Client) CreatePoll(params *CreatePollParams) (*PollsResponse, error) {
-	resp, err := c.postAsJSON("/polls", &ManyPolls{}, params)
+func (c *Client) CreatePoll(params *CreatePollParams, opts ...Options) (*PollsResponse, error) {
+	resp, err := c.postAsJSON("/polls", &ManyPolls{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +99,8 @@ type EndPollParams struct {
 }
 
 // Required scope: channel:manage:polls
-func (c *Client) EndPoll(params *EndPollParams) (*PollsResponse, error) {
-	resp, err := c.patchAsJSON("/polls", &ManyPolls{}, params)
+func (c *Client) EndPoll(params *EndPollParams, opts ...Options) (*PollsResponse, error) {
+	resp, err := c.patchAsJSON("/polls", &ManyPolls{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -18,11 +18,18 @@ type AuthorizationURLParams struct {
 	ForceVerify  bool     // (Optional)
 }
 
-func (c *Client) GetAuthorizationURL(params *AuthorizationURLParams) string {
+func (c *Client) GetAuthorizationURL(params *AuthorizationURLParams, opts ...Options) string {
+	var options Options
+	if len(opts) == 0 {
+		options = *c.opts
+	} else {
+		options = opts[0]
+	}
+
 	url := AuthBaseURL + "/authorize"
 	url += "?response_type=" + params.ResponseType
-	url += "&client_id=" + c.opts.ClientID
-	url += "&redirect_uri=" + c.opts.RedirectURI
+	url += "&client_id=" + options.ClientID
+	url += "&redirect_uri=" + options.RedirectURI
 
 	if params.State != "" {
 		url += "&state=" + params.State
@@ -51,12 +58,18 @@ type AppAccessTokenResponse struct {
 	Data AccessCredentials
 }
 
-func (c *Client) RequestAppAccessToken(scopes []string) (*AppAccessTokenResponse, error) {
-	opts := c.opts
+func (c *Client) RequestAppAccessToken(scopes []string, opts ...Options) (*AppAccessTokenResponse, error) {
+	var options Options
+	if len(opts) == 0 {
+		options = *c.opts
+	} else {
+		options = opts[0]
+	}
+
 	data := &accessTokenRequestData{
-		ClientID:     opts.ClientID,
-		ClientSecret: opts.ClientSecret,
-		RedirectURI:  opts.RedirectURI,
+		ClientID:     options.ClientID,
+		ClientSecret: options.ClientSecret,
+		RedirectURI:  options.RedirectURI,
 		GrantType:    "client_credentials",
 		Scopes:       strings.Join(scopes, " "),
 	}
@@ -90,13 +103,18 @@ type accessTokenRequestData struct {
 	Scopes       string `query:"scope"`
 }
 
-func (c *Client) RequestUserAccessToken(code string) (*UserAccessTokenResponse, error) {
-	opts := c.opts
+func (c *Client) RequestUserAccessToken(code string, opts ...Options) (*UserAccessTokenResponse, error) {
+	var options Options
+	if len(opts) == 0 {
+		options = *c.opts
+	} else {
+		options = opts[0]
+	}
 	data := &accessTokenRequestData{
 		Code:         code,
-		ClientID:     opts.ClientID,
-		ClientSecret: opts.ClientSecret,
-		RedirectURI:  opts.RedirectURI,
+		ClientID:     options.ClientID,
+		ClientSecret: options.ClientSecret,
+		RedirectURI:  options.RedirectURI,
 		GrantType:    "authorization_code",
 	}
 
@@ -131,11 +149,16 @@ type refreshTokenRequestData struct {
 // access token extended. Twitch OAuth2 access tokens have expirations.
 // Token-expiration periods vary in length. You should build your applications
 // in such a way that they are resilient to token authentication failures.
-func (c *Client) RefreshUserAccessToken(refreshToken string) (*RefreshTokenResponse, error) {
-	opts := c.opts
+func (c *Client) RefreshUserAccessToken(refreshToken string, opts ...Options) (*RefreshTokenResponse, error) {
+	var options Options
+	if len(opts) == 0 {
+		options = *c.opts
+	} else {
+		options = opts[0]
+	}
 	data := &refreshTokenRequestData{
-		ClientID:     opts.ClientID,
-		ClientSecret: opts.ClientSecret,
+		ClientID:     options.ClientID,
+		ClientSecret: options.ClientSecret,
 		GrantType:    "refresh_token",
 		RefreshToken: refreshToken,
 	}
@@ -169,9 +192,15 @@ type revokeAccessTokenRequestData struct {
 // Both successful requests and requests with bad tokens return 200 OK with
 // no body. Requests with bad tokens return the same response, as there is no
 // meaningful action a client can take after sending a bad token.
-func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenResponse, error) {
+func (c *Client) RevokeUserAccessToken(accessToken string, opts ...Options) (*RevokeAccessTokenResponse, error) {
+	var options Options
+	if len(opts) == 0 {
+		options = *c.opts
+	} else {
+		options = opts[0]
+	}
 	data := &revokeAccessTokenRequestData{
-		ClientID:    c.opts.ClientID,
+		ClientID:    options.ClientID,
 		AccessToken: accessToken,
 	}
 
@@ -200,13 +229,12 @@ type validateTokenDetails struct {
 
 // ValidateToken - Validate access token
 func (c *Client) ValidateToken(accessToken string) (bool, *ValidateTokenResponse, error) {
-	// Reset to original token after request
-	currentToken := c.opts.UserAccessToken
-	c.SetUserAccessToken(accessToken)
-	defer c.SetUserAccessToken(currentToken)
+	opts := Options{
+		UserAccessToken: accessToken,
+	}
 
 	var data validateTokenDetails
-	resp, err := c.get(authPaths["validate"], &data, nil)
+	resp, err := c.get(authPaths["validate"], &data, nil, opts)
 	if err != nil {
 		return false, nil, err
 	}

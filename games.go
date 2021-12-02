@@ -20,8 +20,8 @@ type GamesParams struct {
 	Names []string `query:"name"` // Limit 100
 }
 
-func (c *Client) GetGames(params *GamesParams) (*GamesResponse, error) {
-	resp, err := c.get("/games", &ManyGames{}, params)
+func (c *Client) GetGames(params *GamesParams, opts ...Options) (*GamesResponse, error) {
+	resp, err := c.get("/games", &ManyGames{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +49,8 @@ type TopGamesResponse struct {
 	Data ManyGamesWithPagination
 }
 
-func (c *Client) GetTopGames(params *TopGamesParams) (*TopGamesResponse, error) {
-	resp, err := c.get("/games/top", &ManyGamesWithPagination{}, params)
+func (c *Client) GetTopGames(params *TopGamesParams, opts ...Options) (*TopGamesResponse, error) {
+	resp, err := c.get("/games/top", &ManyGamesWithPagination{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

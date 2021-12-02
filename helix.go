@@ -1,3 +1,4 @@
+// Package helix provides an client for the Twitch Helix API.
 package helix
 
 import (
@@ -128,35 +129,35 @@ func NewClient(options *Options) (*Client, error) {
 	return client, nil
 }
 
-func (c *Client) get(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodGet, path, respData, reqData, false)
+func (c *Client) get(path string, respData, reqData interface{}, opts ...Options) (*Response, error) {
+	return c.sendRequest(http.MethodGet, path, respData, reqData, false, opts...)
 }
 
-func (c *Client) post(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodPost, path, respData, reqData, false)
+func (c *Client) post(path string, respData, reqData interface{}, opts ...Options) (*Response, error) {
+	return c.sendRequest(http.MethodPost, path, respData, reqData, false, opts...)
 }
 
-func (c *Client) put(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodPut, path, respData, reqData, false)
+func (c *Client) put(path string, respData, reqData interface{}, opts ...Options) (*Response, error) {
+	return c.sendRequest(http.MethodPut, path, respData, reqData, false, opts...)
 }
 
-func (c *Client) delete(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodDelete, path, respData, reqData, false)
+func (c *Client) delete(path string, respData, reqData interface{}, opts ...Options) (*Response, error) {
+	return c.sendRequest(http.MethodDelete, path, respData, reqData, false, opts...)
 }
 
-func (c *Client) patchAsJSON(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodPatch, path, respData, reqData, true)
+func (c *Client) patchAsJSON(path string, respData, reqData interface{}, opts ...Options) (*Response, error) {
+	return c.sendRequest(http.MethodPatch, path, respData, reqData, true, opts...)
 }
 
-func (c *Client) postAsJSON(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodPost, path, respData, reqData, true)
+func (c *Client) postAsJSON(path string, respData, reqData interface{}, opts ...Options) (*Response, error) {
+	return c.sendRequest(http.MethodPost, path, respData, reqData, true, opts...)
 }
 
-func (c *Client) putAsJSON(path string, respData, reqData interface{}) (*Response, error) {
-	return c.sendRequest(http.MethodPut, path, respData, reqData, true)
+func (c *Client) putAsJSON(path string, respData, reqData interface{}, opts ...Options) (*Response, error) {
+	return c.sendRequest(http.MethodPut, path, respData, reqData, true, opts...)
 }
 
-func (c *Client) sendRequest(method, path string, respData, reqData interface{}, hasJSONBody bool) (*Response, error) {
+func (c *Client) sendRequest(method, path string, respData, reqData interface{}, hasJSONBody bool, opts ...Options) (*Response, error) {
 	resp := &Response{}
 	if respData != nil {
 		resp.Data = respData
@@ -167,7 +168,7 @@ func (c *Client) sendRequest(method, path string, respData, reqData interface{},
 		return nil, err
 	}
 
-	err = c.doRequest(req, resp)
+	err = c.doRequest(req, resp, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -321,8 +322,8 @@ func (c *Client) getBaseURL(path string) string {
 	return c.opts.APIBaseURL
 }
 
-func (c *Client) doRequest(req *http.Request, resp *Response) error {
-	c.setRequestHeaders(req)
+func (c *Client) doRequest(req *http.Request, resp *Response, opts ...Options) error {
+	c.setRequestHeaders(req, opts...)
 
 	rateLimitFunc := c.opts.RateLimitFunc
 
@@ -385,24 +386,28 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	return nil
 }
 
-func (c *Client) setRequestHeaders(req *http.Request) {
-	opts := c.opts
+func (c *Client) setRequestHeaders(req *http.Request, opts ...Options) {
+	var options Options
+	if len(opts) == 0 {
+		options = *c.opts
+	} else {
+		options = opts[0]
+	}
+	req.Header.Set("Client-ID", options.ClientID)
 
-	req.Header.Set("Client-ID", opts.ClientID)
-
-	if opts.UserAgent != "" {
-		req.Header.Set("User-Agent", opts.UserAgent)
+	if options.UserAgent != "" {
+		req.Header.Set("User-Agent", options.UserAgent)
 	}
 
 	var bearerToken string
-	if opts.AppAccessToken != "" {
-		bearerToken = opts.AppAccessToken
+	if options.AppAccessToken != "" {
+		bearerToken = options.AppAccessToken
 	}
-	if opts.UserAccessToken != "" {
-		bearerToken = opts.UserAccessToken
+	if options.UserAccessToken != "" {
+		bearerToken = options.UserAccessToken
 	}
-	if opts.ExtensionOpts.SignedJWTToken != "" {
-		bearerToken = opts.ExtensionOpts.SignedJWTToken
+	if options.ExtensionOpts.SignedJWTToken != "" {
+		bearerToken = options.ExtensionOpts.SignedJWTToken
 	}
 
 	authType := "Bearer"

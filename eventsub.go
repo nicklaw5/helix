@@ -567,8 +567,8 @@ type EventSubChannelGoalEndEvent struct {
 }
 
 // Get all EventSub Subscriptions
-func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (*EventSubSubscriptionsResponse, error) {
-	resp, err := c.get("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, params)
+func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams, opts ...Options) (*EventSubSubscriptionsResponse, error) {
+	resp, err := c.get("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -584,9 +584,9 @@ func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (
 }
 
 // Remove an EventSub Subscription
-func (c *Client) RemoveEventSubSubscription(id string) (*RemoveEventSubSubscriptionParamsResponse, error) {
+func (c *Client) RemoveEventSubSubscription(id string, opts ...Options) (*RemoveEventSubSubscriptionParamsResponse, error) {
 
-	resp, err := c.delete("/eventsub/subscriptions", nil, &RemoveEventSubSubscriptionParams{ID: id})
+	resp, err := c.delete("/eventsub/subscriptions", nil, &RemoveEventSubSubscriptionParams{ID: id}, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -597,7 +597,7 @@ func (c *Client) RemoveEventSubSubscription(id string) (*RemoveEventSubSubscript
 }
 
 // Creates an EventSub subscription
-func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*EventSubSubscriptionsResponse, error) {
+func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription, opts ...Options) (*EventSubSubscriptionsResponse, error) {
 	if payload.Transport.Method == "webhook" && !strings.HasPrefix(payload.Transport.Callback, "https://") {
 		return nil, fmt.Errorf("error: callback must use https")
 	}
@@ -613,7 +613,7 @@ func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*Eve
 	if callbackUrl.Port() != "" && callbackUrl.Port() != "443" {
 		return nil, fmt.Errorf("error: callback must use port 443")
 	}
-	resp, err := c.postAsJSON("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, payload)
+	resp, err := c.postAsJSON("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, payload, opts...)
 	if err != nil {
 		return nil, err
 	}

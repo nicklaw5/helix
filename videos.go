@@ -60,8 +60,8 @@ type DeleteVideosResponse struct {
 
 // GetVideos gets video information by video ID (one or more), user ID (one only),
 // or game ID (one only).
-func (c *Client) GetVideos(params *VideosParams) (*VideosResponse, error) {
-	resp, err := c.get("/videos", &ManyVideos{}, params)
+func (c *Client) GetVideos(params *VideosParams, opts ...Options) (*VideosResponse, error) {
+	resp, err := c.get("/videos", &ManyVideos{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +76,8 @@ func (c *Client) GetVideos(params *VideosParams) (*VideosResponse, error) {
 
 // DeleteVideos delete one or more videos (max 5)
 // Required scope: channel:manage:videos
-func (c *Client) DeleteVideos(params *DeleteVideosParams) (*DeleteVideosResponse, error) {
-	resp, err := c.delete("/videos", &DeleteVideosResponse{}, params)
+func (c *Client) DeleteVideos(params *DeleteVideosParams, opts ...Options) (*DeleteVideosResponse, error) {
+	resp, err := c.delete("/videos", &DeleteVideosResponse{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -11,8 +11,8 @@ type HeldMessageModerationParams struct {
 }
 
 // Required scope: moderator:manage:automod
-func (c *Client) ModerateHeldMessage(params *HeldMessageModerationParams) (*HeldMessageModerationResponse, error) {
-	resp, err := c.postAsJSON("/moderation/automod/message", nil, params)
+func (c *Client) ModerateHeldMessage(params *HeldMessageModerationParams, opts ...Options) (*HeldMessageModerationResponse, error) {
+	resp, err := c.postAsJSON("/moderation/automod/message", nil, params, opts...)
 	if err != nil {
 		return nil, err
 	}

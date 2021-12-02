@@ -32,8 +32,8 @@ type BitsLeaderboardParams struct {
 // information for an authorized broadcaster.
 //
 // Required Scope: bits:read
-func (c *Client) GetBitsLeaderboard(params *BitsLeaderboardParams) (*BitsLeaderboardResponse, error) {
-	resp, err := c.get("/bits/leaderboard", &ManyUserBitTotals{}, params)
+func (c *Client) GetBitsLeaderboard(params *BitsLeaderboardParams, opts ...Options) (*BitsLeaderboardResponse, error) {
+	resp, err := c.get("/bits/leaderboard", &ManyUserBitTotals{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,8 +96,8 @@ type CheermotesResponse struct {
 	Data ManyCheermotes
 }
 
-func (c *Client) GetCheermotes(params *CheermotesParams) (*CheermotesResponse, error) {
-	resp, err := c.get("/bits/cheermotes", &ManyCheermotes{}, params)
+func (c *Client) GetCheermotes(params *CheermotesParams, opts ...Options) (*CheermotesResponse, error) {
+	resp, err := c.get("/bits/cheermotes", &ManyCheermotes{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

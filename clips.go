@@ -43,8 +43,8 @@ type ClipsParams struct {
 }
 
 // GetClips returns information about a specified clip.
-func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
-	resp, err := c.get("/clips", &ManyClips{}, params)
+func (c *Client) GetClips(params *ClipsParams, opts ...Options) (*ClipsResponse, error) {
+	resp, err := c.get("/clips", &ManyClips{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +98,8 @@ type CreateClipParams struct {
 // clip was not created and retry Create Clip.
 //
 // Required scope: clips:edit
-func (c *Client) CreateClip(params *CreateClipParams) (*CreateClipResponse, error) {
-	resp, err := c.post("/clips", &ManyClipEditURLs{}, params)
+func (c *Client) CreateClip(params *CreateClipParams, opts ...Options) (*CreateClipResponse, error) {
+	resp, err := c.post("/clips", &ManyClipEditURLs{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
