@@ -184,8 +184,8 @@ func TestRatelimitCallback(t *testing.T) {
 		ClientID: "my-client-id",
 	}
 
-	c = newMockClient(options2, newMockHandler(http.StatusOK, respBody2, nil))
-	_, err := c.GetStreams(&StreamsParams{})
+	cOK := newMockClient(options2, newMockHandler(http.StatusOK, respBody2, nil))
+	_, err := cOK.GetStreams(&StreamsParams{})
 	if err != nil {
 		t.Errorf("Did not expect error, got \"%s\"", err.Error())
 	}
