@@ -173,7 +173,7 @@ type EventSubChannelSubscriptionMessageEvent struct {
 	BroadcasterUserName  string          `json:"broadcaster_user_name"`
 	Tier                 string          `json:"tier"`
 	Message              EventSubMessage `json:"message"`
-	CumulativeTotal      int             `json:"cumulative_total"`
+	CumulativeMonths     int             `json:"cumulative_months"`
 	StreakMonths         int             `json:"streak_months"`
 	DurationMonths       int             `json:"duration_months"`
 }
