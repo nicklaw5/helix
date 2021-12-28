@@ -90,7 +90,7 @@
 - [x] Create Extension Secret
 - [x] Get Extension Secret
 - [ ] Revoke Extension Secrets
-- [ ] Get Live Channels with Extension Activated
+- [x] Get Live Channels with Extension Activated
 - [x] Set Extension Required Configuration
 - [x] Set Extension Configuration Segment
 - [ ] Get Extension Channel Configuration
