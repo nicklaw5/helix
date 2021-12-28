@@ -54,6 +54,30 @@ type ExtensionSendChatMessageResponse struct {
 	ResponseCommon
 }
 
+type ExtensionLiveChannel struct {
+	BroadcasterID   string `json:"broadcaster_id"`
+	BroadcasterName string `json:"broadcaster_name"`
+	GameName        string `json:"game_name"`
+	GameID          string `json:"game_id"`
+	Title           string `json:"title"`
+}
+
+type ManyExtensionLiveChannels struct {
+	LiveChannels []ExtensionLiveChannel `json:"data"`
+	Pagination   string                 `json:"pagination"`
+}
+
+type ExtensionLiveChannelsParams struct {
+	ExtensionID string `query:"extension_id"` // Required
+	After       string `query:"after"`        // Optional
+	First       int    `query:"first,20"`     // Optional, Limit 100
+}
+
+type ExtensionLiveChannelsResponse struct {
+	ResponseCommon
+	Data ManyExtensionLiveChannels
+}
+
 // GetExtensionTransactions allows extension back end servers to fetch a list of transactions that
 // have occurred for their extension across all of Twitch. A transaction is a record of a user
 // exchanging Bits for an in-Extension digital good.
@@ -96,4 +120,22 @@ func (c *Client) SendExtensionChatMessage(params *ExtensionSendChatMessageParams
 	resp.HydrateResponseCommon(&sndExtMsgResp.ResponseCommon)
 
 	return sndExtMsgResp, nil
+}
+
+func (c *Client) GetExtensionLiveChannels(params *ExtensionLiveChannelsParams) (*ExtensionLiveChannelsResponse, error) {
+
+	if params.ExtensionID == "" {
+		return nil, fmt.Errorf("error: extension ID must be specified")
+	}
+
+	resp, err := c.get("/extensions/live", &ManyExtensionLiveChannels{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	liveChannels := &ExtensionLiveChannelsResponse{}
+	resp.HydrateResponseCommon(&liveChannels.ResponseCommon)
+	liveChannels.Data.LiveChannels = resp.Data.(*ManyExtensionLiveChannels).LiveChannels
+	liveChannels.Data.Pagination = resp.Data.(*ManyExtensionLiveChannels).Pagination
+	return liveChannels, nil
 }
