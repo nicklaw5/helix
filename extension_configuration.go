@@ -31,12 +31,6 @@ type ExtensionConfigurationSegment struct {
 	Content string               `json:"content"`
 }
 
-type ExtensionConfigurationSegment struct {
-	Segment ExtensionSegmentType `json:"segment"`
-	Version string               `json:"version"`
-	Content string               `json:"content"`
-}
-
 type ExtensionGetConfigurationParams struct {
 	ExtensionID   string                 `query:"extension_id"`
 	BroadcasterID string                 `query:"broadcaster_id"`
