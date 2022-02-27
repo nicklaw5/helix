@@ -44,6 +44,7 @@ type EventSubTransport struct {
 
 // Twitch Response for getting all current subscriptions
 type ManyEventSubSubscriptions struct {
+	Total                 int                    `json:"total"`
 	TotalCost             int                    `json:"total_cost"`
 	MaxTotalCost          int                    `json:"max_total_cost"`
 	EventSubSubscriptions []EventSubSubscription `json:"data"`
