@@ -17,6 +17,7 @@ type Stream struct {
 	StartedAt    time.Time `json:"started_at"`
 	Language     string    `json:"language"`
 	ThumbnailURL string    `json:"thumbnail_url"`
+	StreamKey    string    `json:"stream_key"`
 }
 
 type ManyStreams struct {
@@ -38,6 +39,10 @@ type StreamsParams struct {
 	Type       string   `query:"type,all"`   // "all" (default), "live" and "vodcast"
 	UserIDs    []string `query:"user_id"`    // limit 100
 	UserLogins []string `query:"user_login"` // limit 100
+}
+
+type StreamKeyParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
 }
 
 // GetStreams returns a list of live channels based on the search parameters.
@@ -71,6 +76,23 @@ type FollowedStreamsParams struct {
 // Required scope: user:read:follows
 func (c *Client) GetFollowedStream(params *FollowedStreamsParams) (*StreamsResponse, error) {
 	resp, err := c.get("/streams/followed", &ManyStreams{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	streams := &StreamsResponse{}
+	resp.HydrateResponseCommon(&streams.ResponseCommon)
+	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
+	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
+
+	return streams, nil
+}
+
+// GetStreamKey : Returns the secret stream key of the broadcaster
+//
+// Required scope: channel:read:stream_key
+func (c *Client) GetStreamKey(params *StreamKeyParams) (*StreamsResponse, error) {
+	resp, err := c.get("/streams/key", &ManyStreams{}, params)
 	if err != nil {
 		return nil, err
 	}
