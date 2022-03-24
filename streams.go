@@ -17,7 +17,6 @@ type Stream struct {
 	StartedAt    time.Time `json:"started_at"`
 	Language     string    `json:"language"`
 	ThumbnailURL string    `json:"thumbnail_url"`
-	StreamKey    string    `json:"stream_key"`
 }
 
 type ManyStreams struct {
@@ -39,6 +38,19 @@ type StreamsParams struct {
 	Type       string   `query:"type,all"`   // "all" (default), "live" and "vodcast"
 	UserIDs    []string `query:"user_id"`    // limit 100
 	UserLogins []string `query:"user_login"` // limit 100
+}
+
+type StreamKey struct {
+	StreamKey string `json:"stream_key"`
+}
+
+type ManyStreamKeys struct {
+	StreamKeys []StreamKey `json:"data"`
+}
+
+type StreamKeysResponse struct {
+	ResponseCommon
+	Data ManyStreamKeys
 }
 
 type StreamKeyParams struct {
@@ -91,16 +103,15 @@ func (c *Client) GetFollowedStream(params *FollowedStreamsParams) (*StreamsRespo
 // GetStreamKey : Returns the secret stream key of the broadcaster
 //
 // Required scope: channel:read:stream_key
-func (c *Client) GetStreamKey(params *StreamKeyParams) (*StreamsResponse, error) {
-	resp, err := c.get("/streams/key", &ManyStreams{}, params)
+func (c *Client) GetStreamKey(params *StreamKeyParams) (*StreamKeysResponse, error) {
+	resp, err := c.get("/streams/key", &ManyStreamKeys{}, params)
 	if err != nil {
 		return nil, err
 	}
 
-	streams := &StreamsResponse{}
+	streams := &StreamKeysResponse{}
 	resp.HydrateResponseCommon(&streams.ResponseCommon)
-	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
-	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
+	streams.Data.StreamKeys = resp.Data.(*ManyStreamKeys).StreamKeys
 
 	return streams, nil
 }
