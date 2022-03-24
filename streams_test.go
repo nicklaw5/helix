@@ -200,8 +200,8 @@ func TestGetStreamKeys(t *testing.T) {
 			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
 		}
 
-		if len(resp.Data.StreamKeys) != testCase.Length {
-			t.Errorf("expected \"%d\" streams, got \"%d\"", testCase.Length, len(resp.Data.StreamKeys))
+		if len(resp.Data.Data) != testCase.Length {
+			t.Errorf("expected \"%d\" streams, got \"%d\"", testCase.Length, len(resp.Data.Data))
 		}
 	}
 

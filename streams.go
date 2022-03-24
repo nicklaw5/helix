@@ -40,12 +40,10 @@ type StreamsParams struct {
 	UserLogins []string `query:"user_login"` // limit 100
 }
 
-type StreamKey struct {
-	StreamKey string `json:"stream_key"`
-}
-
 type ManyStreamKeys struct {
-	StreamKeys []StreamKey `json:"data"`
+	Data []struct {
+		StreamKey string `json:"stream_key"`
+	} `json:"data"`
 }
 
 type StreamKeysResponse struct {
@@ -111,7 +109,7 @@ func (c *Client) GetStreamKey(params *StreamKeyParams) (*StreamKeysResponse, err
 
 	streams := &StreamKeysResponse{}
 	resp.HydrateResponseCommon(&streams.ResponseCommon)
-	streams.Data.StreamKeys = resp.Data.(*ManyStreamKeys).StreamKeys
+	streams.Data.Data = resp.Data.(*ManyStreamKeys).Data
 
 	return streams, nil
 }
