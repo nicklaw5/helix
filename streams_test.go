@@ -150,3 +150,79 @@ func TestGetFollowedStreams(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestGetStreamKeys(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		broadcasterID string
+		Length        int
+		respBody      string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"kivutar",
+			1,
+			`{"data":[{"stream_key":"live_695820277_TF1dAMbU4cQvGKyrk2Q88SvWNCw6Rs"}]}`,
+		},
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id"},
+			"kivutar",
+			0,
+			`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetStreamKey(&StreamKeyParams{
+			BroadcasterID: testCase.broadcasterID,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			firstErrStr := "Invalid OAuth token"
+			if resp.ErrorMessage != firstErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", firstErrStr, resp.ErrorMessage)
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if len(resp.Data.Data) != testCase.Length {
+			t.Errorf("expected \"%d\" streams, got \"%d\"", testCase.Length, len(resp.Data.Data))
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetStreamKey(&StreamKeyParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}

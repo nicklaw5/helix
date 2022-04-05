@@ -40,6 +40,21 @@ type StreamsParams struct {
 	UserLogins []string `query:"user_login"` // limit 100
 }
 
+type ManyStreamKeys struct {
+	Data []struct {
+		StreamKey string `json:"stream_key"`
+	} `json:"data"`
+}
+
+type StreamKeysResponse struct {
+	ResponseCommon
+	Data ManyStreamKeys
+}
+
+type StreamKeyParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+}
+
 // GetStreams returns a list of live channels based on the search parameters.
 // To query offline channels, use SearchChannels.
 func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
@@ -79,6 +94,22 @@ func (c *Client) GetFollowedStream(params *FollowedStreamsParams) (*StreamsRespo
 	resp.HydrateResponseCommon(&streams.ResponseCommon)
 	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
 	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
+
+	return streams, nil
+}
+
+// GetStreamKey : Returns the secret stream key of the broadcaster
+//
+// Required scope: channel:read:stream_key
+func (c *Client) GetStreamKey(params *StreamKeyParams) (*StreamKeysResponse, error) {
+	resp, err := c.get("/streams/key", &ManyStreamKeys{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	streams := &StreamKeysResponse{}
+	resp.HydrateResponseCommon(&streams.ResponseCommon)
+	streams.Data.Data = resp.Data.(*ManyStreamKeys).Data
 
 	return streams, nil
 }
