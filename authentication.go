@@ -192,10 +192,11 @@ type ValidateTokenResponse struct {
 }
 
 type validateTokenDetails struct {
-	ClientID string   `json:"client_id"`
-	Login    string   `json:"login"`
-	Scopes   []string `json:"scopes"`
-	UserID   string   `json:"user_id"`
+	ClientID  string   `json:"client_id"`
+	Login     string   `json:"login"`
+	Scopes    []string `json:"scopes"`
+	UserID    string   `json:"user_id"`
+	ExpiresIn int      `json:"expires_in"`
 }
 
 // ValidateToken - Validate access token
