@@ -61,6 +61,7 @@ type EventSubSubscriptionsResponse struct {
 type EventSubSubscriptionsParams struct {
 	Status string `query:"status"`
 	Type   string `query:"type"`
+	UserID string `query:"user_id"`
 	After  string `query:"after"`
 }
 
