@@ -115,6 +115,7 @@ const (
 	EventSubTypeHypeTrainBegin                            = "channel.hype_train.begin"
 	EventSubTypeHypeTrainProgress                         = "channel.hype_train.progress"
 	EventSubTypeHypeTrainEnd                              = "channel.hype_train.end"
+	EventSubTypeCharityDonation                           = "channel.charity_campaign.donate"
 	EventSubTypeStreamOnline                              = "stream.online"
 	EventSubTypeStreamOffline                             = "stream.offline"
 	EventSubTypeUserAuthorizationRevoke                   = "user.authorization.revoke"
@@ -566,6 +567,23 @@ type EventSubChannelGoalEndEvent struct {
 	TargetAmount         int    `json:"target_amount"`
 	StartedAt            Time   `json:"started_at"`
 	EndedAt              Time   `json:"ended_at"`
+}
+
+type EventSubCharityAmount struct {
+	Value         int64  `json:"value"`
+	DecimalPlaces int64  `json:"decimal_places"`
+	Currency      string `json:"currency"`
+}
+
+type EventSubCharityDonationEvent struct {
+	ID                   string                `json:"id"`
+	BroadcasterUserID    string                `json:"broadcaster_user_id"`
+	BroadcasterUserName  string                `json:"broadcaster_user_name"`
+	BroadcasterUserLogin string                `json:"broadcaster_user_login"`
+	UserID               string                `json:"user_id"`
+	UserName             string                `json:"user_name"`
+	UserLogin            string                `json:"user_login"`
+	Amount               EventSubCharityAmount `json:"amount"`
 }
 
 // Get all EventSub Subscriptions
