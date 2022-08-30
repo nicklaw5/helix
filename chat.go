@@ -71,6 +71,18 @@ type SendChatAnnouncementResponse struct {
     ResponseCommon
 }
 
+type SendChatAnnouncementParams struct {
+	BroadcasterID string `query:"broadcaster_id"` // required
+	ModeratorID   string `query:"moderator_id"`   // required
+	Message       string `json:"message"`         // upto 500 chars, thereafter str is truncated
+	// blue || green || orange || purple are valid, default 'primary' or empty str result in channel accent color.
+	Color string `json:"color"`
+}
+
+type SendChatAnnouncementResponse struct {
+	ResponseCommon
+}
+
 type GetChannelEmotesResponse struct {
     ResponseCommon
     Data ManyEmotes
@@ -161,4 +173,18 @@ func (c *Client) SendChatAnnouncement(params *SendChatAnnouncementParams) (*Send
     resp.HydrateResponseCommon(&chatResp.ResponseCommon)
 
     return chatResp, nil
+}
+
+// SendChatAnnouncement sends an announcement to the broadcaster’s chat room.
+// Required scope: moderator:manage:announcements
+func (c *Client) SendChatAnnouncement(params *SendChatAnnouncementParams) (*SendChatAnnouncementResponse, error) {
+	resp, err := c.postAsJSON("/chat/announcements", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	chatResp := &SendChatAnnouncementResponse{}
+	resp.HydrateResponseCommon(&chatResp.ResponseCommon)
+
+	return chatResp, nil
 }

@@ -416,7 +416,7 @@ func TestSendChatAnnouncement(t *testing.T) {
 		{
 			http.StatusNoContent,
 			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
-			&SendChatAnnouncementParams{BroadcasterID: "100249558", ModeratorID: "100249558", Message: "hello world", Color: "blue"},
+			&SendChatAnnouncementParams{BroadcasterID: "100249558", ModeratorID: "100249558", Message: "hello twitch chat", Color: "blue"},
 			``,
 		},
 	}
