@@ -113,18 +113,6 @@ type SendChatAnnouncementResponse struct {
     ResponseCommon
 }
 
-type SendChatAnnouncementParams struct {
-	BroadcasterID string `query:"broadcaster_id"` // required
-	ModeratorID   string `query:"moderator_id"`   // required
-	Message       string `json:"message"`         // upto 500 chars, thereafter str is truncated
-	// blue || green || orange || purple are valid, default 'primary' or empty str result in channel accent color.
-	Color string `json:"color"`
-}
-
-type SendChatAnnouncementResponse struct {
-	ResponseCommon
-}
-
 type GetChannelEmotesResponse struct {
     ResponseCommon
     Data ManyEmotes
