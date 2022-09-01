@@ -37,7 +37,7 @@ type CharityCampaignsParams struct {
 
 // Required scope: channel:read:charity
 func (c *Client) GetCharityCampaigns(params *CharityCampaignsParams) (*CharityCampaignsResponse, error) {
-	resp, err := c.get("charity/campaigns", &ManyCharityCampaigns{}, params)
+	resp, err := c.get("/charity/campaigns", &ManyCharityCampaigns{}, params)
 	if err != nil {
 		return nil, err
 	}
