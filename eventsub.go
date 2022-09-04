@@ -570,7 +570,7 @@ type EventSubChannelGoalEndEvent struct {
 }
 
 type EventSubCharityAmount struct {
-	Value         int64  `json:"value"`
+	Value         int64  `json:"amount"`
 	DecimalPlaces int64  `json:"decimal_places"`
 	Currency      string `json:"currency"`
 }
