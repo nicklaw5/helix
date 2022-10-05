@@ -1,5 +1,45 @@
 package helix
 
+import "errors"
+
+type GetChatChattersParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+	ModeratorID   string `query:"broadcaster_id"`
+	After         string `query:"after"`
+	First         string `query:"first"`
+}
+
+type ChatChatter struct {
+	UserLogin string `json:"user_login"`
+}
+
+type ManyChatChatters struct {
+	Chatters   []ChatChatter `json:"data"`
+	Pagination Pagination  `json:"pagination"`
+}
+
+type GetChatChattersResponse struct {
+	ResponseCommon
+	Data ManyChatChatters
+}
+
+// Required scope: moderator:read:chatters
+func (c *Client) GetChannelChatChatters(params *GetChatChattersParams) (*GetChatChattersResponse, error) {
+	if params.BroadcasterID == "" || params.ModeratorID == "" {
+		return nil, errors.New("error: broadcaster and moderator identifiers must be provided")
+	}
+	resp, err := c.get("/chat/chatters", &ManyChatChatters{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	chatters := &GetChatChattersResponse{}
+	resp.HydrateResponseCommon(&chatters.ResponseCommon)
+	chatters.Data.Chatters = resp.Data.(*ManyChatChatters).Chatters
+
+	return chatters, nil
+}
+
 type GetChatBadgeParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
 }
