@@ -32,7 +32,7 @@ type IDToken struct {
 
 type OIDCClaims struct {
 	IDToken  IDToken       `json:"id_token"`
-	UserInfo UserInfoClaim `json:"userinfo"`
+	UserInfo UserInfoClaim `json:"user_info"`
 }
 
 type UserInfoClaim struct {
@@ -50,7 +50,7 @@ type AuthorizationURLParams struct {
 }
 
 func (c *Client) GetAuthorizationURL(params *AuthorizationURLParams) string {
-	url := AuthBaseURL + "/authorize"
+	url := c.opts.AuthAPIBaseURL + "/authorize"
 	url += "?response_type=" + params.ResponseType
 	url += "&client_id=" + c.opts.ClientID
 	url += "&redirect_uri=" + c.opts.RedirectURI
@@ -265,21 +265,16 @@ func (c *Client) RequestUserOIDCAccessToken(
 ) {
 	resp = &OIDCAuth{}
 
-	provider, err := oidc.NewProvider(context.Background(), AuthBaseURL)
-	if err != nil {
-		return
-	}
-
 	oauth2Config := oauth2.Config{
 		ClientID:     c.opts.ClientID,
 		ClientSecret: c.opts.ClientSecret,
 		RedirectURL:  c.opts.RedirectURI,
-		Endpoint:     provider.Endpoint(),
+		Endpoint:     c.opts.OidcProvider.Endpoint(),
 		// "openid" is a required scope for OpenID Connect flows.
 		Scopes: append([]string{oidc.ScopeOpenID}, scopes...),
 	}
 
-	verifier := provider.Verifier(&oidc.Config{ClientID: c.opts.ClientID})
+	verifier := c.opts.OidcProvider.Verifier(&oidc.Config{ClientID: c.opts.ClientID})
 
 	oauth2Token, err := oauth2Config.Exchange(context.Background(), code)
 	if err != nil {
@@ -297,7 +292,7 @@ func (c *Client) RequestUserOIDCAccessToken(
 
 	idToken, err := verifier.Verify(context.Background(), rawIDToken)
 	if err != nil {
-		err = fmt.Errorf("failed to verify id_token err:%s", err)
+		err = fmt.Errorf("failed to validate oidc token:%s err:%w", rawIDToken, err)
 		return
 	}
 	resp.IDToken = idToken
@@ -312,18 +307,13 @@ func (c *Client) RequestUserOIDCAccessToken(
 	return
 }
 
-func (c *Client) UserInfoFromAccessToken(
+func (c *Client) UserInfoFromOIDCAccessToken(
 	token string,
 ) (
 	claim UserInfoClaim,
 	err error,
 ) {
-	provider, err := oidc.NewProvider(context.Background(), AuthBaseURL)
-	if err != nil {
-		return
-	}
-
-	userInfo, err := provider.UserInfo(
+	userInfo, err := c.opts.OidcProvider.UserInfo(
 		context.Background(),
 		oauth2.StaticTokenSource(&oauth2.Token{
 			AccessToken:  token,
