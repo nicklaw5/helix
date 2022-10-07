@@ -5,6 +5,72 @@ import (
 	"testing"
 )
 
+func TestGetChannelChatChatterss(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode            int
+		options               *Options
+		GetChatChattersParams *GetChatChattersParams
+		respBody              string
+		validationErr         string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetChatChattersParams{BroadcasterID: "", ModeratorID: "1234"},
+			``,
+			"error: broadcaster and moderator identifiers must be provided",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&GetChatChattersParams{BroadcasterID: "121445595", ModeratorID: "1234"},
+			`{"data": [{"user_login": "smittysmithers"}]}`,
+			"",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetChatChattersParams{BroadcasterID: "1231", ModeratorID: "1234"},
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetChannelChatChatters(testCase.GetChatChattersParams)
+		if err != nil {
+			if err.Error() == testCase.validationErr {
+				continue
+			}
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			continue
+		}
+
+		if len(resp.Data.Chatters) != 1 {
+			t.Errorf("expected %d chatters got %d", 1, len(resp.Data.Chatters))
+		}
+	}
+}
+
 func TestGetChannelChatBadges(t *testing.T) {
 	t.Parallel()
 
