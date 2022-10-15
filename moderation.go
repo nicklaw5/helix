@@ -42,3 +42,68 @@ func (c *Client) GetBannedUsers(params *BannedUsersParams) (*BannedUsersResponse
 
 	return bans, nil
 }
+
+type BanUserParams struct {
+	BroadcasterID string             `json:"broadcaster_id"`
+	ModeratorId   string             `json:"moderator_id"`
+	Body          BanUserRequestBody `json:"data"`
+}
+
+type BanUserRequestBody struct {
+	Duration int    `json:"duration"` // optional
+	Reason   string `json:"reason"`   // required
+	UserId   string `json:"user_id"`  // required
+}
+
+type BanUserResponse struct {
+	ResponseCommon
+	Data ManyBanUser
+}
+
+type ManyBanUser struct {
+	Bans []BanUser `json:"data"`
+}
+
+type BanUser struct {
+	BoardcasterId string `json:"broadcaster_id"`
+	CreatedAt     string `json:"created_at"`
+	EndTime       string `json:"end_time"`
+	ModeratorId   string `json:"moderator_id"`
+	UserId        string `json:"user_id"`
+}
+
+// BanUser Bans a user from participating in a broadcaster’s chat room, or puts them in a timeout.
+// Required scope: moderator:manage:banned_users
+func (c *Client) BanUser(params *BanUserParams) (*BanUserResponse, error) {
+	resp, err := c.postAsJSON("/moderation/bans", &ManyBanUser{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	banResp := &BanUserResponse{}
+	resp.HydrateResponseCommon(&banResp.ResponseCommon)
+	banResp.Data.Bans = resp.Data.(*ManyBanUser).Bans
+
+	return banResp, nil
+}
+
+type UnbanUserParams struct {
+	BroadcasterID string `json:"broadcaster_id"`
+	ModeratorID   string `json:"moderator_id"`
+	UserID        string `json:"user_id"`
+}
+
+type UnbanUserResponse struct {
+	ResponseCommon
+}
+
+func (c *Client) UnbanUser(params *UnbanUserParams) (*UnbanUserResponse, error) {
+	resp, err := c.delete("/moderation/bans", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	unbanResp := &UnbanUserResponse{}
+	resp.HydrateResponseCommon(&unbanResp.ResponseCommon)
+	return unbanResp, nil
+}
