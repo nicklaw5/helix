@@ -26,11 +26,18 @@
 - [x] Get Channel Information
 - [x] Modify Channel Information
 - [x] Get Channel Editors
+- [ ] Get Charity Campaign
+- [ ] Get Chatters
 - [x] Get Channel Emotes
 - [x] Get Global Emotes
 - [x] Get Emote Sets
 - [x] Get Channel Chat Badges
 - [x] Get Global Chat Badges
+- [ ] Get Chat Settings
+- [ ] Update Chat Settings
+- [ ] Send Chat Announcement
+- [ ] Get User Chat Color
+- [ ] Update User Chat Color
 - [x] Create Clip
 - [x] Get Clips
 - [x] Get Code Status
@@ -49,21 +56,43 @@
 - [x] Get Extension Secrets
 - [x] Create Extension Secret
 - [x] Send Extension Chat Message
+- [ ] Get Extensions
+- [ ] Get Released Extensions
+- [ ] Get Extension Bits Products
+- [ ] Update Extension Bits Product
 - [x] Get Top Games
 - [x] Get Games
+- [ ] Get Creator Goals
 - [x] Get Hype Train Events
 - [ ] Check AutoMod Status
 - [x] Manage Held AutoMod Messages
+- [ ] Get AutoMod Settings
+- [ ] Update AutoMod Settings
 - [ ] Get Banned Events
 - [x] Get Banned Users
+- [ ] Ban User
+- [ ] Unban User
+- [ ] Get Blocked Terms
+- [ ] Add Blocked Term
+- [ ] Remove Blocked Term
+- [ ] Delete Chat Messages
 - [ ] Get Moderators
 - [ ] Get Moderator Events
+- [ ] Remove Channel Moderator
+- [ ] Get VIPs
+- [ ] Add Channel VIP
+- [ ] Remove Channel VIP
+- [ ] Get Soundtrack Current Track
+- [ ] Get Soundtrack Playlist
+- [ ] Get Soundtrack Playlists
 - [x] Get Polls
 - [x] Create Poll
 - [x] End Poll
 - [x] Get Predictions
 - [x] Create Prediction
 - [x] End Prediction
+- [ ] Start a raid
+- [ ] Cancel a raid
 - [ ] Get Channel Stream Schedule
 - [ ] Get Channel iCalendar
 - [ ] Update Channel Stream Schedule
@@ -95,4 +124,5 @@
 - [ ] Update User Extensions
 - [x] Get Videos
 - [x] Delete Videos
+- [ ] Send Whisper
 - [x] Get Webhook Subscriptions
