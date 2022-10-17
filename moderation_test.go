@@ -3,6 +3,7 @@ package helix
 import (
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestGetBannedUsers(t *testing.T) {
@@ -84,6 +85,186 @@ func TestGetBannedUsers(t *testing.T) {
 	}
 
 	_, err := c.GetBannedUsers(&BannedUsersParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestBanUser(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		options        *Options
+		params         *BanUserParams
+		respBody       string
+		expectedErrMsg string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&BanUserParams{BroadcasterID: "1234", ModeratorId: "5678", Body: BanUserRequestBody{
+				UserId:   "9876",
+				Duration: 300,
+				Reason:   "no reason",
+			}},
+			`{"error":"Bad Request","status": 400,"message":"user is already banned"}`,
+			"user is already banned",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&BanUserParams{BroadcasterID: "1234", ModeratorId: "5678", Body: BanUserRequestBody{
+				UserId:   "9876",
+				Duration: 300,
+				Reason:   "no reason",
+			}},
+			`{"data": [{"broadcaster_id": "1234","moderator_id": "5678","user_id": "9876","created_at": "2021-09-28T19:22:31Z","end_time": "2021-09-28T19:27:31Z"}]}`,
+			"",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&BanUserParams{BroadcasterID: "1234", ModeratorId: "5678", Body: BanUserRequestBody{
+				UserId: "9876",
+				Reason: "no reason",
+			}},
+			`{"data": [{"broadcaster_id": "1234","moderator_id": "5678","user_id": "9876","created_at": "2021-09-28T18:22:31Z","end_time": null}]}`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.BanUser(testCase.params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+			}
+		}
+
+		if len(resp.Data.Bans) != 0 {
+			if resp.Data.Bans[0].BoardcasterId != testCase.params.BroadcasterID {
+				t.Errorf("expected broadcaster id to be \"%s\", got \"%s\"", testCase.params.BroadcasterID, resp.Data.Bans[0].BoardcasterId)
+			}
+
+			if resp.Data.Bans[0].ModeratorId != testCase.params.ModeratorId {
+				t.Errorf("expected moderator id to be \"%s\", got \"%s\"", testCase.params.ModeratorId, resp.Data.Bans[0].ModeratorId)
+			}
+
+			if resp.Data.Bans[0].UserId != testCase.params.Body.UserId {
+				t.Errorf("expected user id to be \"%s\", got \"%s\"", testCase.params.Body.UserId, resp.Data.Bans[0].UserId)
+			}
+
+			if !resp.Data.Bans[0].EndTime.IsZero() {
+				expireTime := resp.Data.Bans[0].CreatedAt.Add(time.Duration(testCase.params.Body.Duration * int(time.Second)))
+
+				if !expireTime.Equal(resp.Data.Bans[0].EndTime.Time) {
+					t.Errorf("expected endtime to be \"%s\", got \"%s\"", expireTime, resp.Data.Bans[0].EndTime)
+				}
+			}
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.BanUser(&BanUserParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestUnbanUser(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		options        *Options
+		params         *UnbanUserParams
+		respBody       string
+		expectedErrMsg string
+	}{
+		{
+			204,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&UnbanUserParams{BroadcasterID: "1234", ModeratorID: "5678", UserID: "9876"},
+			"",
+			"",
+		},
+		{
+			400,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&UnbanUserParams{BroadcasterID: "1234", ModeratorID: "5678", UserID: "5432"},
+			`{"error": "Bad Request", "status": 400, "message": "user is not banned"}`,
+			"user is not banned",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.UnbanUser(testCase.params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode != http.StatusNoContent {
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", testCase.expectedErrMsg, resp.ErrorMessage)
+			}
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.BanUser(&BanUserParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
