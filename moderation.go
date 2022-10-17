@@ -66,8 +66,8 @@ type ManyBanUser struct {
 
 type BanUser struct {
 	BoardcasterId string `json:"broadcaster_id"`
-	CreatedAt     string `json:"created_at"`
-	EndTime       string `json:"end_time"`
+	CreatedAt     Time   `json:"created_at"`
+	EndTime       Time   `json:"end_time"`
 	ModeratorId   string `json:"moderator_id"`
 	UserId        string `json:"user_id"`
 }
@@ -97,6 +97,8 @@ type UnbanUserResponse struct {
 	ResponseCommon
 }
 
+// UnbanUser Removes the ban or timeout that was placed on the specified user
+// Required scope: moderator:manage:banned_users
 func (c *Client) UnbanUser(params *UnbanUserParams) (*UnbanUserResponse, error) {
 	resp, err := c.delete("/moderation/bans", nil, params)
 	if err != nil {

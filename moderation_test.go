@@ -173,14 +173,10 @@ func TestBanUser(t *testing.T) {
 				t.Errorf("expected user id to be \"%s\", got \"%s\"", testCase.params.Body.UserId, resp.Data.Bans[0].UserId)
 			}
 
-			if resp.Data.Bans[0].EndTime != "" {
-				layout := "2006-01-02T15:04:05Z"
-				createdTime, _ := time.Parse(layout, resp.Data.Bans[0].CreatedAt)
-				endTime, _ := time.Parse(layout, resp.Data.Bans[0].EndTime)
+			if !resp.Data.Bans[0].EndTime.IsZero() {
+				expireTime := resp.Data.Bans[0].CreatedAt.Add(time.Duration(testCase.params.Body.Duration * int(time.Second)))
 
-				expireTime := createdTime.Add(time.Duration(testCase.params.Body.Duration * int(time.Second)))
-
-				if !expireTime.Equal(endTime) {
+				if !expireTime.Equal(resp.Data.Bans[0].EndTime.Time) {
 					t.Errorf("expected endtime to be \"%s\", got \"%s\"", expireTime, resp.Data.Bans[0].EndTime)
 				}
 			}
@@ -252,7 +248,7 @@ func TestUnbanUser(t *testing.T) {
 			}
 
 			if resp.ErrorMessage != testCase.expectedErrMsg {
-				t.Errorf("expected error message to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", testCase.expectedErrMsg, resp.ErrorMessage)
 			}
 		}
 	}
