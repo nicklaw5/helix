@@ -264,7 +264,273 @@ func TestUnbanUser(t *testing.T) {
 		opts: options,
 	}
 
-	_, err := c.BanUser(&BanUserParams{})
+	_, err := c.UnbanUser(&UnbanUserParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestGetBlockedTerms(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *BlockedTermsParams
+		respBody   string
+		errorMsg   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&BlockedTermsParams{BroadcasterID: "1234", ModeratorID: "5678", First: 2},
+			`{
+				"data": [
+				  {
+					"broadcaster_id": "1234",
+					"moderator_id": "5678",
+					"id": "520e4d4e-0cda-49c7-821e-e5ef4f88c2f2",
+					"text": "A phrase I’m not fond of",
+					"created_at": "2021-09-29T19:45:37Z",
+					"updated_at": "2021-09-29T19:45:37Z",
+					"expires_at": null
+				  },
+				  {
+					"broadcaster_id": "1234",
+					"moderator_id": "5678",
+					"id": "520e4d4e-0cda-49c7-821e-e5ef4f88c2f2",
+					"text": "A phrase I’m not fond of",
+					"created_at": "2021-09-29T19:45:37Z",
+					"updated_at": "2021-09-29T19:45:37Z",
+					"expires_at": null
+				  }
+				],
+				"pagination": {
+				  "cursor": "eyJiIjpudWxsLCJhIjp7IkN1cnNvciI6I..."
+				}
+			}`,
+			"",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&BlockedTermsParams{BroadcasterID: "", ModeratorID: "5678", First: 2},
+			``,
+			"broadcaster id and moderator id must be provided",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetBlockedTerms(testCase.params)
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if len(resp.Data.Terms) != testCase.params.First {
+			t.Errorf("expected terms len to be %d, got %d", testCase.params.First, len(resp.Data.Terms))
+		}
+
+		if len(resp.Data.Terms) != 0 {
+			if resp.Data.Terms[0].BroadcasterID != testCase.params.BroadcasterID {
+				t.Errorf("expected broadcaster id to be %s, got %s", testCase.params.BroadcasterID, resp.Data.Terms[0].BroadcasterID)
+			}
+
+			if resp.Data.Terms[0].ModeratorID != testCase.params.ModeratorID {
+				t.Errorf("expected moderator id to be %s, got %s", testCase.params.ModeratorID, resp.Data.Terms[0].ModeratorID)
+			}
+		}
+
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetBlockedTerms(&BlockedTermsParams{BroadcasterID: "1234", ModeratorID: "1234"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestAddBlockedTerm(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *AddBlockedTermParams
+		respBody   string
+		errorMsg   string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&AddBlockedTermParams{ModeratorID: "5678", Text: "A phrase I’m not fond of"},
+			``,
+			"broadcaster id and moderator id must be provided",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&AddBlockedTermParams{BroadcasterID: "1234", ModeratorID: "5678", Text: "a"},
+			``,
+			"the term len must be between 2 and 500",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&AddBlockedTermParams{BroadcasterID: "1234", ModeratorID: "5678", Text: "crac*"},
+			`{
+				"data": [
+				  {
+					"broadcaster_id": "1234",
+					"moderator_id": "5678",
+					"id": "520e4d4e-0cda-49c7-821e-e5ef4f88c2f2",
+					"text": "crac*",
+					"created_at": "2021-09-29T19:45:37Z",
+					"updated_at": "2021-09-29T19:45:37Z",
+					"expires_at": null
+				  }
+				]
+			  }`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.AddBlockedTerm(testCase.params)
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if len(resp.Data.Terms) != 1 {
+			t.Errorf("expected terms len to be %d, got %d", 1, len(resp.Data.Terms))
+		}
+
+		if resp.Data.Terms[0].Text != testCase.params.Text {
+			t.Errorf("expected blocked word to be %s, got %s", testCase.params.Text, resp.Data.Terms[0].Text)
+		}
+
+		if !resp.Data.Terms[0].ExpiresAt.Time.IsZero() {
+			t.Errorf("expected expiration time to be %s, got %s", "nil", resp.Data.Terms[0].ExpiresAt)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.AddBlockedTerm(&AddBlockedTermParams{BroadcasterID: "1234", ModeratorID: "1234", Text: "test"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestRemoveBlockedTerm(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *RemoveBlockedTermParams
+		respBody   string
+		errorMsg   string
+	}{
+		{
+			http.StatusNoContent,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&RemoveBlockedTermParams{BroadcasterID: "1234", ModeratorID: "5678", ID: "c9fc79b8-0f63-4ef7-9d38-efd811e74ac2"},
+			``,
+			"",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&RemoveBlockedTermParams{ModeratorID: "5678", ID: "c9fc79b8-0f63-4ef7-9d38-efd811e74ac2"},
+			``,
+			"broadcaster id and moderator id must be provided",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&RemoveBlockedTermParams{BroadcasterID: "1234", ModeratorID: "5678"},
+			``,
+			"id must be provided",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.RemoveBlockedTerm(testCase.params)
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RemoveBlockedTerm(&RemoveBlockedTermParams{BroadcasterID: "1234", ModeratorID: "1234", ID: "test"})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}

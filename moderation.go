@@ -1,5 +1,7 @@
 package helix
 
+import "errors"
+
 // ExpiresAt must be parsed manually since an empty string means perma ban
 type Ban struct {
 	UserID    string `json:"user_id"`
@@ -108,4 +110,125 @@ func (c *Client) UnbanUser(params *UnbanUserParams) (*UnbanUserResponse, error) 
 	unbanResp := &UnbanUserResponse{}
 	resp.HydrateResponseCommon(&unbanResp.ResponseCommon)
 	return unbanResp, nil
+}
+
+type BlockedTermsParams struct {
+	// Required
+	BroadcasterID string `json:"broadcaster_id"`
+	ModeratorID   string `json:"moderator_id"`
+
+	// Optional
+	After string `json:"after"`
+	First int    `json:"first"`
+}
+
+type BlockedTermsResponse struct {
+	ResponseCommon
+	Data ManyBlockedTerms
+}
+
+type ManyBlockedTerms struct {
+	Terms      []BlockedTerm `json:"data"`
+	Pagination Pagination    `json:"pagination"`
+}
+
+type BlockedTerm struct {
+	BroadcasterID string `json:"broadcaster_id"`
+	CreatedAt     Time   `json:"created_at"`
+	ExpiresAt     Time   `json:"expires_at"`
+	ID            string `json:"id"`
+	ModeratorID   string `json:"moderator_id"`
+	Text          string `json:"text"`
+	UpdatedAt     Time   `json:"updated_at"`
+}
+
+// GetBlockedTerms Gets the broadcaster’s list of non-private, blocked words or phrases.
+// These are the terms that the broadcaster or moderator added manually, or that were denied by AutoMod.
+// Required scope: moderator:read:blocked_terms
+func (c *Client) GetBlockedTerms(params *BlockedTermsParams) (*BlockedTermsResponse, error) {
+	if params.BroadcasterID == "" || params.ModeratorID == "" {
+		return nil, errors.New("broadcaster id and moderator id must be provided")
+	}
+
+	resp, err := c.get("/moderation/blocked_terms", &ManyBlockedTerms{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	blockedTermsResp := &BlockedTermsResponse{}
+	resp.HydrateResponseCommon(&blockedTermsResp.ResponseCommon)
+	blockedTermsResp.Data.Terms = resp.Data.(*ManyBlockedTerms).Terms
+	blockedTermsResp.Data.Pagination = resp.Data.(*ManyBlockedTerms).Pagination
+
+	return blockedTermsResp, nil
+}
+
+type AddBlockedTermParams struct {
+	BroadcasterID string `json:"broadcaster_id"`
+	ModeratorID   string `json:"moderator_id"`
+	Text          string `json:"text"`
+}
+
+type AddBlockedTermResponse struct {
+	ResponseCommon
+	Data ManyAddBlockedTerms
+}
+
+type ManyAddBlockedTerms struct {
+	Terms []BlockedTerm `json:"data"`
+}
+
+// AddBlockedTerm Adds a word or phrase to the broadcaster’s list of blocked terms.
+// These are the terms that broadcasters don’t want used in their chat room.
+// Required scope: moderator:manage:blocked_terms
+func (c *Client) AddBlockedTerm(params *AddBlockedTermParams) (*AddBlockedTermResponse, error) {
+	if params.BroadcasterID == "" || params.ModeratorID == "" {
+		return nil, errors.New("broadcaster id and moderator id must be provided")
+	}
+	if len(params.Text) < 2 || len(params.Text) > 500 {
+		return nil, errors.New("the term len must be between 2 and 500")
+	}
+
+	resp, err := c.post("/moderation/blocked_terms", &ManyAddBlockedTerms{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	addTermResp := &AddBlockedTermResponse{}
+	resp.HydrateResponseCommon(&addTermResp.ResponseCommon)
+	addTermResp.Data.Terms = resp.Data.(*ManyAddBlockedTerms).Terms
+
+	return addTermResp, nil
+}
+
+type RemoveBlockedTermParams struct {
+	BroadcasterID string `json:"broadcaster_id"`
+	ModeratorID   string `json:"moderator_id"`
+	ID            string `json:"id"`
+}
+
+type RemoveBlockedTermResponse struct {
+	ResponseCommon
+}
+
+// RemoveBlockedTerm Removes the word or phrase that the broadcaster is blocking users from using in their chat room.
+// Required scope: moderator:manage:blocked_terms
+func (c *Client) RemoveBlockedTerm(params *RemoveBlockedTermParams) (*RemoveBlockedTermResponse, error) {
+	if params.BroadcasterID == "" || params.ModeratorID == "" {
+		return nil, errors.New("broadcaster id and moderator id must be provided")
+	}
+
+	if params.ID == "" {
+		return nil, errors.New("id must be provided")
+	}
+
+	resp, err := c.delete("/moderation/blocked_terms", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	blockedTermResp := &RemoveBlockedTermResponse{}
+	resp.HydrateResponseCommon(&blockedTermResp.ResponseCommon)
+
+	return blockedTermResp, nil
 }
