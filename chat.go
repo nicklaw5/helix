@@ -4,7 +4,7 @@ import "errors"
 
 type GetChatChattersParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
-	ModeratorID   string `query:"broadcaster_id"`
+	ModeratorID   string `query:"moderator_id"`
 	After         string `query:"after"`
 	First         string `query:"first"`
 }
