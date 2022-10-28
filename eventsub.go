@@ -577,9 +577,11 @@ type EventSubCharityAmount struct {
 
 type EventSubCharityDonationEvent struct {
 	CharityCampaignID    string                `json:"campaign_id"`
-	BroadcasterUserID    string                `json:"broadcaster_id"`
-	BroadcasterUserName  string                `json:"broadcaster_name"`
-	BroadcasterUserLogin string                `json:"broadcaster_login"`
+	CharityName          string                `json:"charity_name"`
+	CharityLogoURL       string                `json:"charity_logo"`
+	BroadcasterUserID    string                `json:"broadcaster_user_id"`
+	BroadcasterUserName  string                `json:"broadcaster_user_name"`
+	BroadcasterUserLogin string                `json:"broadcaster_user_login"`
 	UserID               string                `json:"user_id"`
 	UserName             string                `json:"user_name"`
 	UserLogin            string                `json:"user_login"`
