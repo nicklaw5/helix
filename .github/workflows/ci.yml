@@ -11,7 +11,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17.x
+          go-version: 1.19.x
       - name: Lint
         run: |
           go vet .
@@ -21,8 +21,8 @@ jobs:
     strategy:
       matrix:
         go:
-          - 1.17.x
-          - 1.16.x
+          - 1.19.x
+          - 1.18.x
     name: Test with Go v${{ matrix.go }}
     steps:
       - uses: actions/checkout@v2
@@ -32,8 +32,7 @@ jobs:
           go-version: ${{ matrix.go }}
       - name: Setup
         run: |
-          go get golang.org/x/tools/cmd/cover
-          go get github.com/mattn/goveralls
+          go install github.com/mattn/goveralls@latest
       - name: Test
         run: |
           go test -v -parallel=10 -covermode=count -coverprofile=coverage.out
