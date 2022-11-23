@@ -35,11 +35,14 @@ type EventSubCondition struct {
 	UserID                string `json:"user_id"`
 }
 
-// Transport for the subscription, currently the only supported Method is "webhook". Secret must be between 10 and 100 characters
+// Transport for the subscription, currently the only supported Methods are "webhook" and "websocket". Secret must be between 10 and 100 characters
 type EventSubTransport struct {
-	Method   string `json:"method"`
-	Callback string `json:"callback"`
-	Secret   string `json:"secret"`
+	Method         string `json:"method"`
+	Callback       string `json:"callback"`
+	Secret         string `json:"secret"`
+	SessionID      string `json:"session_id"`
+	ConnectedAt    string `json:"connected_at"`
+	DisconnectedAt string `json:"disconnected_at"`
 }
 
 // Twitch Response for getting all current subscriptions
