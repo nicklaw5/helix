@@ -1,11 +1,11 @@
 package helix
 
 type CharityDonationData struct {
-	CampaignID       string                `json:"campaign_id"`
-	BroadcasterID    string                `json:"user_id"`
-	BroadcasterName  string                `json:"user_name"`
-	BroadcasterLogin string                `json:"user_login"`
-	Amount           CharityCampaignAmount `json:"amount"`
+	CampaignID string                `json:"campaign_id"`
+	UserID     string                `json:"user_id"`
+	UserName   string                `json:"user_name"`
+	UserLogin  string                `json:"user_login"`
+	Amount     CharityCampaignAmount `json:"amount"`
 }
 
 type ManyCharityDonations struct {
