@@ -116,6 +116,9 @@ const (
 	EventSubTypeHypeTrainProgress                         = "channel.hype_train.progress"
 	EventSubTypeHypeTrainEnd                              = "channel.hype_train.end"
 	EventSubTypeCharityDonation                           = "channel.charity_campaign.donate"
+	EventSubTypeCharityProgress                           = "channel.charity_campaign.progress"
+	EventSubTypeCharityStop                               = "channel.charity_campaign.stop"
+	EventSubTypeCharityStart                              = "channel.charity_campaign.start"
 	EventSubTypeStreamOnline                              = "stream.online"
 	EventSubTypeStreamOffline                             = "stream.offline"
 	EventSubTypeUserAuthorizationRevoke                   = "user.authorization.revoke"
@@ -577,6 +580,8 @@ type EventSubCharityAmount struct {
 
 type EventSubCharityDonationEvent struct {
 	CharityCampaignID    string                `json:"campaign_id"`
+	CharityDescription   string                `json:"campaign_description"`
+	CharityWebsite       string                `json:"campaign_website"`
 	CharityName          string                `json:"charity_name"`
 	CharityLogoURL       string                `json:"charity_logo"`
 	BroadcasterUserID    string                `json:"broadcaster_user_id"`
@@ -586,6 +591,55 @@ type EventSubCharityDonationEvent struct {
 	UserName             string                `json:"user_name"`
 	UserLogin            string                `json:"user_login"`
 	Amount               EventSubCharityAmount `json:"amount"`
+}
+
+type EventSubCharityProgressEvent struct {
+	CharityCampaignID    string                `json:"campaign_id"`
+	CharityDescription   string                `json:"campaign_description"`
+	CharityWebsite       string                `json:"campaign_website"`
+	CharityName          string                `json:"charity_name"`
+	CharityLogoURL       string                `json:"charity_logo"`
+	BroadcasterUserID    string                `json:"broadcaster_id"`
+	BroadcasterUserName  string                `json:"broadcaster_name"`
+	BroadcasterUserLogin string                `json:"broadcaster_user_login"`
+	UserID               string                `json:"user_id"`
+	UserName             string                `json:"user_name"`
+	UserLogin            string                `json:"user_login"`
+	Amount               EventSubCharityAmount `json:"amount"`
+}
+
+type EventSubCharityStopEvent struct {
+	CharityCampaignID    string                `json:"campaign_id"`
+	CharityDescription   string                `json:"campaign_description"`
+	CharityWebsite       string                `json:"campaign_website"`
+	CharityName          string                `json:"charity_name"`
+	CharityLogoURL       string                `json:"charity_logo"`
+	BroadcasterUserID    string                `json:"broadcaster_id"`
+	BroadcasterUserName  string                `json:"broadcaster_name"`
+	BroadcasterUserLogin string                `json:"broadcaster_login"`
+	UserID               string                `json:"user_id"`
+	UserName             string                `json:"user_name"`
+	UserLogin            string                `json:"user_login"`
+	CurrentAmount        EventSubCharityAmount `json:"current_amount"`
+	TargetAmount         EventSubCharityAmount `json:"target_amount"`
+	StoppedAt            Time                  `json:"stopped_at"`
+}
+
+type EventSubCharityStartEvent struct {
+	CharityCampaignID    string                `json:"campaign_id"`
+	CharityDescription   string                `json:"campaign_description"`
+	CharityWebsite       string                `json:"campaign_website"`
+	CharityName          string                `json:"charity_name"`
+	CharityLogoURL       string                `json:"charity_logo"`
+	BroadcasterUserID    string                `json:"broadcaster_id"`
+	BroadcasterUserName  string                `json:"broadcaster_name"`
+	BroadcasterUserLogin string                `json:"broadcaster_login"`
+	UserID               string                `json:"user_id"`
+	UserName             string                `json:"user_name"`
+	UserLogin            string                `json:"user_login"`
+	CurrentAmount        EventSubCharityAmount `json:"current_amount"`
+	TargetAmount         EventSubCharityAmount `json:"target_amount"`
+	StartedAt            Time                  `json:"started_at"`
 }
 
 // Get all EventSub Subscriptions

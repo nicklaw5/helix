@@ -84,3 +84,83 @@ func TestGetCharityCampaigns(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestGetCharityDonations(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		options        *Options
+		DonationParams *CharityDonationParams
+		respBody       string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&CharityDonationParams{BroadcasterID: ""},
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&CharityDonationParams{BroadcasterID: "123456"},
+			`{ "data": [{ "campaign_id": "100249558", "user_id": "123456", "user_name": "SunnySideUp", "user_login": "sunnysideup", "amount": { "value": 86000, "decimal_places": 2, "currency": "USD" }}] }`},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetCharityDonations(testCase.DonationParams)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "Missing required parameter \"broadcaster_id\""
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		if len(resp.Data.Donations) != 1 {
+			t.Errorf("expected charity campaigns len to be 1, got %d", len(resp.Data.Donations))
+		}
+		if resp.Data.Donations[0].CampaignID != "100249558" {
+			t.Errorf("invalid charity name %q, expected 100249588", resp.Data.Donations[0].CampaignID)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(400, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetCharityDonations(&CharityDonationParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
