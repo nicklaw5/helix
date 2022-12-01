@@ -26,7 +26,7 @@ func TestGetChannelChatChatterss(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&GetChatChattersParams{BroadcasterID: "121445595", ModeratorID: "1234"},
-			`{"data": [{"user_login": "smittysmithers"}]}`,
+			`{"data": [{"user_login": "smittysmithers", "user_name": "example", "user_id": "100249558"}]}`,
 			"",
 		},
 		{
@@ -67,6 +67,10 @@ func TestGetChannelChatChatterss(t *testing.T) {
 
 		if len(resp.Data.Chatters) != 1 {
 			t.Errorf("expected %d chatters got %d", 1, len(resp.Data.Chatters))
+		}
+
+		if resp.Data.Chatters[0].UserID != "100249558" {
+			t.Errorf("expected %s chatters got %s", "100249558", resp.Data.Chatters[0].UserID)
 		}
 	}
 }
