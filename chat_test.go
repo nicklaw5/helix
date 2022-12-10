@@ -553,12 +553,20 @@ func TestGetChatSettings(t *testing.T) {
 		validationErr string
 		expected      *ChatSettings
 	}{
-		{
+		{ // Early-out error thrown by us
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
 			&GetChatSettingsParams{BroadcasterID: "", ModeratorID: "82008718"},
 			``,
 			"error: broadcaster id must be specified",
+			nil,
+		},
+		{ // Error thrown by Twitch
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetChatSettingsParams{BroadcasterID: "2248463222222222222222222222"},
+			`{"error":"Bad Request","status":400,"message":"The parameter \"broadcaster_id\" was malformed: value must be a numeric"}`,
+			"",
 			nil,
 		},
 		{ // Request made with a valid moderator ID
@@ -625,7 +633,7 @@ func TestGetChatSettings(t *testing.T) {
 			if err.Error() == testCase.validationErr {
 				continue
 			}
-			t.Error(err)
+			t.Errorf("Unmatched error, expected '%v', got '%v'", testCase.validationErr, err)
 			continue
 		}
 
@@ -661,5 +669,27 @@ func TestGetChatSettings(t *testing.T) {
 				t.Errorf("expected %v channel settings, got %v", *expected, actual)
 			}
 		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.GetChatSettings(&GetChatSettingsParams{BroadcasterID: "123"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	const expectedHTTPError = "Failed to execute API request: Oops, that's bad :("
+
+	if err.Error() != expectedHTTPError {
+		t.Errorf("expected error does match return error, got '%s'", err.Error())
 	}
 }
