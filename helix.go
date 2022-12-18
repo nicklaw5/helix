@@ -2,6 +2,7 @@ package helix
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -43,6 +44,7 @@ type Options struct {
 	RateLimitFunc   RateLimitFunc
 	APIBaseURL      string
 	ExtensionOpts   ExtensionOptions
+	Context         context.Context
 }
 
 type ExtensionOptions struct {
@@ -267,7 +269,12 @@ func (c *Client) newRequest(method, path string, data interface{}, hasJSONBody b
 }
 
 func (c *Client) newStandardRequest(method, url string, data interface{}) (*http.Request, error) {
-	req, err := http.NewRequest(method, url, nil)
+	ctx := c.opts.Context
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +301,12 @@ func (c *Client) newJSONRequest(method, url string, data interface{}) (*http.Req
 
 	buf := bytes.NewBuffer(b)
 
-	req, err := http.NewRequest(method, url, buf)
+	ctx := c.opts.Context
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, url, buf)
 	if err != nil {
 		return nil, err
 	}
