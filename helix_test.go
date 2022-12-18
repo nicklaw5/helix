@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -155,6 +156,76 @@ func TestNewClientDefault(t *testing.T) {
 
 	if opts.RedirectURI != options.RedirectURI {
 		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, opts.RedirectURI)
+	}
+}
+
+func TestContext(t *testing.T) {
+	t.Parallel()
+
+	contextExists := false
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		if r.Context() != nil {
+			contextExists = true
+		}
+	}
+	options := &Options{Context: context.Background()}
+
+	c := newMockClient(options, handlerFunc)
+	_, err := c.GetStreams(nil)
+
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err)
+	}
+
+	if !contextExists {
+		t.Error("Expected context to be passed into request, got nil context")
+	}
+}
+
+func TestContextWithCancel(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	wasCanceled := false
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		<-r.Context().Done()
+		wasCanceled = true
+	}
+	options := &Options{Context: ctx}
+
+	c := newMockClient(options, handlerFunc)
+	cancel()
+	_, err := c.GetStreams(nil)
+
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err)
+	}
+
+	if !wasCanceled {
+		t.Error("Context was not cancelled")
+	}
+}
+
+func TestNoContext(t *testing.T) {
+	t.Parallel()
+
+	contextExists := false
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		if r.Context() != nil {
+			contextExists = true
+		}
+	}
+
+	c := newMockClient(&Options{}, handlerFunc)
+	_, err := c.GetStreams(nil)
+
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err)
+	}
+
+	if !contextExists {
+		t.Error("Expected context to be passed into request, got nil context")
 	}
 }
 
