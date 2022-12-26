@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -67,6 +68,7 @@ func TestGetPredictions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetPredictions(&PredictionsParams{})
@@ -149,6 +151,7 @@ func TestCreatePrediction(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.CreatePrediction(&CreatePredictionParams{})
@@ -228,6 +231,7 @@ func TestEndPrediction(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.EndPrediction(&EndPredictionParams{})

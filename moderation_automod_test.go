@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -71,6 +72,7 @@ func TestModerateHeldMessage(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.ModerateHeldMessage(&HeldMessageModerationParams{})

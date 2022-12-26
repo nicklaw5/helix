@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -82,6 +83,7 @@ func TestGetBannedUsers(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetBannedUsers(&BannedUsersParams{})
@@ -192,6 +194,7 @@ func TestBanUser(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.BanUser(&BanUserParams{})
@@ -262,6 +265,7 @@ func TestUnbanUser(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.UnbanUser(&UnbanUserParams{})
@@ -364,6 +368,7 @@ func TestGetBlockedTerms(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetBlockedTerms(&BlockedTermsParams{BroadcasterID: "1234", ModeratorID: "1234"})
@@ -458,6 +463,7 @@ func TestAddBlockedTerm(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.AddBlockedTerm(&AddBlockedTermParams{BroadcasterID: "1234", ModeratorID: "1234", Text: "test"})
@@ -528,6 +534,7 @@ func TestRemoveBlockedTerm(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.RemoveBlockedTerm(&RemoveBlockedTermParams{BroadcasterID: "1234", ModeratorID: "1234", ID: "test"})

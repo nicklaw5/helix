@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"strings"
 	"testing"
@@ -93,6 +94,7 @@ func TestGetDropsEntitlements(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetDropsEntitlements(&GetDropEntitlementsParams{})
@@ -202,6 +204,7 @@ func TestUpdateDropsEntitlements(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.UpdateDropsEntitlements(&UpdateDropsEntitlementsParams{})

@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -71,6 +72,7 @@ func TestGetStreamMarkers(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetStreamMarkers(&StreamMarkersParams{})
@@ -149,6 +151,7 @@ func TestCreateStreamMarker(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.CreateStreamMarker(&CreateStreamMarkerParams{})

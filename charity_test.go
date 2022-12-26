@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -73,6 +74,7 @@ func TestGetCharityCampaigns(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetCharityCampaigns(&CharityCampaignsParams{})
@@ -153,6 +155,7 @@ func TestGetCharityDonations(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetCharityDonations(&CharityDonationParams{})
