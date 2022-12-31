@@ -105,3 +105,26 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get Chat Settings
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+    AppAccessToken: "your-app-user-token",
+    // Optionally, a moderator's user token with the `moderator:read:chat_settings` scope can be specified to read some more settings
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.GetChatSettings(&helix.GetChatSettingsParams{
+    BroadcasterID: "22484632",
+    // ModeratorID should be specified matching the UserAccessToken if you want the extended information
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```

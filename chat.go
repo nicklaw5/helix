@@ -204,3 +204,67 @@ func (c *Client) SendChatAnnouncement(params *SendChatAnnouncementParams) (*Send
 
 	return chatResp, nil
 }
+
+type GetChatSettingsParams struct {
+	// Required, the ID of the broadcaster whose chat settings you want to get
+	BroadcasterID string `query:"broadcaster_id"`
+
+	// Optional, can be specified if you want the `non_moderator_chat_delay` and `non_moderator_chat_delay_duration` fields in the response. The ID should be a user that has moderation privileges in the broadcaster's chat.
+	// The ID must match the specified User Access Token & the User Access Token must have the `moderator:read:chat_settings` scope
+	ModeratorID string `query:"moderator_id,omitempty"`
+}
+
+type ChatSettings struct {
+	BroadcasterID string `json:"broadcaster_id"`
+
+	EmoteMode bool `json:"emote_mode"`
+
+	FollowerMode bool `json:"follower_mode"`
+	// Follower mode duration in minutes
+	FollowerModeDuration int `json:"follower_mode_duration"`
+
+	SlowMode bool `json:"slow_mode"`
+	// Slow mode wait time in seconds
+	SlowModeWaitTime int `json:"slow_mode_wait_time"`
+
+	SubscriberMode bool `json:"subscriber_mode"`
+
+	UniqueChatMode bool `json:"unique_chat_mode"`
+
+	// Only included if the user access token includes the `moderator:read:chat_settings` scope
+	ModeratorID string `json:"moderator_id"`
+
+	// Boolean value denoting whether the "Non moderator chat delay" setting is enabled.
+	// Only included if the request specifies a user access token that includes the moderator:read:chat_settings scope and the user in the moderator_id query parameter is one of the broadcaster’s moderators.
+	NonModeratorChatDelay bool `json:"non_moderator_chat_delay"`
+	// The amount of time, in seconds, that messages are delayed before appearing in chat.
+	// Only included if the request specifies a user access token that includes the moderator:read:chat_settings scope and the user in the moderator_id query parameter is one of the broadcaster’s moderators.
+	NonModeratorChatDelayDuration int `json:"non_moderator_chat_delay_duration"`
+}
+
+type ManyChatSettings struct {
+	Settings []ChatSettings `json:"data"`
+}
+
+type GetChatSettingsResponse struct {
+	ResponseCommon
+	Data ManyChatSettings
+}
+
+// GetChatSettings gets the chat settings for the broadcaster's chat room.
+// Optional scope: moderator:read:chat_settings
+func (c *Client) GetChatSettings(params *GetChatSettingsParams) (*GetChatSettingsResponse, error) {
+	if params.BroadcasterID == "" {
+		return nil, errors.New("error: broadcaster id must be specified")
+	}
+	resp, err := c.get("/chat/settings", &ManyChatSettings{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	settings := &GetChatSettingsResponse{}
+	resp.HydrateResponseCommon(&settings.ResponseCommon)
+	settings.Data.Settings = resp.Data.(*ManyChatSettings).Settings
+
+	return settings, nil
+}

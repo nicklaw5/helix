@@ -33,7 +33,7 @@
 - [x] Get Emote Sets
 - [x] Get Channel Chat Badges
 - [x] Get Global Chat Badges
-- [ ] Get Chat Settings
+- [x] Get Chat Settings
 - [ ] Update Chat Settings
 - [ ] Send Chat Announcement
 - [ ] Get User Chat Color
