@@ -90,6 +90,17 @@ if err != nil {
 }
 ```
 
+You also have the option to pass a context to it using:
+
+```go
+client, err := helix.NewClientWithContext(ctx, &helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+```
+
 If you'd like to pass in your own `http.Client`, you can do so like this:
 
 ```go
