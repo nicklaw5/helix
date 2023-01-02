@@ -26,9 +26,64 @@ if err != nil {
 fmt.Printf("%+v\n", resp)
 ```
 
+## Delete Specific Chat Message
+
+This is an example of how to delete a specific chat message. 
+
+To use this function you need a user access token with the `moderator:manage:chat_messages` scope.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+    UserAccessToken: "your-user-access-token",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.DeleteChatMessage(&helix.DeleteChatMessageParams{
+    BroadcasterID: "54946241",
+    ModeratorID: "145328278",
+    MessageID: "885196de-cb67-427a-baa8-82f9b0fcd05f",
+})
+
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Delete All Chat Messages
+
+This is an example of how to delete all chat message.
+
+To use this function you need a user access token with the `moderator:manage:chat_messages` scope.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+    UserAccessToken: "your-user-access-token",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.DeleteAllChatMessages(&helix.DeleteAllChatMessagesParams{
+    BroadcasterID: "54946241",
+    ModeratorID: "145328278",
+})
+
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
 ## Manage Held AutoMod Messages
 
-This is an example of how to manage held automod message in a channel.
+This is an example of how to manage held automod message in a channel. 
 
 ```go
 client, err := helix.NewClient(&helix.Options{
