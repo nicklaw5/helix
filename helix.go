@@ -2,6 +2,7 @@ package helix
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,18 +13,27 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"golang.org/x/oauth2"
 )
 
 const (
 	// DefaultAPIBaseURL is the base URL for composing API requests.
 	DefaultAPIBaseURL = "https://api.twitch.tv/helix"
 
-	// AuthBaseURL is the base URL for composing authentication requests.
-	AuthBaseURL = "https://id.twitch.tv/oauth2"
+	// DefaultAuthBaseURL is the base URL for composing authentication requests.
+	DefaultAuthBaseURL = "https://id.twitch.tv/oauth2"
 )
 
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
+}
+
+type OidcProvider interface {
+	Endpoint() oauth2.Endpoint
+	Verifier(*oidc.Config) *oidc.IDTokenVerifier
+	UserInfo(context.Context, oauth2.TokenSource) (*oidc.UserInfo, error)
 }
 
 type Client struct {
@@ -42,7 +52,9 @@ type Options struct {
 	HTTPClient      HTTPClient
 	RateLimitFunc   RateLimitFunc
 	APIBaseURL      string
+	AuthAPIBaseURL  string
 	ExtensionOpts   ExtensionOptions
+	OidcProvider    OidcProvider
 }
 
 type ExtensionOptions struct {
@@ -106,9 +118,11 @@ type Pagination struct {
 	Cursor string `json:"cursor"`
 }
 
+type oidcverifier *oidc.IDTokenVerifier
+
 // NewClient returns a new Twitch Helix API client. It returns an
 // if clientID is an empty string. It is concurrency safe.
-func NewClient(options *Options) (*Client, error) {
+func NewClient(options *Options) (client *Client, err error) {
 	if options.ClientID == "" {
 		return nil, errors.New("A client ID was not provided but is required")
 	}
@@ -121,7 +135,18 @@ func NewClient(options *Options) (*Client, error) {
 		options.APIBaseURL = DefaultAPIBaseURL
 	}
 
-	client := &Client{
+	if options.AuthAPIBaseURL == "" {
+		options.APIBaseURL = DefaultAPIBaseURL
+	}
+
+	if options.OidcProvider == nil {
+		options.OidcProvider, err = oidc.NewProvider(context.Background(), options.AuthAPIBaseURL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to init oidc provider for twitch err:%w", err)
+		}
+	}
+
+	client = &Client{
 		opts: options,
 	}
 
@@ -314,7 +339,7 @@ func (c *Client) newJSONRequest(method, url string, data interface{}) (*http.Req
 func (c *Client) getBaseURL(path string) string {
 	for _, authPath := range authPaths {
 		if strings.Contains(path, authPath) {
-			return AuthBaseURL
+			return c.opts.AuthAPIBaseURL
 		}
 	}
 
@@ -407,7 +432,7 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 
 	authType := "Bearer"
 	// Token validation requires different type of Auth
-	if req.URL.String() == AuthBaseURL+authPaths["validate"] {
+	if req.URL.String() == c.opts.AuthAPIBaseURL+authPaths["validate"] {
 		authType = "OAuth"
 	}
 

@@ -694,10 +694,14 @@ func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*Eve
 		return nil, err
 	}
 
-	eventsub := &EventSubSubscriptionsResponse{}
-	resp.HydrateResponseCommon(&eventsub.ResponseCommon)
-	eventsub.Data = *resp.Data.(*ManyEventSubSubscriptions)
-	return eventsub, nil
+	eventsubs := &EventSubSubscriptionsResponse{}
+	resp.HydrateResponseCommon(&eventsubs.ResponseCommon)
+	eventsubs.Data.Total = resp.Data.(*ManyEventSubSubscriptions).Total
+	eventsubs.Data.TotalCost = resp.Data.(*ManyEventSubSubscriptions).TotalCost
+	eventsubs.Data.MaxTotalCost = resp.Data.(*ManyEventSubSubscriptions).MaxTotalCost
+	eventsubs.Data.EventSubSubscriptions = resp.Data.(*ManyEventSubSubscriptions).EventSubSubscriptions
+
+	return eventsubs, nil
 }
 
 // Verifys that a notification came from twitch using the a signature and the secret used when creating the subscription

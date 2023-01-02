@@ -1,8 +1,12 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"golang.org/x/oauth2"
 )
 
 func TestGetAuthorizationURL(t *testing.T) {
