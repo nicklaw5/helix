@@ -37,4 +37,4 @@ It's also helpful if you can include usage examples in the [docs](docs) director
 
 ## License
 
-This package is distributed under the terms of the [MIT](License) license.
+This package is distributed under the terms of the [MIT](LICENSE) license.
