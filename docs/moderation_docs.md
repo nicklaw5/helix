@@ -50,3 +50,30 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get Moderators
+
+To use this function you need a user access token with the `moderation:read` scope.
+`BroadcasterID` is required and need to be the same as the user id of the user access token.
+
+This is an example of how to get moderators of a channel.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+    UserAccessToken: "your-user-access-token",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.GetModerators(&helix.GetModeratorsParams{
+    BroadcasterID: "145328278",
+    First: 10
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```

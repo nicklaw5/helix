@@ -232,3 +232,49 @@ func (c *Client) RemoveBlockedTerm(params *RemoveBlockedTermParams) (*RemoveBloc
 
 	return blockedTermResp, nil
 }
+
+type GetModeratorsParams struct {
+	// Required
+	BroadcasterID string `query:"broadcaster_id"`
+
+	// Optional
+	UserIDs []string `query:"user_id"` // Limit 100
+	After   string   `query:"after"`
+	First   int      `query:"first"`
+}
+
+type Moderator struct {
+	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
+	UserName  string `json:"user_name"`
+}
+
+type ManyModerators struct {
+	Moderators []Moderator `json:"data"`
+	Pagination Pagination  `json:"pagination"`
+}
+
+type ModeratorsResponse struct {
+	ResponseCommon
+	Data ManyModerators
+}
+
+// GetModerators Gets all users allowed to moderate the broadcaster’s chat room.
+// Required scope: moderation:read
+func (c *Client) GetModerators(params *GetModeratorsParams) (*ModeratorsResponse, error) {
+	if params.BroadcasterID == "" {
+		return nil, errors.New("broadcaster id must be provided")
+	}
+
+	resp, err := c.get("/moderation/moderators", &ManyModerators{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	moderators := &ModeratorsResponse{}
+	resp.HydrateResponseCommon(&moderators.ResponseCommon)
+	moderators.Data.Moderators = resp.Data.(*ManyModerators).Moderators
+	moderators.Data.Pagination = resp.Data.(*ManyModerators).Pagination
+
+	return moderators, nil
+}
