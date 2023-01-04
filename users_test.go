@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -84,6 +85,7 @@ func TestGetUsers(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetUsers(&UsersParams{})
@@ -164,6 +166,7 @@ func TestUpdateUser(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.UpdateUser(&UpdateUserParams{})
@@ -254,6 +257,7 @@ func TestGetUsersFollows(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetUsersFollows(&UsersFollowsParams{})
@@ -358,6 +362,7 @@ func TestGetUsersBlocked(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetUsersBlocked(&UsersBlockedParams{})
@@ -440,6 +445,7 @@ func TestBlockUser(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.BlockUser(&BlockUserParams{})
@@ -518,6 +524,7 @@ func TestUnblockUser(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.UnblockUser(&UnblockUserParams{})

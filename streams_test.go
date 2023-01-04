@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -66,6 +67,7 @@ func TestGetStreams(t *testing.T) {
 
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetStreams(&StreamsParams{
@@ -137,6 +139,7 @@ func TestGetFollowedStreams(t *testing.T) {
 
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetFollowedStream(&FollowedStreamsParams{
@@ -215,6 +218,7 @@ func TestGetStreamKeys(t *testing.T) {
 
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetStreamKey(&StreamKeyParams{})

@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -46,6 +47,7 @@ func TestGetUserExtensions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetUserExtensions()
@@ -102,6 +104,7 @@ func TestGetUserActiveExtensions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetUserActiveExtensions(nil)
@@ -176,6 +179,7 @@ func TestUpdateUserExtensions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.UpdateUserExtensions(&UpdateUserExtensionsPayload{})

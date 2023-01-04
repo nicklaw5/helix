@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"reflect"
 	"regexp"
@@ -75,6 +76,7 @@ func TestGetWebhookSubscriptions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetWebhookSubscriptions(&WebhookSubscriptionsParams{})
@@ -152,6 +154,7 @@ func TestPostWebhookSubscriptions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.PostWebhookSubscription(&WebhookSubscriptionPayload{})

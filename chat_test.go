@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -137,6 +138,7 @@ func TestGetChannelChatBadges(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetChannelChatBadges(&GetChatBadgeParams{})
@@ -208,6 +210,7 @@ func TestGetGlobalChatBadges(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetGlobalChatBadges()
@@ -282,6 +285,7 @@ func TestGetChannelEmotes(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetChannelEmotes(&GetChannelEmotesParams{})
@@ -353,6 +357,7 @@ func TestGetGlobalEmotes(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetGlobalEmotes()
@@ -456,6 +461,7 @@ func TestGetEmoteSets(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetEmoteSets(&GetEmoteSetsParams{})
@@ -530,6 +536,7 @@ func TestSendChatAnnouncement(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.SendChatAnnouncement(&SendChatAnnouncementParams{})
@@ -680,6 +687,7 @@ func TestGetChatSettings(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetChatSettings(&GetChatSettingsParams{BroadcasterID: "123"})

@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +25,10 @@ func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 
 func newMockClient(options *Options, mockHandler http.HandlerFunc) *Client {
 	options.HTTPClient = &mockHTTPClient{mockHandler}
-	return &Client{opts: options}
+	return &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
 }
 
 func newMockHandler(statusCode int, json string, headers map[string]string) http.HandlerFunc {
@@ -155,6 +159,122 @@ func TestNewClientDefault(t *testing.T) {
 
 	if opts.RedirectURI != options.RedirectURI {
 		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", options.RedirectURI, opts.RedirectURI)
+	}
+}
+
+func TestNewClientHasContext(t *testing.T) {
+	t.Parallel()
+
+	contextExists := false
+	mockClient := &mockHTTPClient{func(w http.ResponseWriter, r *http.Request) {
+		contextExists = r.Context() != nil
+	}}
+
+	c, err := NewClient(&Options{
+		ClientID:   "test",
+		HTTPClient: mockClient,
+	})
+	if err != nil {
+		t.Errorf("could not create client: %v", err)
+		return
+	}
+
+	_, err = c.GetStreams(nil)
+
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err)
+	}
+
+	if !contextExists {
+		t.Error("Expected context to be passed into request, got nil context")
+	}
+}
+
+func TestNewClientWithContext(t *testing.T) {
+	t.Parallel()
+
+	type CtxKey string
+	ctxKey := CtxKey("test")
+
+	contextExists := false
+	mockClient := &mockHTTPClient{func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		contextExists = ctx != nil && ctx.Value(ctxKey) != nil
+	}}
+
+	ctx := context.WithValue(context.Background(), ctxKey, 0)
+	c, err := NewClientWithContext(ctx, &Options{
+		ClientID:   "test",
+		HTTPClient: mockClient,
+	})
+	if err != nil {
+		t.Errorf("could not create client with context: %v", err)
+		return
+	}
+
+	_, err = c.GetStreams(nil)
+
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err)
+	}
+
+	if !contextExists {
+		t.Error("Expected context to be passed into request, got nil context")
+	}
+}
+
+func TestNewClientWithContextCancel(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	wasCanceled := false
+	mockClient := &mockHTTPClient{func(w http.ResponseWriter, r *http.Request) {
+		<-r.Context().Done()
+		wasCanceled = true
+	}}
+
+	c, err := NewClientWithContext(ctx, &Options{
+		ClientID:   "test",
+		HTTPClient: mockClient,
+	})
+	if err != nil {
+		t.Errorf("Could not create client with context: %v", err)
+		return
+	}
+
+	cancel()
+	_, err = c.GetStreams(nil)
+
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err)
+	}
+
+	if !wasCanceled {
+		t.Error("Context was not cancelled")
+	}
+}
+
+func TestNoContext(t *testing.T) {
+	t.Parallel()
+
+	contextExists := false
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		if r.Context() != nil {
+			contextExists = true
+		}
+	}
+
+	c := newMockClient(&Options{}, handlerFunc)
+	_, err := c.GetStreams(nil)
+
+	if err != nil {
+		t.Errorf("Did not expect error, got \"%s\"", err)
+	}
+
+	if !contextExists {
+		t.Error("Expected context to be passed into request, got nil context")
 	}
 }
 
@@ -355,6 +475,7 @@ func TestFailedHTTPClientDoRequest(t *testing.T) {
 
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetUsers(&UsersParams{
@@ -365,7 +486,7 @@ func TestFailedHTTPClientDoRequest(t *testing.T) {
 	}
 
 	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
-		t.Error("expected error does match return error")
+		t.Errorf("expected error does match return error: %v", err)
 	}
 }
 
