@@ -687,6 +687,7 @@ func TestGetChatSettings(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetChatSettings(&GetChatSettingsParams{BroadcasterID: "123"})

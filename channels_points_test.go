@@ -136,6 +136,7 @@ func TestUpdateCustomReward(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.UpdateCustomReward(&UpdateChannelCustomRewardsParams{})
