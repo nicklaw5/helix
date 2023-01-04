@@ -546,3 +546,164 @@ func TestRemoveBlockedTerm(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestDeleteChatMessage(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		BroadcasterID string
+		ModeratorID   string
+		MessageID     string
+		errorMsg      string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"",
+			"test-moderator-id",
+			"test-message-id",
+			"broadcaster id and moderator id must be provided",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"test-broadcaster-id",
+			"",
+			"test-message-id",
+			"broadcaster id and moderator id must be provided",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"test-broadcaster-id",
+			"test-moderator-id",
+			"",
+			"message id must be provided",
+		},
+		{
+			http.StatusNoContent,
+			&Options{ClientID: "my-client-id"},
+			"test-broadcaster-id",
+			"test-moderator-id",
+			"test-message-id",
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, "", nil))
+
+		resp, err := c.DeleteChatMessage(&DeleteChatMessageParams{
+			BroadcasterID: testCase.BroadcasterID,
+			ModeratorID:   testCase.ModeratorID,
+			MessageID:     testCase.MessageID,
+		})
+
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RemoveBlockedTerm(&RemoveBlockedTermParams{BroadcasterID: "1234", ModeratorID: "1234", ID: "test"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestDeleteAllChatMessages(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		BroadcasterID string
+		ModeratorID   string
+		errorMsg      string
+	}{
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"",
+			"test-moderator-id",
+			"broadcaster id and moderator id must be provided",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"test-broadcaster-id",
+			"",
+			"broadcaster id and moderator id must be provided",
+		},
+		{
+			http.StatusNoContent,
+			&Options{ClientID: "my-client-id"},
+			"test-broadcaster-id",
+			"test-moderator-id",
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, "", nil))
+
+		resp, err := c.DeleteAllChatMessages(&DeleteAllChatMessagesParams{
+			BroadcasterID: testCase.BroadcasterID,
+			ModeratorID:   testCase.ModeratorID,
+		})
+
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+	}
+
+	_, err := c.RemoveBlockedTerm(&RemoveBlockedTermParams{BroadcasterID: "1234", ModeratorID: "1234", ID: "test"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}

@@ -33,7 +33,7 @@ func newMockClient(options *Options, mockHandler http.HandlerFunc) *Client {
 
 func newMockHandler(statusCode int, json string, headers map[string]string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if headers != nil && len(headers) > 0 {
+		if len(headers) > 0 {
 			for key, value := range headers {
 				w.Header().Add(key, value)
 			}

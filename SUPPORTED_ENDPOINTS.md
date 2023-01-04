@@ -70,12 +70,12 @@
 - [ ] Update AutoMod Settings
 - [ ] Get Banned Events
 - [x] Get Banned Users
-- [ ] Ban User
-- [ ] Unban User
-- [ ] Get Blocked Terms
-- [ ] Add Blocked Term
-- [ ] Remove Blocked Term
-- [ ] Delete Chat Messages
+- [x] Ban User
+- [x] Unban User
+- [x] Get Blocked Terms
+- [x] Add Blocked Term
+- [x] Remove Blocked Term
+- [x] Delete Chat Messages
 - [ ] Get Moderators
 - [ ] Get Moderator Events
 - [ ] Remove Channel Moderator
