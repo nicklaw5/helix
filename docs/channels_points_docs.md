@@ -24,6 +24,31 @@ if err != nil {
 fmt.Printf("%+v\n", resp)
 ```
 
+## Update Custom Rewards
+
+This is an example of how to update a custom reward.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.UpdateCustomReward(&helix.UpdateChannelCustomRewardsParams{
+    ID            : "6741db51-bc4e-4f0e-b96b-d79eafe227f3",
+    BroadcasterID : "145328278",
+    Title         : "game analysis 1v1",
+    Cost          : 50000,
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
 ## Delete Custom Rewards
 
 This is an example of how to delete a custom rewards.
