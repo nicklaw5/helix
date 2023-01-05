@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -96,6 +97,7 @@ func TestClient_StartCommercial(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.StartCommercial(&StartCommercialParams{})

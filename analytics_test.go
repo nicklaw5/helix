@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -81,6 +82,7 @@ func TestGetExtensionAnalytics(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetExtensionAnalytics(&ExtensionAnalyticsParams{})
@@ -165,6 +167,7 @@ func TestGetGameAnalytics(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetGameAnalytics(&GameAnalyticsParams{})

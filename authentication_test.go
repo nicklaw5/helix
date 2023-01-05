@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -138,6 +139,7 @@ func TestRequestAppAccessToken(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.RequestAppAccessToken([]string{"some-scope"})
@@ -287,6 +289,7 @@ func TestRequestUserAccessToken(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.RequestUserAccessToken("valid-auth-code")
@@ -430,6 +433,7 @@ func TestRefreshUserAccessToken(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.RefreshUserAccessToken("refresh-token")
@@ -517,6 +521,7 @@ func TestRevokeUserAccessToken(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.RevokeUserAccessToken("access-token")
@@ -619,6 +624,7 @@ func TestValidateToken(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, _, err := c.ValidateToken("access-token")

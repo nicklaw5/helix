@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"strings"
 	"testing"
@@ -111,6 +112,7 @@ func TestCreateEntitlementsUploadURL(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.CreateEntitlementsUploadURL("manifestID", "entitlementType")

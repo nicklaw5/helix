@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -81,6 +82,7 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetEventSubSubscriptions(&EventSubSubscriptionsParams{})
@@ -173,6 +175,7 @@ func TestRemoveEventSubSubscriptions(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.RemoveEventSubSubscription("832389eb-0d0b-41f8-b564-da039f6c4c75")

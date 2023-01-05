@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -63,6 +64,7 @@ func TestCreateCustomReward(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.CreateCustomReward(&ChannelCustomRewardsParams{})
@@ -134,6 +136,7 @@ func TestUpdateCustomReward(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.UpdateCustomReward(&UpdateChannelCustomRewardsParams{})
@@ -203,6 +206,7 @@ func TestDeleteCustomRewards(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.DeleteCustomRewards(&DeleteCustomRewardsParams{})
@@ -271,6 +275,7 @@ func TestGetCustomRewards(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetCustomRewards(&GetCustomRewardsParams{})
