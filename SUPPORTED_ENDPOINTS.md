@@ -76,7 +76,7 @@
 - [x] Add Blocked Term
 - [x] Remove Blocked Term
 - [x] Delete Chat Messages
-- [ ] Get Moderators
+- [x] Get Moderators
 - [ ] Get Moderator Events
 - [ ] Remove Channel Moderator
 - [ ] Get VIPs
