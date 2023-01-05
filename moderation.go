@@ -282,7 +282,6 @@ func (c *Client) DeleteAllChatMessages(params *DeleteAllChatMessagesParams) (*De
 	}
 
 	resp, err := c.delete("/moderation/chat", nil, params)
-
 	if err != nil {
 		return nil, err
 	}
