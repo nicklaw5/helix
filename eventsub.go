@@ -579,6 +579,7 @@ type EventSubCharityAmount struct {
 }
 
 type EventSubCharityDonationEvent struct {
+	DonationID           string                `json:"id"`
 	CharityCampaignID    string                `json:"campaign_id"`
 	CharityDescription   string                `json:"campaign_description"`
 	CharityWebsite       string                `json:"campaign_website"`
