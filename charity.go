@@ -2,6 +2,7 @@ package helix
 
 type CharityDonationData struct {
 	CampaignID string                `json:"campaign_id"`
+	DonationID string                `json:"id"`
 	UserID     string                `json:"user_id"`
 	UserName   string                `json:"user_name"`
 	UserLogin  string                `json:"user_login"`
