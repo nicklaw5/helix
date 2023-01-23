@@ -123,6 +123,8 @@ const (
 	EventSubTypeStreamOffline                             = "stream.offline"
 	EventSubTypeUserAuthorizationRevoke                   = "user.authorization.revoke"
 	EventSubTypeUserUpdate                                = "user.update"
+	EventSubShoutoutCreate                                = "channel.shoutout.create"
+	EventSubShoutoutReceive                               = "channel.shoutout.receive"
 )
 
 // Event Notification Responses
@@ -641,6 +643,33 @@ type EventSubCharityStartEvent struct {
 	CurrentAmount        EventSubCharityAmount `json:"current_amount"`
 	TargetAmount         EventSubCharityAmount `json:"target_amount"`
 	StartedAt            Time                  `json:"started_at"`
+}
+
+type EventSubShoutoutCreateEvent struct {
+	BroadcasterUserID      string `json:"broadcaster_user_id"`
+	BroadcasterUserName    string `json:"broadcaster_user_name"`
+	BroadcasterUserLogin   string `json:"broadcaster_user_login"`
+	ModeratorUserID        string `json:"moderator_user_id"`
+	ModeratorUserName      string `json:"moderator_user_name"`
+	ModeratorUserLogin     string `json:"moderator_user_login"`
+	ToBroadcasterUserID    string `json:"to_broadcaster_user_id"`
+	ToBroadcasterUserName  string `json:"to_broadcaster_user_name"`
+	ToBroadcasterUserLogin string `json:"to_broadcaster_user_login"`
+	StartedAt              Time   `json:"started_at"`
+	ViewerCount            int64  `json:"viewer_count"`
+	CooldownEndsAt         Time   `json:"cooldown_ends_at"`
+	TargetCooldownEndsAt   Time   `json:"target_cooldown_ends_at"`
+}
+
+type EventSubShoutoutReceiveEvent struct {
+	BroadcasterUserID        string `json:"broadcaster_user_id"`
+	BroadcasterUserName      string `json:"broadcaster_user_name"`
+	BroadcasterUserLogin     string `json:"broadcaster_user_login"`
+	FromBroadcasterUserID    string `json:"from_broadcaster_user_id"`
+	FromBroadcasterUserName  string `json:"from_broadcaster_user_name"`
+	FromBroadcasterUserLogin string `json:"from_broadcaster_user_login"`
+	ViewerCount              int64  `json:"viewer_count"`
+	StartedAt                Time   `json:"started_at"`
 }
 
 // Get all EventSub Subscriptions
