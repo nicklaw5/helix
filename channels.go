@@ -23,6 +23,7 @@ type Channel struct {
 	DisplayName      string   `json:"display_name"`
 	Language         string   `json:"broadcaster_language"`
 	Title            string   `json:"title"`
+	Tags             []string `json:"tags"`
 	ThumbnailURL     string   `json:"thumbnail_url"`
 	IsLive           bool     `json:"is_live"`
 	StartedAt        Time     `json:"started_at"`
@@ -58,11 +59,12 @@ type GetChannelInformationParams struct {
 }
 
 type EditChannelInformationParams struct {
-	BroadcasterID       string `query:"broadcaster_id" json:"-"`
-	GameID              string `json:"game_id"`
-	BroadcasterLanguage string `json:"broadcaster_language"`
-	Title               string `json:"title"`
-	Delay               int    `json:"delay,omitempty"`
+	BroadcasterID       string   `query:"broadcaster_id" json:"-"`
+	GameID              string   `json:"game_id"`
+	BroadcasterLanguage string   `json:"broadcaster_language"`
+	Title               string   `json:"title"`
+	Delay               int      `json:"delay,omitempty"`
+	Tags                []string `json:"tags"`
 }
 
 type GetChannelInformationResponse struct {
@@ -79,13 +81,14 @@ type ManyChannelInformation struct {
 }
 
 type ChannelInformation struct {
-	BroadcasterID       string `json:"broadcaster_id"`
-	BroadcasterName     string `json:"broadcaster_name"`
-	BroadcasterLanguage string `json:"broadcaster_language"`
-	GameID              string `json:"game_id"`
-	GameName            string `json:"game_name"`
-	Title               string `json:"title"`
-	Delay               int    `json:"delay"`
+	BroadcasterID       string   `json:"broadcaster_id"`
+	BroadcasterName     string   `json:"broadcaster_name"`
+	BroadcasterLanguage string   `json:"broadcaster_language"`
+	GameID              string   `json:"game_id"`
+	GameName            string   `json:"game_name"`
+	Title               string   `json:"title"`
+	Delay               int      `json:"delay"`
+	Tags                []string `json:"tags"`
 }
 
 func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*GetChannelInformationResponse, error) {
