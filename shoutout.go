@@ -15,7 +15,7 @@ type SendShoutoutResponse struct {
 // The broadcaster may send a Shoutout once every 2 minutes.
 // They may send the same broadcaster a Shoutout once every 60 minutes.
 func (c *Client) SendShoutout(params *SendShoutoutParams) (*SendShoutoutResponse, error) {
-	resp, err := c.post("/shoutouts", nil, params)
+	resp, err := c.post("/chat/shoutouts", nil, params)
 	if err != nil {
 		return nil, err
 	}
