@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -79,6 +80,7 @@ func TestGetVideos(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetVideos(&VideosParams{})
@@ -153,6 +155,7 @@ func TestDeleteVideos(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.DeleteVideos(&DeleteVideosParams{})

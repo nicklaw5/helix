@@ -6,29 +6,25 @@ import (
 	"testing"
 )
 
-func TestModerateHeldMessage(t *testing.T) {
+func TestSendUserWhisper(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		statusCode int
-		options    *Options
-		Params     *HeldMessageModerationParams
-		respBody   string
+		statusCode            int
+		options               *Options
+		SendUserWhisperParams *SendUserWhisperParams
+		respBody              string
 	}{
 		{
 			http.StatusBadRequest,
-			&Options{ClientID: "my-client-id"},
-			&HeldMessageModerationParams{UserID: ""},
-			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"user_id\""}`,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&SendUserWhisperParams{ToUserID: "100249558", FromUserID: "100249559", Message: ""},
+			`{"error":"Bad Request","status":400,"message":"The parameter \"Color\" was malformed: the value must be a valid color"}`,
 		},
 		{
-			http.StatusOK,
-			&Options{ClientID: "my-client-id"},
-			&HeldMessageModerationParams{
-				UserID: "145328278",
-				MsgID:  "19fe2618-df5f-45d3-a210-aeda6f6c6d9e",
-				Action: "145328278",
-			},
+			http.StatusNoContent,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&SendUserWhisperParams{ToUserID: "100249558", FromUserID: "100249559", Message: "hello twitch chat"},
 			``,
 		},
 	}
@@ -36,7 +32,7 @@ func TestModerateHeldMessage(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.ModerateHeldMessage(testCase.Params)
+		resp, err := c.SendUserWhisper(testCase.SendUserWhisperParams)
 		if err != nil {
 			t.Error(err)
 		}
@@ -52,11 +48,6 @@ func TestModerateHeldMessage(t *testing.T) {
 
 			if resp.ErrorStatus != http.StatusBadRequest {
 				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
-			}
-
-			expectedErrMsg := "Missing required parameter \"user_id\""
-			if resp.ErrorMessage != expectedErrMsg {
-				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
 			}
 
 			continue
@@ -75,7 +66,7 @@ func TestModerateHeldMessage(t *testing.T) {
 		ctx:  context.Background(),
 	}
 
-	_, err := c.ModerateHeldMessage(&HeldMessageModerationParams{})
+	_, err := c.SendUserWhisper(&SendUserWhisperParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}

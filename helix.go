@@ -2,6 +2,7 @@ package helix
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -28,6 +29,7 @@ type HTTPClient interface {
 
 type Client struct {
 	mu           sync.RWMutex
+	ctx          context.Context
 	opts         *Options
 	lastResponse *Response
 }
@@ -109,6 +111,10 @@ type Pagination struct {
 // NewClient returns a new Twitch Helix API client. It returns an
 // if clientID is an empty string. It is concurrency safe.
 func NewClient(options *Options) (*Client, error) {
+	return NewClientWithContext(context.Background(), options)
+}
+
+func NewClientWithContext(ctx context.Context, options *Options) (*Client, error) {
 	if options.ClientID == "" {
 		return nil, errors.New("A client ID was not provided but is required")
 	}
@@ -122,6 +128,7 @@ func NewClient(options *Options) (*Client, error) {
 	}
 
 	client := &Client{
+		ctx:  ctx,
 		opts: options,
 	}
 
@@ -267,7 +274,7 @@ func (c *Client) newRequest(method, path string, data interface{}, hasJSONBody b
 }
 
 func (c *Client) newStandardRequest(method, url string, data interface{}) (*http.Request, error) {
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequestWithContext(c.ctx, method, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +301,7 @@ func (c *Client) newJSONRequest(method, url string, data interface{}) (*http.Req
 
 	buf := bytes.NewBuffer(b)
 
-	req, err := http.NewRequest(method, url, buf)
+	req, err := http.NewRequestWithContext(c.ctx, method, url, buf)
 	if err != nil {
 		return nil, err
 	}

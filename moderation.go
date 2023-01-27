@@ -53,8 +53,8 @@ type BanUserParams struct {
 
 type BanUserRequestBody struct {
 	Duration int    `json:"duration,omitempty"` // optional
-	Reason   string `json:"reason"`   // required
-	UserId   string `json:"user_id"`  // required
+	Reason   string `json:"reason"`             // required
+	UserId   string `json:"user_id"`            // required
 }
 
 type BanUserResponse struct {
@@ -231,4 +231,109 @@ func (c *Client) RemoveBlockedTerm(params *RemoveBlockedTermParams) (*RemoveBloc
 	resp.HydrateResponseCommon(&blockedTermResp.ResponseCommon)
 
 	return blockedTermResp, nil
+}
+
+type DeleteChatMessageParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+	ModeratorID   string `query:"moderator_id"`
+	MessageID     string `query:"message_id"`
+}
+
+type DeleteChatMessageResponse struct {
+	ResponseCommon
+}
+
+// DeleteChatMessage Removes a single chat message from the broadcaster’s chat room.
+// Required scope: moderator:manage:chat_messages
+func (c *Client) DeleteChatMessage(params *DeleteChatMessageParams) (*DeleteChatMessageResponse, error) {
+	if params.BroadcasterID == "" || params.ModeratorID == "" {
+		return nil, errors.New("broadcaster id and moderator id must be provided")
+	}
+
+	if params.MessageID == "" {
+		return nil, errors.New("message id must be provided")
+	}
+
+	resp, err := c.delete("/moderation/chat", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	deletedMessageResp := &DeleteChatMessageResponse{}
+	resp.HydrateResponseCommon(&deletedMessageResp.ResponseCommon)
+
+	return deletedMessageResp, nil
+}
+
+type DeleteAllChatMessagesParams struct {
+	BroadcasterID string `query:"broadcaster_id"`
+	ModeratorID   string `query:"moderator_id"`
+}
+
+type DeleteAllChatMessagesResponse struct {
+	ResponseCommon
+}
+
+// DeleteAllChatMessages Removes all chat messages from the broadcaster’s chat room.
+// Required scope: moderator:manage:chat_messages
+func (c *Client) DeleteAllChatMessages(params *DeleteAllChatMessagesParams) (*DeleteAllChatMessagesResponse, error) {
+	if params.BroadcasterID == "" || params.ModeratorID == "" {
+		return nil, errors.New("broadcaster id and moderator id must be provided")
+	}
+
+	resp, err := c.delete("/moderation/chat", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	deletedMessagesResp := &DeleteAllChatMessagesResponse{}
+	resp.HydrateResponseCommon(&deletedMessagesResp.ResponseCommon)
+
+	return deletedMessagesResp, nil
+}
+
+type GetModeratorsParams struct {
+	// Required
+	BroadcasterID string `query:"broadcaster_id"`
+
+	// Optional
+	UserIDs []string `query:"user_id"` // Limit 100
+	After   string   `query:"after"`
+	First   int      `query:"first"`
+}
+
+type Moderator struct {
+	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
+	UserName  string `json:"user_name"`
+}
+
+type ManyModerators struct {
+	Moderators []Moderator `json:"data"`
+	Pagination Pagination  `json:"pagination"`
+}
+
+type ModeratorsResponse struct {
+	ResponseCommon
+	Data ManyModerators
+}
+
+// GetModerators Gets all users allowed to moderate the broadcaster’s chat room.
+// Required scope: moderation:read
+func (c *Client) GetModerators(params *GetModeratorsParams) (*ModeratorsResponse, error) {
+	if params.BroadcasterID == "" {
+		return nil, errors.New("broadcaster id must be provided")
+	}
+
+	resp, err := c.get("/moderation/moderators", &ManyModerators{}, params)
+	if err != nil {
+		return nil, err
+	}
+  
+	moderators := &ModeratorsResponse{}
+	resp.HydrateResponseCommon(&moderators.ResponseCommon)
+	moderators.Data.Moderators = resp.Data.(*ManyModerators).Moderators
+	moderators.Data.Pagination = resp.Data.(*ManyModerators).Pagination
+
+	return moderators, nil
 }

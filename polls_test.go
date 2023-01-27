@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -67,6 +68,7 @@ func TestGetPolls(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetPolls(&PollsParams{})
@@ -149,6 +151,7 @@ func TestCreatePoll(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.CreatePoll(&CreatePollParams{})
@@ -227,6 +230,7 @@ func TestEndPoll(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.EndPoll(&EndPollParams{})

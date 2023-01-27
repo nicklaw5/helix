@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -26,7 +27,7 @@ func TestGetChannelChatChatterss(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&GetChatChattersParams{BroadcasterID: "121445595", ModeratorID: "1234"},
-			`{"data": [{"user_login": "smittysmithers"}]}`,
+			`{"data": [{"user_login": "smittysmithers", "user_name": "example", "user_id": "100249558"}]}`,
 			"",
 		},
 		{
@@ -67,6 +68,10 @@ func TestGetChannelChatChatterss(t *testing.T) {
 
 		if len(resp.Data.Chatters) != 1 {
 			t.Errorf("expected %d chatters got %d", 1, len(resp.Data.Chatters))
+		}
+
+		if resp.Data.Chatters[0].UserID != "100249558" {
+			t.Errorf("expected %s chatters got %s", "100249558", resp.Data.Chatters[0].UserID)
 		}
 	}
 }
@@ -133,6 +138,7 @@ func TestGetChannelChatBadges(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetChannelChatBadges(&GetChatBadgeParams{})
@@ -204,6 +210,7 @@ func TestGetGlobalChatBadges(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetGlobalChatBadges()
@@ -278,6 +285,7 @@ func TestGetChannelEmotes(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetChannelEmotes(&GetChannelEmotesParams{})
@@ -349,6 +357,7 @@ func TestGetGlobalEmotes(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetGlobalEmotes()
@@ -452,6 +461,7 @@ func TestGetEmoteSets(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetEmoteSets(&GetEmoteSetsParams{})
@@ -526,6 +536,7 @@ func TestSendChatAnnouncement(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.SendChatAnnouncement(&SendChatAnnouncementParams{})
@@ -535,5 +546,158 @@ func TestSendChatAnnouncement(t *testing.T) {
 
 	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
 		t.Error("expected error does match return error")
+	}
+}
+
+func TestGetChatSettings(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		params        *GetChatSettingsParams
+		respBody      string
+		validationErr string
+		expected      *ChatSettings
+	}{
+		{ // Early-out error thrown by us
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&GetChatSettingsParams{BroadcasterID: "", ModeratorID: "82008718"},
+			``,
+			"error: broadcaster id must be specified",
+			nil,
+		},
+		{ // Error thrown by Twitch
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetChatSettingsParams{BroadcasterID: "2248463222222222222222222222"},
+			`{"error":"Bad Request","status":400,"message":"The parameter \"broadcaster_id\" was malformed: value must be a numeric"}`,
+			"",
+			nil,
+		},
+		{ // Request made with a valid moderator ID
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&GetChatSettingsParams{BroadcasterID: "22484632", ModeratorID: "11148817"},
+			`{"data":[{"broadcaster_id":"22484632","emote_mode":false,"follower_mode":true,"follower_mode_duration":10080,"moderator_id":"11148817","non_moderator_chat_delay":true,"non_moderator_chat_delay_duration":1,"slow_mode":false,"slow_mode_wait_time":null,"subscriber_mode":false,"unique_chat_mode":false}]}`,
+			``,
+			&ChatSettings{
+				BroadcasterID: "22484632",
+
+				EmoteMode: false,
+
+				FollowerMode:         true,
+				FollowerModeDuration: 10080,
+
+				SlowMode:         false,
+				SlowModeWaitTime: 0,
+
+				SubscriberMode: false,
+
+				UniqueChatMode: false,
+
+				ModeratorID: "11148817",
+
+				NonModeratorChatDelay:         true,
+				NonModeratorChatDelayDuration: 1,
+			},
+		},
+		{ // Request made with no moderator ID
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&GetChatSettingsParams{BroadcasterID: "22484632", ModeratorID: ""},
+			`{"data":[{"broadcaster_id":"22484632","emote_mode":false,"follower_mode":true,"follower_mode_duration":10080,"slow_mode":false,"slow_mode_wait_time":null,"subscriber_mode":false,"unique_chat_mode":false}]}`,
+			``,
+			&ChatSettings{
+				BroadcasterID: "22484632",
+
+				EmoteMode: false,
+
+				FollowerMode:         true,
+				FollowerModeDuration: 10080,
+
+				SlowMode:         false,
+				SlowModeWaitTime: 0,
+
+				SubscriberMode: false,
+
+				UniqueChatMode: false,
+
+				ModeratorID: "",
+
+				NonModeratorChatDelay:         false,
+				NonModeratorChatDelayDuration: 0,
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetChatSettings(testCase.params)
+		if err != nil {
+			if err.Error() == testCase.validationErr {
+				continue
+			}
+			t.Errorf("Unmatched error, expected '%v', got '%v'", testCase.validationErr, err)
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			continue
+		}
+
+		if len(resp.Data.Settings) != 1 {
+			t.Errorf("expected %d channel settings, got %d", 1, len(resp.Data.Settings))
+		}
+
+		if resp.Data.Settings[0].BroadcasterID != "22484632" {
+			t.Errorf("expected broadcaster_id to be %s, got %s", "22484632", resp.Data.Settings[0].BroadcasterID)
+		}
+
+		if testCase.expected != nil {
+			expected := testCase.expected
+			actual := resp.Data.Settings[0]
+
+			if *expected != actual {
+				t.Errorf("expected %v channel settings, got %v", *expected, actual)
+			}
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.GetChatSettings(&GetChatSettingsParams{BroadcasterID: "123"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	const expectedHTTPError = "Failed to execute API request: Oops, that's bad :("
+
+	if err.Error() != expectedHTTPError {
+		t.Errorf("expected error does match return error, got '%s'", err.Error())
 	}
 }

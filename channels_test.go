@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
@@ -120,6 +121,7 @@ func TestSearchChannels(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.SearchChannels(&SearchChannelsParams{})
@@ -273,6 +275,7 @@ func TestGetChannelInformation(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetChannelInformation(&GetChannelInformationParams{})
@@ -366,6 +369,7 @@ func TestEditChannelInformation(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.EditChannelInformation(&EditChannelInformationParams{})

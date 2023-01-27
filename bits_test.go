@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -114,6 +115,7 @@ func TestClient_GetBitsLeaderboard(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetBitsLeaderboard(&BitsLeaderboardParams{})
@@ -628,6 +630,7 @@ func TestClient_GetCheermotes(t *testing.T) {
 	}
 	c := &Client{
 		opts: options,
+		ctx:  context.Background(),
 	}
 
 	_, err := c.GetCheermotes(&CheermotesParams{})

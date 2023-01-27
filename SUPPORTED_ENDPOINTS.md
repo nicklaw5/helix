@@ -33,7 +33,7 @@
 - [x] Get Emote Sets
 - [x] Get Channel Chat Badges
 - [x] Get Global Chat Badges
-- [ ] Get Chat Settings
+- [x] Get Chat Settings
 - [ ] Update Chat Settings
 - [ ] Send Chat Announcement
 - [ ] Get User Chat Color
@@ -70,13 +70,13 @@
 - [ ] Update AutoMod Settings
 - [ ] Get Banned Events
 - [x] Get Banned Users
-- [ ] Ban User
-- [ ] Unban User
-- [ ] Get Blocked Terms
-- [ ] Add Blocked Term
-- [ ] Remove Blocked Term
-- [ ] Delete Chat Messages
-- [ ] Get Moderators
+- [x] Ban User
+- [x] Unban User
+- [x] Get Blocked Terms
+- [x] Add Blocked Term
+- [x] Remove Blocked Term
+- [x] Delete Chat Messages
+- [x] Get Moderators
 - [ ] Get Moderator Events
 - [ ] Remove Channel Moderator
 - [ ] Get VIPs
