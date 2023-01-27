@@ -681,6 +681,7 @@ func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (
 
 	eventSubs := &EventSubSubscriptionsResponse{}
 	resp.HydrateResponseCommon(&eventSubs.ResponseCommon)
+	eventSubs.Data.Total = resp.Data.(*ManyEventSubSubscriptions).Total
 	eventSubs.Data.TotalCost = resp.Data.(*ManyEventSubSubscriptions).TotalCost
 	eventSubs.Data.MaxTotalCost = resp.Data.(*ManyEventSubSubscriptions).MaxTotalCost
 	eventSubs.Data.EventSubSubscriptions = resp.Data.(*ManyEventSubSubscriptions).EventSubSubscriptions
