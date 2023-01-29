@@ -28,6 +28,7 @@ type EventSubSubscription struct {
 type EventSubCondition struct {
 	BroadcasterUserID     string `json:"broadcaster_user_id"`
 	FromBroadcasterUserID string `json:"from_broadcaster_user_id"`
+	ModeratorUserID       string `json:"moderator_user_id"`
 	ToBroadcasterUserID   string `json:"to_broadcaster_user_id"`
 	RewardID              string `json:"reward_id"`
 	ClientID              string `json:"client_id"`
@@ -681,6 +682,7 @@ func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (
 
 	eventSubs := &EventSubSubscriptionsResponse{}
 	resp.HydrateResponseCommon(&eventSubs.ResponseCommon)
+	eventSubs.Data.Total = resp.Data.(*ManyEventSubSubscriptions).Total
 	eventSubs.Data.TotalCost = resp.Data.(*ManyEventSubSubscriptions).TotalCost
 	eventSubs.Data.MaxTotalCost = resp.Data.(*ManyEventSubSubscriptions).MaxTotalCost
 	eventSubs.Data.EventSubSubscriptions = resp.Data.(*ManyEventSubSubscriptions).EventSubSubscriptions

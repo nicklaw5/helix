@@ -18,9 +18,10 @@ func TestSendShoutout(t *testing.T) {
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
-			&SendShoutoutParams{FromBroadcasterID: "100249558", ModeratorID: "100249558"},
-			`{"error":"Bad Request","status":400,"message":"The parameter \"to_broadcaster_id\" was malformed: the value must be a valid"}`,
+			&SendShoutoutParams{FromBroadcasterID: "100249558", ToBroadcasterID: "11111", ModeratorID: "100249558"},
+			`{"error":"Bad Request","status":400,"message":"The broadcaster is not streaming live or does not have one or more viewers."}`,
 		},
+
 		{
 			http.StatusNoContent,
 			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
@@ -50,7 +51,7 @@ func TestSendShoutout(t *testing.T) {
 				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
 			}
 
-			expectedErrMsg := "The parameter \"to_broadcaster_id\" was malformed: the value must be a valid"
+			expectedErrMsg := "The broadcaster is not streaming live or does not have one or more viewers."
 			if resp.ErrorMessage != expectedErrMsg {
 				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
 			}
