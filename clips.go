@@ -16,6 +16,7 @@ type Clip struct {
 	ViewCount       int     `json:"view_count"`
 	CreatedAt       string  `json:"created_at"`
 	ThumbnailURL    string  `json:"thumbnail_url"`
+	VodOffset       int     `json:"vod_offset"`
 }
 
 type ManyClips struct {
