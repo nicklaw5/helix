@@ -467,7 +467,7 @@ func TestFollowedChannels(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&GetFollowedChannelParams{
-				BroadcasterID: "123",
+				UserID: "123",
 			},
 			`{ "total": 8, "data": [{ "broadcaster_id": "11111", "broadcaster_login": "userloginname", "broadcaster_name": "UserDisplayName", "followed_at": "2022-05-24T22:22:08Z" }], "pagination": { "cursor": "eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6NX19" } }`,
 		},
@@ -475,7 +475,7 @@ func TestFollowedChannels(t *testing.T) {
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
 			&GetFollowedChannelParams{
-				BroadcasterID: "",
+				UserID: "",
 			},
 			`{"error":"Bad Request","status":400,"message":"the user id was not provided"}`,
 		},
@@ -491,7 +491,7 @@ func TestFollowedChannels(t *testing.T) {
 
 		// Test Bad Request Responses
 		if resp.StatusCode == http.StatusBadRequest {
-			broadcasterIDErrStr := "the broadcaster id was not provided"
+			broadcasterIDErrStr := "the user id was not provided"
 
 			if resp.ErrorMessage != broadcasterIDErrStr {
 				t.Errorf("expected error message to be \"%s\", got \"%s\"", broadcasterIDErrStr, resp.ErrorMessage)
