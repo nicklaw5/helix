@@ -329,7 +329,7 @@ func (c *Client) GetModerators(params *GetModeratorsParams) (*ModeratorsResponse
 	if err != nil {
 		return nil, err
 	}
-  
+
 	moderators := &ModeratorsResponse{}
 	resp.HydrateResponseCommon(&moderators.ResponseCommon)
 	moderators.Data.Moderators = resp.Data.(*ManyModerators).Moderators
