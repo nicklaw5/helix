@@ -381,3 +381,147 @@ func TestEditChannelInformation(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestChannelFollows(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *GetChannelFollowsParams
+		respBody   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&GetChannelFollowsParams{
+				BroadcasterID: "123",
+			},
+			`{ "total": 8, "data": [{ "user_id": "11111", "user_name": "UserDisplayName", "user_login": "userloginname", "followed_at": "2022-05-24T22:22:08Z" }], "pagination": { "cursor": "eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6NX19" } }`,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetChannelFollowsParams{
+				BroadcasterID: "",
+			},
+			`{"error":"Bad Request","status":400,"message":"the broadcaster id was not provided"}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetChannelFollows(testCase.params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			broadcasterIDErrStr := "the broadcaster id was not provided"
+
+			if resp.ErrorMessage != broadcasterIDErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", broadcasterIDErrStr, resp.ErrorMessage)
+				continue
+			}
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.GetChannelFollows(&GetChannelFollowsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestFollowedChannels(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *GetFollowedChannelParams
+		respBody   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&GetFollowedChannelParams{
+				BroadcasterID: "123",
+			},
+			`{ "total": 8, "data": [{ "broadcaster_id": "11111", "broadcaster_login": "userloginname", "broadcaster_name": "UserDisplayName", "followed_at": "2022-05-24T22:22:08Z" }], "pagination": { "cursor": "eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6NX19" } }`,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&GetFollowedChannelParams{
+				BroadcasterID: "",
+			},
+			`{"error":"Bad Request","status":400,"message":"the user id was not provided"}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetFollowedChannels(testCase.params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			broadcasterIDErrStr := "the broadcaster id was not provided"
+
+			if resp.ErrorMessage != broadcasterIDErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", broadcasterIDErrStr, resp.ErrorMessage)
+				continue
+			}
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.GetFollowedChannels(&GetFollowedChannelParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}

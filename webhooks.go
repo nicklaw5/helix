@@ -120,12 +120,12 @@ func GetWebhookTopicFromRequest(req *http.Request) WebhookTopic {
 // For example, say we receive a "User Follows" webhook event from Twitch.
 // Its "Link" header value look likes the following:
 //
-// 		<https://api.twitch.tv/helix/webhooks/hub>; rel="hub", <https://api.twitch.tv/helix/users/follows?first=1&from_id=111116&to_id=22222>; rel="self"
+//	<https://api.twitch.tv/helix/webhooks/hub>; rel="hub", <https://api.twitch.tv/helix/users/follows?first=1&from_id=111116&to_id=22222>; rel="self"
 //
 // From which GetWebhookTopicValuesFromRequest will return a map with the
 // values of from_id and to_id:
 //
-// 		map[from_id:111116 to_id:22222]
+//	map[from_id:111116 to_id:22222]
 //
 // This is particularly useful for webhooks events that do not have a distinguishable
 // JSON payload, such as the "Stream Changed" down event.
