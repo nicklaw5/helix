@@ -202,6 +202,10 @@ func buildQueryString(req *http.Request, v interface{}) (string, error) {
 		field := vType.Field(i)
 		tag := field.Tag.Get("query")
 
+		if tag == "" {
+			continue
+		}
+
 		// Get the default value from the struct tag
 		if strings.Contains(tag, ",") {
 			tagSlice := strings.Split(tag, ",")
