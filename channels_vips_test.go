@@ -12,13 +12,13 @@ func TestGetChannelVips(t *testing.T) {
 	testCases := []struct {
 		statusCode int
 		options    *Options
-		params     *ChannelsVipsParams
+		params     *GetChannelVipsParams
 		respBody   string
 	}{
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			&ChannelsVipsParams{
+			&GetChannelVipsParams{
 				UserID: "123",
 			},
 			`{ "data": [{ "user_id": "11111", "user_name": "UserDisplayName", "user_login": "userloginname" }], "pagination": { "cursor": "eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6NX19" } }`,
@@ -26,7 +26,7 @@ func TestGetChannelVips(t *testing.T) {
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
-			&ChannelsVipsParams{
+			&GetChannelVipsParams{
 				UserID: "",
 			},
 			`{"error":"Bad Request","status":400,"message":"the user id was not provided"}`,
@@ -68,7 +68,7 @@ func TestGetChannelVips(t *testing.T) {
 		ctx:  context.Background(),
 	}
 
-	_, err := c.GetChannelVips(&ChannelsVipsParams{})
+	_, err := c.GetChannelVips(&GetChannelVipsParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
@@ -84,13 +84,13 @@ func TestAddChannelVips(t *testing.T) {
 	testCases := []struct {
 		statusCode int
 		options    *Options
-		params     *AddChannelsVipsParams
+		params     *AddChannelVipParams
 		respBody   string
 	}{
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			&AddChannelsVipsParams{
+			&AddChannelVipParams{
 				BroadcasterID: "123",
 				UserID:        "456",
 			},
@@ -99,7 +99,7 @@ func TestAddChannelVips(t *testing.T) {
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
-			&AddChannelsVipsParams{},
+			&AddChannelVipParams{},
 			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
 		},
 	}
@@ -107,7 +107,7 @@ func TestAddChannelVips(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.AddChannelVips(testCase.params)
+		resp, err := c.AddChannelVip(testCase.params)
 		if err != nil {
 			t.Error(err)
 		}
@@ -138,7 +138,7 @@ func TestAddChannelVips(t *testing.T) {
 		ctx:  context.Background(),
 	}
 
-	_, err := c.AddChannelVips(&AddChannelsVipsParams{})
+	_, err := c.AddChannelVip(&AddChannelVipParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
@@ -154,13 +154,13 @@ func TestRemoveChannelVips(t *testing.T) {
 	testCases := []struct {
 		statusCode int
 		options    *Options
-		params     *RemoveChannelsVipsParams
+		params     *RemoveChannelVipParams
 		respBody   string
 	}{
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
-			&RemoveChannelsVipsParams{
+			&RemoveChannelVipParams{
 				BroadcasterID: "123",
 				UserID:        "456",
 			},
@@ -169,7 +169,7 @@ func TestRemoveChannelVips(t *testing.T) {
 		{
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
-			&RemoveChannelsVipsParams{},
+			&RemoveChannelVipParams{},
 			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
 		},
 	}
@@ -177,7 +177,7 @@ func TestRemoveChannelVips(t *testing.T) {
 	for _, testCase := range testCases {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
-		resp, err := c.RemoveChannelVips(testCase.params)
+		resp, err := c.RemoveChannelVip(testCase.params)
 		if err != nil {
 			t.Error(err)
 		}
@@ -208,7 +208,7 @@ func TestRemoveChannelVips(t *testing.T) {
 		ctx:  context.Background(),
 	}
 
-	_, err := c.RemoveChannelVips(&RemoveChannelsVipsParams{})
+	_, err := c.RemoveChannelVip(&RemoveChannelVipParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}

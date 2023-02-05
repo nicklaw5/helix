@@ -79,9 +79,9 @@
 - [x] Get Moderators
 - [ ] Get Moderator Events
 - [ ] Remove Channel Moderator
-- [ ] Get VIPs
-- [ ] Add Channel VIP
-- [ ] Remove Channel VIP
+- [x] Get VIPs
+- [x] Add Channel VIP
+- [x] Remove Channel VIP
 - [ ] Get Soundtrack Current Track
 - [ ] Get Soundtrack Playlist
 - [ ] Get Soundtrack Playlists
