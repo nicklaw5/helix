@@ -25,6 +25,7 @@ Follow the links below to their respective API usage examples:
 - [Users](users_docs.md)
 - [Videos](videos_docs.md)
 - [Webhook Subscriptions](webhook_docs.md)
+- [Vips](vips_docs.md)
 
 ## Getting Started
 
