@@ -46,8 +46,8 @@ func (c *Client) GetBannedUsers(params *BannedUsersParams) (*BannedUsersResponse
 }
 
 type BanUserParams struct {
-	BroadcasterID string             `json:"broadcaster_id"`
-	ModeratorId   string             `json:"moderator_id"`
+	BroadcasterID string             `query:"broadcaster_id"`
+	ModeratorId   string             `query:"moderator_id"`
 	Body          BanUserRequestBody `json:"data"`
 }
 
