@@ -268,3 +268,80 @@ func (c *Client) GetChatSettings(params *GetChatSettingsParams) (*GetChatSetting
 
 	return settings, nil
 }
+
+type UpdateChatSettingsParams struct {
+	// Required, the ID of the broadcaster whose chat settings you want to update
+	BroadcasterID string `query:"broadcaster_id"`
+
+	// Required, the ID of a user that has moderator privileges in the BroadcasterID's channel.
+	// The ID must match the specified User Access Token
+	ModeratorID string `query:"moderator_id"`
+
+	// Optional, set to true if only emotes are allowed
+	// If unset (i.e. nil), no change to this setting will be made
+	EmoteMode *bool `json:"emote_mode,omitempty"`
+
+	// Optional, set to true if only followers may chat
+	// If unset (i.e. nil), no change to this setting will be made
+	FollowerMode *bool `json:"follower_mode,omitempty"`
+
+	// Optional, time in minutes a user must have been following to chat.
+	// If unset (i.e. nil), no change to this setting will be made
+	// If set, FollowerMode must be set to true.
+	// Possible values are 0 (no time restriction) through 129600 (3 months)
+	FollowerModeDuration *int `json:"follower_mode_duration,omitempty"`
+
+	// Optional, set to true if there's a delay before chat messages appear for non-moderators
+	// If unset (i.e. nil), no change to this setting will be made
+	NonModeratorChatDelay *bool `json:"non_moderator_chat_delay,omitempty"`
+
+	// Optional, time in seconds before messages appear for non-moderators
+	// If unset (i.e. nil), no change to this setting will be made
+	// If set, FollowerMode must be set to true.
+	// Possible values are 2, 4, or 6
+	NonModeratorChatDelayDuration *int `json:"non_moderator_chat_delay_duration,omitempty"`
+
+	// Optional, set to true if chatters must wait some extra time between sending more messages
+	// If unset (i.e. nil), no change to this setting will be made
+	SlowMode *bool `json:"slow_mode,omitempty"`
+
+	// Optional, time in seconds chatters must wait between sending messages
+	// If unset (i.e. nil), no change to this setting will be made
+	// If set, SlowMode must be set to true.
+	// Possible values are 3 through 120 seconds
+	SlowModeWaitTime *int `json:"slow_mode_wait_time,omitempty"`
+
+	// Optional, set to true if only subscribers may chat
+	// If unset (i.e. nil), no change to this setting will be made
+	SubscriberMode *bool `json:"subscriber_mode,omitempty"`
+
+	// Optional, set to true if users may only post "unique messages" in chat
+	// If unset (i.e. nil), no change to this setting will be made
+	UniqueChatMode *bool `json:"unique_chat_mode,omitempty"`
+}
+
+type UpdateChatSettingsResponse struct {
+	ResponseCommon
+	Data ManyChatSettings
+}
+
+// UpdateChatSettings updates the broadcaster's chat settings.
+// Required scope: moderator:manage:chat_settings
+func (c *Client) UpdateChatSettings(params *UpdateChatSettingsParams) (*UpdateChatSettingsResponse, error) {
+	if params.BroadcasterID == "" {
+		return nil, errors.New("error: broadcaster id must be specified")
+	}
+	if params.ModeratorID == "" {
+		return nil, errors.New("error: moderator id must be specified")
+	}
+	resp, err := c.patchAsJSON("/chat/settings", &ManyChatSettings{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	settings := &UpdateChatSettingsResponse{}
+	resp.HydrateResponseCommon(&settings.ResponseCommon)
+	settings.Data.Settings = resp.Data.(*ManyChatSettings).Settings
+
+	return settings, nil
+}

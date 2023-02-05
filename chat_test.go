@@ -701,3 +701,128 @@ func TestGetChatSettings(t *testing.T) {
 		t.Errorf("expected error does match return error, got '%s'", err.Error())
 	}
 }
+
+func TestUpdateChatSettings(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode    int
+		options       *Options
+		params        *UpdateChatSettingsParams
+		respBody      string
+		validationErr string
+		expected      *ChatSettings
+	}{
+		{ // Early-out error thrown by us
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&UpdateChatSettingsParams{BroadcasterID: "", ModeratorID: "82008718"},
+			``,
+			"error: broadcaster id must be specified",
+			nil,
+		},
+		{ // Early-out error thrown by us
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&UpdateChatSettingsParams{BroadcasterID: "11148817", ModeratorID: ""},
+			``,
+			"error: moderator id must be specified",
+			nil,
+		},
+		{ // Request that updates nothing still return all data
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&UpdateChatSettingsParams{BroadcasterID: "22484632", ModeratorID: "11148817"},
+			`{"data":[{"broadcaster_id":"22484632","emote_mode":false,"follower_mode":true,"follower_mode_duration":10080,"moderator_id":"11148817","non_moderator_chat_delay":true,"non_moderator_chat_delay_duration":1,"slow_mode":false,"slow_mode_wait_time":null,"subscriber_mode":false,"unique_chat_mode":false}]}`,
+			``,
+			&ChatSettings{
+				BroadcasterID: "22484632",
+				ModeratorID:   "11148817",
+
+				EmoteMode: false,
+
+				FollowerMode:         true,
+				FollowerModeDuration: 10080,
+
+				SlowMode:         false,
+				SlowModeWaitTime: 0,
+
+				SubscriberMode: false,
+
+				UniqueChatMode: false,
+
+				NonModeratorChatDelay:         true,
+				NonModeratorChatDelayDuration: 1,
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.UpdateChatSettings(testCase.params)
+		if err != nil {
+			if err.Error() == testCase.validationErr {
+				continue
+			}
+			t.Errorf("Unmatched error, expected '%v', got '%v'", testCase.validationErr, err)
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			continue
+		}
+
+		if len(resp.Data.Settings) != 1 {
+			t.Errorf("expected %d channel settings, got %d", 1, len(resp.Data.Settings))
+		}
+
+		if resp.Data.Settings[0].BroadcasterID != "22484632" {
+			t.Errorf("expected broadcaster_id to be %s, got %s", "22484632", resp.Data.Settings[0].BroadcasterID)
+		}
+
+		if testCase.expected != nil {
+			expected := testCase.expected
+			actual := resp.Data.Settings[0]
+
+			if *expected != actual {
+				t.Errorf("expected %v channel settings, got %v", *expected, actual)
+			}
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.UpdateChatSettings(&UpdateChatSettingsParams{BroadcasterID: "123", ModeratorID: "123"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	const expectedHTTPError = "Failed to execute API request: Oops, that's bad :("
+
+	if err.Error() != expectedHTTPError {
+		t.Errorf("expected error does match return error, got '%s'", err.Error())
+	}
+}
