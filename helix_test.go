@@ -657,3 +657,78 @@ func TestHydrateRequestCommon(t *testing.T) {
 		t.Errorf("expected ErrorMessage to be \"%s\", got \"%s\"", sampleErrorMessage, targetResponse.ResponseCommon.ErrorMessage)
 	}
 }
+
+func TestQueryStringBuilderAllQuery(t *testing.T) {
+	t.Parallel()
+
+	// For structs where every member has a query tag
+	type Struct struct {
+		Foo string `query:"foo"`
+		Bar string `query:"bar"`
+	}
+	v := &Struct{Foo: "value", Bar: "value"}
+	expectedQueryString := `bar=value&foo=value`
+
+	req, err := http.NewRequest("GET", "https://example.com", nil)
+	if err != nil {
+		t.Error("request creation failed")
+	}
+
+	q, err := buildQueryString(req, v)
+	if err != nil {
+		t.Errorf("expected buildQueryString to not error, got \"%s\"", err)
+	}
+	if q != expectedQueryString {
+		t.Errorf(`expected q to be "%s", got "%s"`, expectedQueryString, q)
+	}
+}
+
+func TestQueryStringBuilderPartialQuery(t *testing.T) {
+	t.Parallel()
+
+	// For structs where only some members have a query tag
+	type Struct struct {
+		Foo string `query:"foo"`
+		Bar string `json:"bar"`
+	}
+	v := &Struct{Foo: "value", Bar: "value"}
+	expectedQueryString := `foo=value`
+
+	req, err := http.NewRequest("GET", "https://example.com", nil)
+	if err != nil {
+		t.Error("request creation failed")
+	}
+
+	q, err := buildQueryString(req, v)
+	if err != nil {
+		t.Errorf("expected buildQueryString to not error, got \"%s\"", err)
+	}
+	if q != expectedQueryString {
+		t.Errorf(`expected q to be "%s", got "%s"`, expectedQueryString, q)
+	}
+}
+
+func TestQueryStringBuilderNoQuery(t *testing.T) {
+	t.Parallel()
+
+	// For structs where no members have query tags
+	type Struct struct {
+		Foo string `json:"foo"`
+		Bar string `json:"bar"`
+	}
+	v := &Struct{Foo: "value", Bar: "value"}
+	expectedQueryString := ``
+
+	req, err := http.NewRequest("GET", "https://example.com", nil)
+	if err != nil {
+		t.Error("request creation failed")
+	}
+
+	q, err := buildQueryString(req, v)
+	if err != nil {
+		t.Errorf("expected buildQueryString to not error, got \"%s\"", err)
+	}
+	if q != expectedQueryString {
+		t.Errorf(`expected q to be "%s", got "%s"`, expectedQueryString, q)
+	}
+}
