@@ -18,6 +18,7 @@ type ChatChatter struct {
 type ManyChatChatters struct {
 	Chatters   []ChatChatter `json:"data"`
 	Pagination Pagination    `json:"pagination"`
+	Total      int           `json:"total"`
 }
 
 type GetChatChattersResponse struct {
@@ -38,6 +39,8 @@ func (c *Client) GetChannelChatChatters(params *GetChatChattersParams) (*GetChat
 	chatters := &GetChatChattersResponse{}
 	resp.HydrateResponseCommon(&chatters.ResponseCommon)
 	chatters.Data.Chatters = resp.Data.(*ManyChatChatters).Chatters
+	chatters.Data.Total = resp.Data.(*ManyChatChatters).Total
+	chatters.Data.Pagination = resp.Data.(*ManyChatChatters).Pagination
 
 	return chatters, nil
 }
