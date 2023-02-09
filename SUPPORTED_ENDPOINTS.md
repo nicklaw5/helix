@@ -34,7 +34,7 @@
 - [x] Get Channel Chat Badges
 - [x] Get Global Chat Badges
 - [x] Get Chat Settings
-- [ ] Update Chat Settings
+- [x] Update Chat Settings
 - [ ] Send Chat Announcement
 - [ ] Get User Chat Color
 - [ ] Update User Chat Color
