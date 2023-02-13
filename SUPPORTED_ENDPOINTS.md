@@ -37,6 +37,7 @@
 - [x] Get Chat Settings
 - [x] Update Chat Settings
 - [x] Send Chat Announcement
+- [ ] Send a Shoutout
 - [ ] Get User Chat Color
 - [ ] Update User Chat Color
 - [x] Create Clip
@@ -77,10 +78,13 @@
 - [x] Remove Blocked Term
 - [x] Delete Chat Messages
 - [x] Get Moderators
+- [ ] Add Channel Moderator
 - [ ] Remove Channel Moderator
 - [x] Get VIPs
 - [x] Add Channel VIP
 - [x] Remove Channel VIP
+- [ ] Update Shield Mode Status
+- [ ] Get Shield Mode Status
 - [ ] Get Soundtrack Current Track
 - [ ] Get Soundtrack Playlist
 - [ ] Get Soundtrack Playlists
@@ -100,9 +104,6 @@
 - [ ] Delete Channel Stream Schedule Segment
 - [ ] Search Categories
 - [ ] Search Channels
-- [ ] Get Shield Mode Status
-- [ ] Update Shield Mode Status
-- [ ] Send a Shoutout
 - [x] Get Stream Key
 - [x] Get Streams
 - [x] Get Followed Streams
