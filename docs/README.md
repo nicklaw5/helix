@@ -7,6 +7,7 @@ Follow the links below to their respective API usage examples:
 - [Analytics](analytics_docs.md)
 - [Authentication](authentication_docs.md)
 - [Bits](bits_docs.md)
+- [Categories](categories_docs.md)
 - [Channels](channels_docs.md)
 - [Channels Points](channels_points_docs.md)
 - [Chat](chat_docs.md)

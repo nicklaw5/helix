@@ -102,7 +102,7 @@
 - [ ] Create Channel Stream Schedule Segment
 - [ ] Update Channel Stream Schedule Segment
 - [ ] Delete Channel Stream Schedule Segment
-- [ ] Search Categories
+- [x] Search Categories
 - [ ] Search Channels
 - [x] Get Stream Key
 - [x] Get Streams
