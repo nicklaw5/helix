@@ -94,8 +94,8 @@
 - [x] Get Predictions
 - [x] Create Prediction
 - [x] End Prediction
-- [ ] Start a raid
-- [ ] Cancel a raid
+- [x] Start a raid
+- [x] Cancel a raid
 - [ ] Get Channel Stream Schedule
 - [ ] Get Channel iCalendar
 - [ ] Update Channel Stream Schedule
