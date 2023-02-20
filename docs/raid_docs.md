@@ -35,7 +35,7 @@ if err != nil {
     // handle error
 }
 
-resp, err := resp, err := client.CancelRaid(&helix.StartRaidParams{
+resp, err := resp, err := client.CancelRaid(&helix.CanRaidParams{
     BroadcasterID: "22484632", 
 })
 if err != nil {

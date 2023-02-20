@@ -59,8 +59,8 @@ func (c *Client) CancelRaid(params *CancelRaidParams) (*CancelRaidResponse, erro
 		return nil, err
 	}
 
-	canceldRaid := &CancelRaidResponse{}
-	resp.HydrateResponseCommon(&canceldRaid.ResponseCommon)
+	canceledRaid := &CancelRaidResponse{}
+	resp.HydrateResponseCommon(&canceledRaid.ResponseCommon)
 
-	return canceldRaid, nil
+	return canceledRaid, nil
 }
