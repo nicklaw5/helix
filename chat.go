@@ -348,3 +348,83 @@ func (c *Client) UpdateChatSettings(params *UpdateChatSettingsParams) (*UpdateCh
 
 	return settings, nil
 }
+
+// UserChatColorResponse is the response from GetUserChatColor
+type UserChatColorResponse struct {
+	ResponseCommon
+	Data GetUserChatColorResponse
+}
+
+// GetUserChatColorParams are the parameters for GetUserChatColor
+type GetUserChatColorParams struct {
+	UserID string `json:"user_id"`
+}
+
+// GetUserChatColorResponse is the response data in UserChatColorResponse
+type GetUserChatColorResponse struct {
+	Data []GetUserChatColorUser `json:"data"`
+}
+
+// GetUserChatColorUser describes the user and their color
+type GetUserChatColorUser struct {
+	UserID    string `json:"user_id"`
+	UserLogin string `json:"user_login"`
+	UserName  string `json:"user_name"`
+	Color     string `json:"color"`
+}
+
+// GetUserChatColor fetches the color used for the user’s name in chat.
+func (c *Client) GetUserChatColor(params *GetUserChatColorParams) (*UserChatColorResponse, error) {
+	resp, err := c.get("/chat/color", &GetUserChatColorResponse{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	userColor := &UserChatColorResponse{}
+	resp.HydrateResponseCommon(&userColor.ResponseCommon)
+
+	return userColor, nil
+}
+
+// UpdateUserChatColorResponse is the response for UpdateUserChatColor
+type UpdateUserChatColorResponse struct {
+	ResponseCommon
+}
+
+// UpdateUserChatColorParams are the parameters for UpdateUserChatColor
+type UpdateUserChatColorParams struct {
+	UserID string `json:"user_id"`
+	Color  string `json:"color"`
+}
+
+// UpdateUserChatcolor updates the color used for the user’s name in chat.
+//
+// Required scope: user:manage:chat_color
+//
+// Prime and Turbo users can specify a Hex color code, everyone can use the default colors:
+//   - blue
+//   - blue_violet
+//   - cadet_blue
+//   - chocolate
+//   - coral
+//   - dodger_blue
+//   - firebrick
+//   - golden_rod
+//   - green
+//   - hot_pink
+//   - orange_red
+//   - red
+//   - sea_green
+//   - spring_green
+//   - yellow_green
+func (c *Client) UpdateUserChatColor(params *UpdateUserChatColorParams) (*UpdateUserChatColorResponse, error) {
+	resp, err := c.put("/chat/color", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	update := &UpdateUserChatColorResponse{}
+	resp.HydrateResponseCommon(&update.ResponseCommon)
+
+	return update, nil
+}

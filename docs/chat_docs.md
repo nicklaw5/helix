@@ -128,3 +128,45 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get User Chat Color
+Gets the color used for the user’s name in chat.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.GetUserChatColor(&GetUserChatColorParams{
+    UserID: "22484632",
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Update User Chat Color
+Updates the color used for the user’s name in chat.
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.UpdateUserChatColor(&UpdateUserChatColorParams{
+    UserID: "22484632",
+    Color: "blue"
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```

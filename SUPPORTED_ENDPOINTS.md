@@ -38,8 +38,8 @@
 - [x] Update Chat Settings
 - [x] Send Chat Announcement
 - [ ] Send a Shoutout
-- [ ] Get User Chat Color
-- [ ] Update User Chat Color
+- [x] Get User Chat Color
+- [x] Update User Chat Color
 - [x] Create Clip
 - [x] Get Clips
 - [x] Get Code Status
