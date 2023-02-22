@@ -826,3 +826,119 @@ func TestUpdateChatSettings(t *testing.T) {
 		t.Errorf("expected error does match return error, got '%s'", err.Error())
 	}
 }
+
+func TestGetUserChatColor(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		UserID     string
+		respBody   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"22484632",
+			`{"data": [{"user_id": "11111","user_name": "SpeedySpeedster1","user_login": "speedyspeedster1","color": "#9146FF"},{"user_id": "44444","user_name": "SpeedySpeedster2","user_login": "speedyspeedster2","color": ""}]}`,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"22484632",
+			`{"error":"Bad Request","status":400,"message":"The ID in the user_id query parameter is not valid."}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetUserChatColor(&GetUserChatColorParams{
+			UserID: testCase.UserID,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "The ID in the user_id query parameter is not valid."
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+}
+
+func TestUpdateUserChatColor(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		UserID     string
+		Color      string
+		respBody   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			"22484632",
+			"blue",
+			``,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			"22484632",
+			"bad_color",
+			`{"error":"Bad Request","status":400,"message":"The named color in the color query parameter is not valid."}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.UpdateUserChatColor(&UpdateUserChatColorParams{
+			UserID: testCase.UserID,
+			Color:  testCase.Color,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusBadRequest {
+			if resp.Error != "Bad Request" {
+				t.Errorf("expected error to be %s, got %s", "Bad Request", resp.Error)
+			}
+
+			if resp.ErrorStatus != http.StatusBadRequest {
+				t.Errorf("expected error status to be %d, got %d", http.StatusBadRequest, resp.ErrorStatus)
+			}
+
+			expectedErrMsg := "The named color in the color query parameter is not valid."
+			if resp.ErrorMessage != expectedErrMsg {
+				t.Errorf("expected error message to be %s, got %s", expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+	}
+}
