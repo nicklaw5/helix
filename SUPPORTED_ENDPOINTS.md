@@ -20,7 +20,7 @@
 - [x] Create Custom Rewards
 - [x] Delete Custom Reward
 - [x] Get Custom Reward
-- [x] Get Custom Reward Redemption
+- [ ] Get Custom Reward Redemption
 - [x] Update Custom Reward
 - [x] Update Redemption Status
 - [x] Get Channel Information
