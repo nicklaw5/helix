@@ -1,5 +1,7 @@
 package helix
 
+import "time"
+
 type ChannelCustomRewardsParams struct {
 	BroadcasterID                     string `query:"broadcaster_id"`
 	Title                             string `json:"title"`
@@ -104,6 +106,36 @@ type DeleteCustomRewardsResponse struct {
 	ResponseCommon
 }
 
+type UpdateChannelCustomRewardsRedemptionStatusParams struct {
+	ID            string `query:"id"`
+	BroadcasterID string `query:"broadcaster_id"`
+	RewardID      string `query:"reward_id"`
+	Status        string `json:"status"`
+}
+
+type ChannelCustomRewardsRedemptionResponse struct {
+	ResponseCommon
+	Data ManyChannelCustomRewardsRedemptions
+}
+
+type ManyChannelCustomRewardsRedemptions struct {
+	Redemptions []ChannelCustomRewardsRedemption `json:"data"`
+}
+
+type ChannelCustomRewardsRedemption struct {
+	ID               string              `json:"id"`
+	BroadcasterID    string              `json:"broadcaster_id"`
+	BroadcasterLogin string              `json:"broadcaster_login"`
+	BroadcasterName  string              `json:"broadcaster_name"`
+	UserID           string              `json:"user_id"`
+	UserName         string              `json:"user_name"`
+	UserLogin        string              `json:"user_login"`
+	UserInput        string              `json:"user_input"`
+	Status           string              `json:"status"`
+	RedeemedAt       time.Time           `json:"redeemed_at"`
+	Reward           ChannelCustomReward `json:"reward"`
+}
+
 // CreateCustomReward : Creates a Custom Reward on a channel.
 // Required scope: channel:manage:redemptions
 func (c *Client) CreateCustomReward(params *ChannelCustomRewardsParams) (*ChannelCustomRewardResponse, error) {
@@ -161,4 +193,19 @@ func (c *Client) GetCustomRewards(params *GetCustomRewardsParams) (*ChannelCusto
 	rewards.Data.ChannelCustomRewards = resp.Data.(*ManyChannelCustomRewards).ChannelCustomRewards
 
 	return rewards, nil
+}
+
+// UpdateChannelCustomRewardsRedemptionStatus : Update a Custom Reward Redemption status on a channel.
+// Required scope: channel:manage:redemptions
+func (c *Client) UpdateChannelCustomRewardsRedemptionStatus(params *UpdateChannelCustomRewardsRedemptionStatusParams) (*ChannelCustomRewardsRedemptionResponse, error) {
+	resp, err := c.patchAsJSON("/channel_points/custom_rewards/redemptions", &ManyChannelCustomRewardsRedemptions{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	redemptions := &ChannelCustomRewardsRedemptionResponse{}
+	resp.HydrateResponseCommon(&redemptions.ResponseCommon)
+	redemptions.Data.Redemptions = resp.Data.(*ManyChannelCustomRewardsRedemptions).Redemptions
+
+	return redemptions, nil
 }
