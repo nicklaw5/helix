@@ -1,7 +1,5 @@
 package helix
 
-import "time"
-
 type ChannelCustomRewardsParams struct {
 	BroadcasterID                     string `query:"broadcaster_id"`
 	Title                             string `json:"title"`
@@ -132,7 +130,7 @@ type ChannelCustomRewardsRedemption struct {
 	UserLogin        string              `json:"user_login"`
 	UserInput        string              `json:"user_input"`
 	Status           string              `json:"status"`
-	RedeemedAt       time.Time           `json:"redeemed_at"`
+	RedeemedAt       Time                `json:"redeemed_at"`
 	Reward           ChannelCustomReward `json:"reward"`
 }
 
