@@ -233,6 +233,7 @@ type EventSubChannelFollowEvent struct {
 	BroadcasterUserID    string `json:"broadcaster_user_id"`
 	BroadcasterUserLogin string `json:"broadcaster_user_login"`
 	BroadcasterUserName  string `json:"broadcaster_user_name"`
+	FollowedAt           Time   `json:"followed_at"`
 }
 
 // Data for a channel moderator add notification, it's the same as the channel follow notification
