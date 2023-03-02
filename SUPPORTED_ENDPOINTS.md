@@ -22,7 +22,7 @@
 - [x] Get Custom Reward
 - [ ] Get Custom Reward Redemption
 - [x] Update Custom Reward
-- [ ] Update Redemption Status
+- [x] Update Redemption Status
 - [x] Get Channel Information
 - [x] Modify Channel Information
 - [x] Get Channel Editors

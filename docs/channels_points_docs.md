@@ -93,3 +93,50 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+## Get Custom Reward Redemption Status
+
+This is an example of how to get the status of a custom reward redemption.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.GetCustomRewards(&helix.GetCustomRewardsParams{
+    BroadcasterID : "145328278",
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```
+
+## Update Custom Reward Redemption Status
+
+This is an example of how to update the status of a custom reward redemption.
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+})
+if err != nil {
+    // handle error
+}
+
+resp, err := client.UpdateChannelCustomRewardsRedemptionStatus(&helix.UpdateChannelCustomRewardsRedemptionStatusParams{
+    ID            : "17fa2df1-ad76-4804-bfa5-a40ef63efe63",
+    BroadcasterID : "274637212",
+    RewardID      : "92af127c-7326-4483-a52b-b0da0be61c01",
+    Status        : "FULFILLED", // The only acceptable values are "CANCELED" and "FULFILLED"
+})
+if err != nil {
+    // handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```

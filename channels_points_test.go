@@ -287,3 +287,67 @@ func TestGetCustomRewards(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestUpdateCustomRewardRedemptionStatus(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *UpdateChannelCustomRewardsRedemptionStatusParams
+		respBody   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&UpdateChannelCustomRewardsRedemptionStatusParams{
+				ID:            "17fa2df1-ad76-4804-bfa5-a40ef63efe63",
+				BroadcasterID: "274637212",
+				RewardID:      "92af127c-7326-4483-a52b-b0da0be61c01",
+				Status:        "CANCELLED",
+			},
+			`{"data": [{"broadcaster_name": "torpedo09", "broadcaster_login": "torpedo09", "broadcaster_id": "274637212", "id": "17fa2df1-ad76-4804-bfa5-a40ef63efe63", "user_id": "274637212", "user_name": "torpedo09", "user_login": "torpedo09", "user_input": "", "status": "CANCELED", "redeemed_at": "2020-07-01T18:37:32Z", "reward": { "id": "92af127c-7326-4483-a52b-b0da0be61c01", "title": "game analysis", "prompt": "", "cost": 50000}}]}`,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&UpdateChannelCustomRewardsRedemptionStatusParams{},
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"id\""}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.UpdateChannelCustomRewardsRedemptionStatus(testCase.params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			firstErrStr := "Missing required parameter \"id\""
+			if resp.ErrorMessage != firstErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", firstErrStr, resp.ErrorMessage)
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if testCase.statusCode == http.StatusOK {
+			numRedemptions := len(resp.Data.Redemptions)
+			if numRedemptions != 1 {
+				t.Errorf("expected 1 redemption, got %d", numRedemptions)
+				continue
+			}
+
+			title := resp.Data.Redemptions[0].Reward.Title
+			if title != "game analysis" {
+				t.Errorf("expected reward title to be \"game analysis\", got \"%s\"", title)
+			}
+		}
+	}
+}
