@@ -37,7 +37,7 @@
 - [x] Get Chat Settings
 - [x] Update Chat Settings
 - [x] Send Chat Announcement
-- [ ] Send a Shoutout
+- [x] Send a Shoutout
 - [x] Get User Chat Color
 - [x] Update User Chat Color
 - [x] Create Clip
