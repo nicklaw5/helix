@@ -870,7 +870,7 @@ func TestAddChannelModerator(t *testing.T) {
 		ctx:  context.Background(),
 	}
 
-	_, err := c.AddChannelVip(&AddChannelVipParams{})
+	_, err := c.AddChannelModerator(&AddChannelModeratorParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
@@ -940,7 +940,7 @@ func TestRemoveChannelModerator(t *testing.T) {
 		ctx:  context.Background(),
 	}
 
-	_, err := c.RemoveChannelVip(&RemoveChannelVipParams{})
+	_, err := c.RemoveChannelModerator(&RemoveChannelModeratorParams{})
 	if err == nil {
 		t.Error("expected error but got nil")
 	}
