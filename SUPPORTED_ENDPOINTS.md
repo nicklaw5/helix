@@ -78,8 +78,8 @@
 - [x] Remove Blocked Term
 - [x] Delete Chat Messages
 - [x] Get Moderators
-- [ ] Add Channel Moderator
-- [ ] Remove Channel Moderator
+- [x] Add Channel Moderator
+- [x] Remove Channel Moderator
 - [x] Get VIPs
 - [x] Add Channel VIP
 - [x] Remove Channel VIP

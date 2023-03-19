@@ -318,6 +318,24 @@ type ModeratorsResponse struct {
 	Data ManyModerators
 }
 
+type AddChannelModeratorParams struct {
+	UserID        string `query:"user_id"`
+	BroadcasterID string `query:"broadcaster_id"`
+}
+
+type AddChannelModeratorResponse struct {
+	ResponseCommon
+}
+
+type RemoveChannelModeratorParams struct {
+	UserID        string `query:"user_id"`
+	BroadcasterID string `query:"broadcaster_id"`
+}
+
+type RemoveChannelModeratorResponse struct {
+	ResponseCommon
+}
+
 // GetModerators Gets all users allowed to moderate the broadcaster’s chat room.
 // Required scope: moderation:read
 func (c *Client) GetModerators(params *GetModeratorsParams) (*ModeratorsResponse, error) {
@@ -334,6 +352,30 @@ func (c *Client) GetModerators(params *GetModeratorsParams) (*ModeratorsResponse
 	resp.HydrateResponseCommon(&moderators.ResponseCommon)
 	moderators.Data.Moderators = resp.Data.(*ManyModerators).Moderators
 	moderators.Data.Pagination = resp.Data.(*ManyModerators).Pagination
+
+	return moderators, nil
+}
+
+func (c *Client) AddChannelModerator(params *AddChannelModeratorParams) (*AddChannelModeratorResponse, error) {
+	resp, err := c.post("/moderation/moderators", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	moderators := &AddChannelModeratorResponse{}
+	resp.HydrateResponseCommon(&moderators.ResponseCommon)
+
+	return moderators, nil
+}
+
+func (c *Client) RemoveChannelModerator(params *RemoveChannelModeratorParams) (*RemoveChannelModeratorResponse, error) {
+	resp, err := c.delete("/moderation/moderators", nil, params)
+	if err != nil {
+		return nil, err
+	}
+
+	moderators := &RemoveChannelModeratorResponse{}
+	resp.HydrateResponseCommon(&moderators.ResponseCommon)
 
 	return moderators, nil
 }
