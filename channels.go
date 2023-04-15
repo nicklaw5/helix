@@ -116,11 +116,11 @@ type GetChannelInformationParams struct {
 
 type EditChannelInformationParams struct {
 	BroadcasterID       string   `query:"broadcaster_id" json:"-"`
-	GameID              string   `json:"game_id"`
-	BroadcasterLanguage string   `json:"broadcaster_language"`
-	Title               string   `json:"title"`
+	GameID              string   `json:"game_id,omitempty"`
+	BroadcasterLanguage string   `json:"broadcaster_language,omitempty"`
+	Title               string   `json:"title,omitempty"`
 	Delay               int      `json:"delay,omitempty"`
-	Tags                []string `json:"tags"`
+	Tags                []string `json:"tags,omitempty"`
 }
 
 type GetChannelInformationResponse struct {
