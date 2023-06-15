@@ -10,7 +10,14 @@ const (
 )
 
 var (
-	datetimeFields = []string{"started_at", "ended_at"}
+	datetimeFields = []string{
+		"started_at",
+		"start_time",
+		"vacation_start_time",
+		"vacation_end_time",
+		"ended_at",
+		"end_time",
+	}
 )
 
 // Time is our custom time struct.
