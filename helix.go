@@ -212,6 +212,10 @@ func buildQueryString(req *http.Request, v interface{}) (string, error) {
 
 			tag = tagSlice[0]
 			defaultValue = tagSlice[1]
+
+			if defaultValue == "omitempty" {
+				defaultValue = ""
+			}
 		}
 
 		if field.Type.Kind() == reflect.Slice {
