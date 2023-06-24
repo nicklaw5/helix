@@ -49,8 +49,8 @@ type StreamMarkersParams struct {
 // of an user being recorded as VOD.
 //
 // Required Scope: user:read:broadcast
-func (c *Client) GetStreamMarkers(params *StreamMarkersParams) (*StreamMarkersResponse, error) {
-	resp, err := c.get("/streams/markers", &ManyStreamMarkers{}, params)
+func (c *Client) GetStreamMarkers(params *StreamMarkersParams, opts ...Options) (*StreamMarkersResponse, error) {
+	resp, err := c.get("/streams/markers", &ManyStreamMarkers{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,8 +92,8 @@ type CreateStreamMarkerParams struct {
 // https://dev.twitch.tv/docs/api/reference/#create-stream-marker
 //
 // Required Scope: user:edit:broadcast
-func (c *Client) CreateStreamMarker(params *CreateStreamMarkerParams) (*CreateStreamMarkerResponse, error) {
-	resp, err := c.post("/streams/markers", &ManyCreateStreamMarkers{}, params)
+func (c *Client) CreateStreamMarker(params *CreateStreamMarkerParams, opts ...Options) (*CreateStreamMarkerResponse, error) {
+	resp, err := c.post("/streams/markers", &ManyCreateStreamMarkers{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

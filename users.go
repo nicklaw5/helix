@@ -35,8 +35,8 @@ type UsersParams struct {
 // a user ID nor a login name is specified, the user is looked up by Bearer token.
 //
 // Optional scope: user:read:email
-func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
-	resp, err := c.get("/users", &ManyUsers{}, params)
+func (c *Client) GetUsers(params *UsersParams, opts ...Options) (*UsersResponse, error) {
+	resp, err := c.get("/users", &ManyUsers{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ type UpdateUserParams struct {
 // by a Bearer token.
 //
 // Required scope: user:edit
-func (c *Client) UpdateUser(params *UpdateUserParams) (*UsersResponse, error) {
-	resp, err := c.put("/users", &ManyUsers{}, params)
+func (c *Client) UpdateUser(params *UpdateUserParams, opts ...Options) (*UsersResponse, error) {
+	resp, err := c.put("/users", &ManyUsers{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +100,8 @@ type UsersFollowsParams struct {
 // Information returned is sorted in order, most recent follow first. This can return
 // information like “who is lirik following,” “who is following lirik,” or “is user X
 // following user Y.”
-func (c *Client) GetUsersFollows(params *UsersFollowsParams) (*UsersFollowsResponse, error) {
-	resp, err := c.get("/users/follows", &ManyFollows{}, params)
+func (c *Client) GetUsersFollows(params *UsersFollowsParams, opts ...Options) (*UsersFollowsResponse, error) {
+	resp, err := c.get("/users/follows", &ManyFollows{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,8 +140,8 @@ type UsersBlockedParams struct {
 // GetUsersBlocked : Gets a specified user’s block list.
 //
 // Required scope: user:read:blocked_users
-func (c *Client) GetUsersBlocked(params *UsersBlockedParams) (*UsersBlockedResponse, error) {
-	resp, err := c.get("/users/blocks", &ManyUsersBlocked{}, params)
+func (c *Client) GetUsersBlocked(params *UsersBlockedParams, opts ...Options) (*UsersBlockedResponse, error) {
+	resp, err := c.get("/users/blocks", &ManyUsersBlocked{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,8 @@ type BlockUserParams struct {
 // BlockUser : Blocks the specified user on behalf of the authenticated user.
 //
 // Required scope: user:manage:blocked_users
-func (c *Client) BlockUser(params *BlockUserParams) (*BlockUserResponse, error) {
-	resp, err := c.put("/users/blocks", nil, params)
+func (c *Client) BlockUser(params *BlockUserParams, opts ...Options) (*BlockUserResponse, error) {
+	resp, err := c.put("/users/blocks", nil, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -186,8 +186,8 @@ type UnblockUserParams struct {
 // UnblockUser : Unblocks the specified user on behalf of the authenticated user.
 //
 // Required scope: user:manage:blocked_users
-func (c *Client) UnblockUser(params *UnblockUserParams) (*BlockUserResponse, error) {
-	resp, err := c.delete("/users/blocks", nil, params)
+func (c *Client) UnblockUser(params *UnblockUserParams, opts ...Options) (*BlockUserResponse, error) {
+	resp, err := c.delete("/users/blocks", nil, params, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -21,8 +21,8 @@ type UserExtensionsResponse struct {
 // identified by a Bearer token
 //
 // Required scope: user:read:broadcast
-func (c *Client) GetUserExtensions() (*UserExtensionsResponse, error) {
-	resp, err := c.get("/users/extensions/list", &ManyUserExtensions{}, nil)
+func (c *Client) GetUserExtensions(opts ...Options) (*UserExtensionsResponse, error) {
+	resp, err := c.get("/users/extensions/list", &ManyUserExtensions{}, nil, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +66,8 @@ type UserActiveExtensionsParams struct {
 // by a user ID or Bearer token.
 //
 // Optional scope: user:read:broadcast or user:edit:broadcast
-func (c *Client) GetUserActiveExtensions(params *UserActiveExtensionsParams) (*UserActiveExtensionsResponse, error) {
-	resp, err := c.get("/users/extensions", &UserActiveExtensionSet{}, params)
+func (c *Client) GetUserActiveExtensions(params *UserActiveExtensionsParams, opts ...Options) (*UserActiveExtensionsResponse, error) {
+	resp, err := c.get("/users/extensions", &UserActiveExtensionSet{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -93,9 +93,9 @@ type wrappedUpdateUserExtensionsPayload struct {
 // If you try to activate a given extension under multiple extension types, the last write wins (and there is no guarantee of write order).
 //
 // Required scope: user:edit:broadcast
-func (c *Client) UpdateUserExtensions(payload *UpdateUserExtensionsPayload) (*UserActiveExtensionsResponse, error) {
+func (c *Client) UpdateUserExtensions(payload *UpdateUserExtensionsPayload, opts ...Options) (*UserActiveExtensionsResponse, error) {
 	normalizedPayload := &wrappedUpdateUserExtensionsPayload{UpdateUserExtensionsPayload: *payload}
-	resp, err := c.putAsJSON("/users/extensions", &UserActiveExtensionSet{}, normalizedPayload)
+	resp, err := c.putAsJSON("/users/extensions", &UserActiveExtensionSet{}, normalizedPayload, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -38,8 +38,8 @@ type CodeResponse struct {
 // Per https://dev.twitch.tv/docs/api/reference#get-code-status
 // Access is controlled via an app access token on the calling service. The client ID associated with the app access token must be approved by Twitch as part of a contracted arrangement.
 // Callers with an app access token are authorized to redeem codes on behalf of any Twitch user account.
-func (c *Client) GetEntitlementCodeStatus(params *CodesParams) (*CodeResponse, error) {
-	resp, err := c.get("/entitlements/codes", &ManyCodes{}, params)
+func (c *Client) GetEntitlementCodeStatus(params *CodesParams, opts ...Options) (*CodeResponse, error) {
+	resp, err := c.get("/entitlements/codes", &ManyCodes{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +55,8 @@ func (c *Client) GetEntitlementCodeStatus(params *CodesParams) (*CodeResponse, e
 // Per https://dev.twitch.tv/docs/api/reference/#redeem-code
 // Access is controlled via an app access token on the calling service. The client ID associated with the app access token must be approved by Twitch.
 // Callers with an app access token are authorized to redeem codes on behalf of any Twitch user account.
-func (c *Client) RedeemEntitlementCode(params *CodesParams) (*CodeResponse, error) {
-	resp, err := c.post("/entitlements/code", &ManyCodes{}, params)
+func (c *Client) RedeemEntitlementCode(params *CodesParams, opts ...Options) (*CodeResponse, error) {
+	resp, err := c.post("/entitlements/code", &ManyCodes{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

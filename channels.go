@@ -94,8 +94,8 @@ type FollowedChannel struct {
 
 // SearchChannels searches for Twitch channels based on the given search
 // parameters. Unlike GetStreams, this can also return offline channels.
-func (c *Client) SearchChannels(params *SearchChannelsParams) (*SearchChannelsResponse, error) {
-	resp, err := c.get("/search/channels", &ManySearchChannels{}, params)
+func (c *Client) SearchChannels(params *SearchChannelsParams, opts ...Options) (*SearchChannelsResponse, error) {
+	resp, err := c.get("/search/channels", &ManySearchChannels{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ type ChannelInformation struct {
 	Tags                []string `json:"tags"`
 }
 
-func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*GetChannelInformationResponse, error) {
-	resp, err := c.get("/channels", &ManyChannelInformation{}, params)
+func (c *Client) GetChannelInformation(params *GetChannelInformationParams, opts ...Options) (*GetChannelInformationResponse, error) {
+	resp, err := c.get("/channels", &ManyChannelInformation{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,8 +160,8 @@ func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*Ge
 	return channels, nil
 }
 
-func (c *Client) EditChannelInformation(params *EditChannelInformationParams) (*EditChannelInformationResponse, error) {
-	resp, err := c.patchAsJSON("/channels", &EditChannelInformationResponse{}, params)
+func (c *Client) EditChannelInformation(params *EditChannelInformationParams, opts ...Options) (*EditChannelInformationResponse, error) {
+	resp, err := c.patchAsJSON("/channels", &EditChannelInformationResponse{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

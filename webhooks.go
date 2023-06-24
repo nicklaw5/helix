@@ -29,8 +29,8 @@ type WebhookSubscriptionsParams struct {
 
 // GetWebhookSubscriptions gets webhook subscriptions, in order of expiration.
 // Requires an app access token.
-func (c *Client) GetWebhookSubscriptions(params *WebhookSubscriptionsParams) (*WebhookSubscriptionsResponse, error) {
-	resp, err := c.get("/webhooks/subscriptions", &ManyWebhookSubscriptions{}, params)
+func (c *Client) GetWebhookSubscriptions(params *WebhookSubscriptionsParams, opts ...Options) (*WebhookSubscriptionsResponse, error) {
+	resp, err := c.get("/webhooks/subscriptions", &ManyWebhookSubscriptions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ type WebhookSubscriptionPayload struct {
 	Secret       string `json:"hub.secret,omitempty"`
 }
 
-func (c *Client) PostWebhookSubscription(payload *WebhookSubscriptionPayload) (*WebhookSubscriptionResponse, error) {
-	resp, err := c.postAsJSON("/webhooks/hub", nil, payload)
+func (c *Client) PostWebhookSubscription(payload *WebhookSubscriptionPayload, opts ...Options) (*WebhookSubscriptionResponse, error) {
+	resp, err := c.postAsJSON("/webhooks/hub", nil, payload, opts...)
 	if err != nil {
 		return nil, err
 	}

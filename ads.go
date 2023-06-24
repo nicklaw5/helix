@@ -35,8 +35,8 @@ type StartCommercialResponse struct {
 // StartCommercial starts a commercial on a specified channel
 // OAuth Token required
 // Requires channel:edit:commercial scope
-func (c *Client) StartCommercial(params *StartCommercialParams) (*StartCommercialResponse, error) {
-	resp, err := c.post("/channels/commercial", &ManyAdDetails{}, params)
+func (c *Client) StartCommercial(params *StartCommercialParams, opts ...Options) (*StartCommercialResponse, error) {
+	resp, err := c.post("/channels/commercial", &ManyAdDetails{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

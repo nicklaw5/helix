@@ -27,8 +27,8 @@ type GetCreatorGoalsParams struct {
 }
 
 // Required scope: channel:read:goals
-func (c *Client) GetCreatorGoals(payload *GetCreatorGoalsParams) (*CreatorGoalsResponse, error) {
-	resp, err := c.get("/goals", &ManyGoals{}, payload)
+func (c *Client) GetCreatorGoals(payload *GetCreatorGoalsParams, opts ...Options) (*CreatorGoalsResponse, error) {
+	resp, err := c.get("/goals", &ManyGoals{}, payload, opts...)
 	if err != nil {
 		return nil, err
 	}

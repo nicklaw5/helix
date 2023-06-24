@@ -63,8 +63,8 @@ type UserSubscriptionsParams struct {
 // Broadcasters can only request their own subscriptions.
 //
 // Required scope: channel:read:subscriptions
-func (c *Client) GetSubscriptions(params *SubscriptionsParams) (*SubscriptionsResponse, error) {
-	resp, err := c.get("/subscriptions", &ManySubscriptions{}, params)
+func (c *Client) GetSubscriptions(params *SubscriptionsParams, opts ...Options) (*SubscriptionsResponse, error) {
+	resp, err := c.get("/subscriptions", &ManySubscriptions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +82,8 @@ func (c *Client) GetSubscriptions(params *SubscriptionsParams) (*SubscriptionsRe
 // CheckUserSubscription Check if a specific user is subscribed to a specific channel
 //
 // Required scope: user:read:subscriptions
-func (c *Client) CheckUserSubscription(params *UserSubscriptionsParams) (*UserSubscriptionResponse, error) {
-	resp, err := c.get("/subscriptions/user", &ManyUserSubscriptions{}, params)
+func (c *Client) CheckUserSubscription(params *UserSubscriptionsParams, opts ...Options) (*UserSubscriptionResponse, error) {
+	resp, err := c.get("/subscriptions/user", &ManyUserSubscriptions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

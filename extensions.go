@@ -83,8 +83,8 @@ type ExtensionLiveChannelsResponse struct {
 // exchanging Bits for an in-Extension digital good.
 //
 // See https://dev.twitch.tv/docs/api/reference/#get-extension-transactions
-func (c *Client) GetExtensionTransactions(params *ExtensionTransactionsParams) (*ExtensionTransactionsResponse, error) {
-	resp, err := c.get("/extensions/transactions", &ManyExtensionTransactions{}, params)
+func (c *Client) GetExtensionTransactions(params *ExtensionTransactionsParams, opts ...Options) (*ExtensionTransactionsResponse, error) {
+	resp, err := c.get("/extensions/transactions", &ManyExtensionTransactions{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Client) GetExtensionTransactions(params *ExtensionTransactionsParams) (
 // The author of the message is the Extension name.
 //
 // see https://dev.twitch.tv/docs/api/reference#send-extension-chat-message
-func (c *Client) SendExtensionChatMessage(params *ExtensionSendChatMessageParams) (*ExtensionSendChatMessageResponse, error) {
+func (c *Client) SendExtensionChatMessage(params *ExtensionSendChatMessageParams, opts ...Options) (*ExtensionSendChatMessageResponse, error) {
 
 	if len(params.Text) > 280 {
 		return nil, fmt.Errorf("error: chat message length exceeds 280 characters")
@@ -111,7 +111,7 @@ func (c *Client) SendExtensionChatMessage(params *ExtensionSendChatMessageParams
 		return nil, fmt.Errorf("error: broadcaster ID must be specified")
 	}
 
-	resp, err := c.postAsJSON("/extensions/chat", &ExtensionSendChatMessageResponse{}, params)
+	resp, err := c.postAsJSON("/extensions/chat", &ExtensionSendChatMessageResponse{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

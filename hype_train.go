@@ -45,8 +45,8 @@ type HypeTrainEventsParams struct {
 }
 
 // Required scope: channel:read:hype_train
-func (c *Client) GetHypeTrainEvents(params *HypeTrainEventsParams) (*HypeTrainEventsResponse, error) {
-	resp, err := c.get("/hypetrain/events", &ManyHypeTrainEvents{}, params)
+func (c *Client) GetHypeTrainEvents(params *HypeTrainEventsParams, opts ...Options) (*HypeTrainEventsResponse, error) {
+	resp, err := c.get("/hypetrain/events", &ManyHypeTrainEvents{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

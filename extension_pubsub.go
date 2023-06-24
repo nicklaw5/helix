@@ -61,8 +61,8 @@ type ExtensionSendPubSubMessageResponse struct {
 	ResponseCommon
 }
 
-func (c *Client) SendExtensionPubSubMessage(params *ExtensionSendPubSubMessageParams) (*ExtensionSendPubSubMessageResponse, error) {
-	resp, err := c.postAsJSON("/extensions/pubsub", &ExtensionSendPubSubMessageResponse{}, params)
+func (c *Client) SendExtensionPubSubMessage(params *ExtensionSendPubSubMessageParams, opts ...Options) (*ExtensionSendPubSubMessageResponse, error) {
+	resp, err := c.postAsJSON("/extensions/pubsub", &ExtensionSendPubSubMessageResponse{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

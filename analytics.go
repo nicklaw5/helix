@@ -28,8 +28,8 @@ type ExtensionAnalyticsParams struct {
 
 // GetExtensionAnalytics returns a URL to the downloadable CSV file
 // containing analytics data. Valid for 5 minutes.
-func (c *Client) GetExtensionAnalytics(params *ExtensionAnalyticsParams) (*ExtensionAnalyticsResponse, error) {
-	resp, err := c.get("/analytics/extensions", &ManyExtensionAnalytics{}, params)
+func (c *Client) GetExtensionAnalytics(params *ExtensionAnalyticsParams, opts ...Options) (*ExtensionAnalyticsResponse, error) {
+	resp, err := c.get("/analytics/extensions", &ManyExtensionAnalytics{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +69,9 @@ type GameAnalyticsParams struct {
 
 // GetGameAnalytics returns a URL to the downloadable CSV file
 // containing analytics data for the specified game. Valid for 5 minutes.
-func (c *Client) GetGameAnalytics(params *GameAnalyticsParams) (*GameAnalyticsResponse, error) {
+func (c *Client) GetGameAnalytics(params *GameAnalyticsParams, opts ...Options) (*GameAnalyticsResponse, error) {
 
-	resp, err := c.get("/analytics/games", &ManyGameAnalytics{}, params)
+	resp, err := c.get("/analytics/games", &ManyGameAnalytics{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -136,8 +136,8 @@ type ChannelCustomRewardsRedemption struct {
 
 // CreateCustomReward : Creates a Custom Reward on a channel.
 // Required scope: channel:manage:redemptions
-func (c *Client) CreateCustomReward(params *ChannelCustomRewardsParams) (*ChannelCustomRewardResponse, error) {
-	resp, err := c.postAsJSON("/channel_points/custom_rewards", &ManyChannelCustomRewards{}, params)
+func (c *Client) CreateCustomReward(params *ChannelCustomRewardsParams, opts ...Options) (*ChannelCustomRewardResponse, error) {
+	resp, err := c.postAsJSON("/channel_points/custom_rewards", &ManyChannelCustomRewards{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -166,8 +166,8 @@ func (c *Client) UpdateCustomReward(params *UpdateChannelCustomRewardsParams) (*
 
 // DeleteCustomRewards : Deletes a Custom Rewards on a channel
 // Required scope: channel:manage:redemptions
-func (c *Client) DeleteCustomRewards(params *DeleteCustomRewardsParams) (*DeleteCustomRewardsResponse, error) {
-	resp, err := c.delete("/channel_points/custom_rewards", nil, params)
+func (c *Client) DeleteCustomRewards(params *DeleteCustomRewardsParams, opts ...Options) (*DeleteCustomRewardsResponse, error) {
+	resp, err := c.delete("/channel_points/custom_rewards", nil, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +180,8 @@ func (c *Client) DeleteCustomRewards(params *DeleteCustomRewardsParams) (*Delete
 
 // GetCustomRewards : Get Custom Rewards on a channel
 // Required scope: channel:read:redemptions
-func (c *Client) GetCustomRewards(params *GetCustomRewardsParams) (*ChannelCustomRewardResponse, error) {
-	resp, err := c.get("/channel_points/custom_rewards", &ManyChannelCustomRewards{}, params)
+func (c *Client) GetCustomRewards(params *GetCustomRewardsParams, opts ...Options) (*ChannelCustomRewardResponse, error) {
+	resp, err := c.get("/channel_points/custom_rewards", &ManyChannelCustomRewards{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

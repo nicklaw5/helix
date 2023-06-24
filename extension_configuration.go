@@ -63,7 +63,7 @@ type ExtensionSetConfigurationResponse struct {
 }
 
 // https://dev.twitch.tv/docs/extensions/reference/#set-extension-configuration-segment
-func (c *Client) SetExtensionSegmentConfig(params *ExtensionSetConfigurationParams) (*ExtensionSetConfigurationResponse, error) {
+func (c *Client) SetExtensionSegmentConfig(params *ExtensionSetConfigurationParams, opts ...Options) (*ExtensionSetConfigurationResponse, error) {
 	if params.BroadcasterID != "" {
 		switch params.Segment {
 		case ExtensionConfigurationDeveloperSegment, ExtensionConfigrationBroadcasterSegment:
@@ -72,7 +72,7 @@ func (c *Client) SetExtensionSegmentConfig(params *ExtensionSetConfigurationPara
 		}
 	}
 
-	resp, err := c.putAsJSON("/extensions/configurations", &ManyPolls{}, params)
+	resp, err := c.putAsJSON("/extensions/configurations", &ManyPolls{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *Client) SetExtensionSegmentConfig(params *ExtensionSetConfigurationPara
 	return setExtCnfgResp, nil
 }
 
-func (c *Client) GetExtensionConfigurationSegment(params *ExtensionGetConfigurationParams) (*ExtensionGetConfigurationSegmentResponse, error) {
+func (c *Client) GetExtensionConfigurationSegment(params *ExtensionGetConfigurationParams, opts ...Options) (*ExtensionGetConfigurationSegmentResponse, error) {
 
 	if params.BroadcasterID != "" {
 		for _, segment := range params.Segments {
@@ -95,7 +95,7 @@ func (c *Client) GetExtensionConfigurationSegment(params *ExtensionGetConfigurat
 		}
 	}
 
-	resp, err := c.get("/extensions/configurations", &ManyExtensionConfigurationSegments{}, params)
+	resp, err := c.get("/extensions/configurations", &ManyExtensionConfigurationSegments{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,9 +107,9 @@ func (c *Client) GetExtensionConfigurationSegment(params *ExtensionGetConfigurat
 	return extCfgSegResp, nil
 }
 
-func (c *Client) SetExtensionRequiredConfiguration(params *ExtensionSetRequiredConfigurationParams) (*ExtensionSetRequiredConfigurationResponse, error) {
+func (c *Client) SetExtensionRequiredConfiguration(params *ExtensionSetRequiredConfigurationParams, opts ...Options) (*ExtensionSetRequiredConfigurationResponse, error) {
 
-	resp, err := c.putAsJSON("/extensions/configurations/required_configuration", &ExtensionSetRequiredConfigurationResponse{}, params)
+	resp, err := c.putAsJSON("/extensions/configurations/required_configuration", &ExtensionSetRequiredConfigurationResponse{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}

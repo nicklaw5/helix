@@ -22,8 +22,8 @@ type ChannelEditorsResponse struct {
 
 // GetChannelEditors Get a list of users who have editor permissions for a specific channel
 // Required scope: channel:read:editors
-func (c *Client) GetChannelEditors(params *ChannelEditorsParams) (*ChannelEditorsResponse, error) {
-	resp, err := c.get("/channels/editors", &ManyChannelEditors{}, params)
+func (c *Client) GetChannelEditors(params *ChannelEditorsParams, opts ...Options) (*ChannelEditorsResponse, error) {
+	resp, err := c.get("/channels/editors", &ManyChannelEditors{}, params, opts...)
 	if err != nil {
 		return nil, err
 	}
