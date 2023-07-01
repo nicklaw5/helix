@@ -38,9 +38,10 @@ type EventSubCondition struct {
 
 // Transport for the subscription, currently the only supported Method is "webhook". Secret must be between 10 and 100 characters
 type EventSubTransport struct {
-	Method   string `json:"method"`
-	Callback string `json:"callback"`
-	Secret   string `json:"secret"`
+	Method    string `json:"method"`
+	Callback  string `json:"callback"`
+	Secret    string `json:"secret"`
+	SessionID string `json:"session_id"`
 }
 
 // Twitch Response for getting all current subscriptions
@@ -707,21 +708,19 @@ func (c *Client) RemoveEventSubSubscription(id string) (*RemoveEventSubSubscript
 
 // Creates an EventSub subscription
 func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*EventSubSubscriptionsResponse, error) {
-	if payload.Transport.Method == "webhook" && !strings.HasPrefix(payload.Transport.Callback, "https://") {
-		return nil, fmt.Errorf("error: callback must use https")
+	switch payload.Transport.Method {
+	case "webhook":
+		if err := verifyWebhookSub(payload); err != nil {
+			return nil, err
+		}
+	case "websocket":
+		if err := verifyWebsocketSub(payload); err != nil {
+			return nil, err
+		}
+	default:
+		return nil, fmt.Errorf("error: unsupported transport method: %s", payload.Transport.Method)
 	}
 
-	if payload.Transport.Secret != "" && (len(payload.Transport.Secret) < 10 || len(payload.Transport.Secret) > 100) {
-		return nil, fmt.Errorf("error: secret must be between 10 and 100 characters")
-	}
-
-	callbackUrl, err := url.Parse(payload.Transport.Callback)
-	if err != nil {
-		return nil, err
-	}
-	if callbackUrl.Port() != "" && callbackUrl.Port() != "443" {
-		return nil, fmt.Errorf("error: callback must use port 443")
-	}
 	resp, err := c.postAsJSON("/eventsub/subscriptions", &ManyEventSubSubscriptions{}, payload)
 	if err != nil {
 		return nil, err
@@ -740,4 +739,32 @@ func VerifyEventSubNotification(secret string, header http.Header, message strin
 	mac.Write(hmacMessage)
 	hmacsha256 := fmt.Sprintf("sha256=%s", hex.EncodeToString(mac.Sum(nil)))
 	return hmacsha256 == header.Get("Twitch-Eventsub-Message-Signature")
+}
+
+func verifyWebhookSub(payload *EventSubSubscription) error {
+	if !strings.HasPrefix(payload.Transport.Callback, "https://") {
+		return fmt.Errorf("error: callback must use https")
+	}
+
+	if payload.Transport.Secret != "" && (len(payload.Transport.Secret) < 10 || len(payload.Transport.Secret) > 100) {
+		return fmt.Errorf("error: secret must be between 10 and 100 characters")
+	}
+
+	callbackUrl, err := url.Parse(payload.Transport.Callback)
+	if err != nil {
+		return err
+	}
+	if callbackUrl.Port() != "" && callbackUrl.Port() != "443" {
+		return fmt.Errorf("error: callback must use port 443")
+	}
+
+	return nil
+}
+
+func verifyWebsocketSub(payload *EventSubSubscription) error {
+	if len(payload.Transport.SessionID) == 0 {
+		return fmt.Errorf("error: session ID must be set up")
+	}
+
+	return nil
 }
