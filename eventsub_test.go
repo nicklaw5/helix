@@ -203,7 +203,18 @@ func TestCreateEventSubSubscriptions(t *testing.T) {
 			&Options{ClientID: "my-client-id"},
 			&EventSubSubscription{},
 			`{"error":"Unauthorized","status":401,"message":"OAuth token is missing"}`,
-			"",
+			"error: unsupported transport method: ",
+		},
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id"},
+			&EventSubSubscription{
+				Transport: EventSubTransport{
+					Method: "custom",
+				},
+			},
+			`{"error":"Unauthorized","status":401,"message":"OAuth token is missing"}`,
+			"error: unsupported transport method: custom",
 		},
 		{
 			http.StatusBadRequest,
