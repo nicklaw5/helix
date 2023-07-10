@@ -393,8 +393,8 @@ type UpdateUserChatColorResponse struct {
 
 // UpdateUserChatColorParams are the parameters for UpdateUserChatColor
 type UpdateUserChatColorParams struct {
-	UserID string `json:"user_id"`
-	Color  string `json:"color"`
+	UserID string `query:"user_id"`
+	Color  string `query:"color"`
 }
 
 // UpdateUserChatcolor updates the color used for the user’s name in chat.
