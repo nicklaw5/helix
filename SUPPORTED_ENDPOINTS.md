@@ -96,12 +96,12 @@
 - [x] End Prediction
 - [x] Start a raid
 - [x] Cancel a raid
-- [ ] Get Channel Stream Schedule
+- [x] Get Channel Stream Schedule
 - [ ] Get Channel iCalendar
-- [ ] Update Channel Stream Schedule
-- [ ] Create Channel Stream Schedule Segment
-- [ ] Update Channel Stream Schedule Segment
-- [ ] Delete Channel Stream Schedule Segment
+- [x] Update Channel Stream Schedule
+- [x] Create Channel Stream Schedule Segment
+- [x] Update Channel Stream Schedule Segment
+- [x] Delete Channel Stream Schedule Segment
 - [x] Search Categories
 - [ ] Search Channels
 - [x] Get Stream Key
