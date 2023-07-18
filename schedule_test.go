@@ -102,8 +102,6 @@ func TestUpdateSchedule(t *testing.T) {
 			&UpdateScheduleParams{
 				BroadcasterID:     "141981764",
 				IsVacationEnabled: true,
-				VacationStartTime: "2021-05-16T00:00:00Z",
-				VacationEndTime:   "2021-05-23T00:00:00Z",
 				Timezone:          "America/New_York",
 			},
 		},
@@ -158,7 +156,6 @@ func TestCreateScheduleSegment(t *testing.T) {
 			&Options{ClientID: "my-client-id", UserAccessToken: "my-access-token"},
 			&CreateScheduleSegmentParams{
 				BroadcasterID: "141981764",
-				StartTime:     "2021-07-01T18:00:00Z",
 				Timezone:      "America/New_York",
 				IsRecurring:   false,
 				Duration:      "60",

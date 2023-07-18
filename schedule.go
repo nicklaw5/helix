@@ -4,7 +4,7 @@ package helix
 type GetScheduleParams struct {
 	BroadcasterID string `json:"broadcaster_id"`
 	ID            string `json:"id"`
-	StartTime     string `json:"start_time"`
+	StartTime     Time   `json:"start_time"`
 	UTCOffset     string `json:"utc_offset"`
 	First         int    `json:"first"`
 	After         string `json:"after"`
@@ -32,8 +32,8 @@ type ScheduleData struct {
 
 type GetScheduleSegment struct {
 	ID            string                     `json:"id"`
-	StartTime     string                     `json:"start_time"`
-	EndTime       string                     `json:"end_time"`
+	StartTime     Time                       `json:"start_time"`
+	EndTime       Time                       `json:"end_time"`
 	Title         string                     `json:"title"`
 	CanceledUntil string                     `json:"canceled_until"`
 	Category      GetScheduleSegmentCategory `json:"category"`
@@ -46,8 +46,8 @@ type GetScheduleSegmentCategory struct {
 }
 
 type GetScheduleVacation struct {
-	StartTime string `json:"start_time"`
-	EndTime   string `json:"end_time"`
+	StartTime Time `json:"start_time"`
+	EndTime   Time `json:"end_time"`
 }
 
 type GetSchedulePagination struct {
@@ -73,8 +73,8 @@ func (c *Client) GetSchedule(params *GetScheduleParams) (*GetScheduleResponse, e
 type UpdateScheduleParams struct {
 	BroadcasterID     string `json:"broadcaster_id"`
 	IsVacationEnabled bool   `json:"is_vacation_enabled"`
-	VacationStartTime string `json:"vacation_start_time"`
-	VacationEndTime   string `json:"vacation_end_time"`
+	VacationStartTime Time   `json:"vacation_start_time"`
+	VacationEndTime   Time   `json:"vacation_end_time"`
 	Timezone          string `json:"timezone"`
 }
 
@@ -97,7 +97,7 @@ func (c *Client) UpdateSchedule(params *UpdateScheduleParams) (*UpdateScheduleRe
 
 type CreateScheduleSegmentParams struct {
 	BroadcasterID string `json:"broadcaster_id"`
-	StartTime     string `json:"start_time"`
+	StartTime     Time   `json:"start_time"`
 	Timezone      string `json:"timezone"`
 	Duration      string `json:"duration"`
 	IsRecurring   bool   `json:"is_recurring"`
@@ -132,7 +132,7 @@ func (c *Client) CreateScheduleSegment(params *CreateScheduleSegmentParams) (*Cr
 type UpdateScheduleSegmentParams struct {
 	BroadcasterID string `json:"broadcaster_id"`
 	ID            string `json:"id"`
-	StartTime     string `json:"start_time"`
+	StartTime     Time   `json:"start_time"`
 	Duration      string `json:"duration"`
 	CategoryID    string `json:"category_id"`
 	Title         string `json:"title"`
