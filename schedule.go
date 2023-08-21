@@ -2,12 +2,12 @@ package helix
 
 // GetScheduleParams are the parameters for GetSchedule
 type GetScheduleParams struct {
-	BroadcasterID string `json:"broadcaster_id"`
-	ID            string `json:"id"`
-	StartTime     Time   `json:"start_time"`
-	UTCOffset     string `json:"utc_offset"`
-	First         int    `json:"first"`
-	After         string `json:"after"`
+	BroadcasterID string `query:"broadcaster_id"`
+	ID            string `query:"id"`
+	StartTime     Time   `query:"start_time"`
+	UTCOffset     string `query:"utc_offset"`
+	First         int    `query:"first"`
+	After         string `query:"after"`
 }
 
 // GetScheduleResponse is the response data in GetSchedule
