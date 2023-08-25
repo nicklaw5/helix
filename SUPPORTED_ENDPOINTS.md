@@ -85,9 +85,6 @@
 - [x] Remove Channel VIP
 - [ ] Update Shield Mode Status
 - [ ] Get Shield Mode Status
-- [x] Get Soundtrack Current Track
-- [ ] Get Soundtrack Playlist
-- [ ] Get Soundtrack Playlists
 - [x] Get Polls
 - [x] Create Poll
 - [x] End Poll
