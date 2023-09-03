@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -32,6 +33,9 @@ type Client struct {
 	ctx          context.Context
 	opts         *Options
 	lastResponse *Response
+	callbacks    struct {
+		onUserAccessTokenRefreshed func(newAccessToken, newRefreshToken string)
+	}
 }
 
 type Options struct {
@@ -39,6 +43,7 @@ type Options struct {
 	ClientSecret    string
 	AppAccessToken  string
 	UserAccessToken string
+	RefreshToken    string
 	UserAgent       string
 	RedirectURI     string
 	HTTPClient      HTTPClient
@@ -370,6 +375,18 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 				// Successful request
 				err = json.Unmarshal(bodyBytes, &resp.Data)
 			} else {
+				// A 401 means Twitch wants us to refresh our token:
+				// https://dev.twitch.tv/docs/authentication/refresh-tokens/
+				if resp.StatusCode == http.StatusUnauthorized && c.canRefreshToken() {
+					if refreshErr := c.refreshToken(); refreshErr != nil {
+						log.Printf("Failed to refresh helix auth token: %v", refreshErr)
+						return err
+					}
+					// Try again now that we have a new token
+					c.setRequestHeaders(req)
+					continue
+				}
+
 				// Failed request
 				err = json.Unmarshal(bodyBytes, &resp)
 			}
@@ -395,6 +412,31 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 			break
 		}
+	}
+
+	return nil
+}
+
+func (c *Client) canRefreshToken() bool {
+	return c.opts.ClientID != "" &&
+		c.opts.ClientSecret != "" &&
+		c.opts.UserAccessToken != "" &&
+		c.opts.RefreshToken != ""
+}
+
+func (c *Client) refreshToken() error {
+	resp, err := c.RefreshUserAccessToken(c.opts.RefreshToken)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to refresh token: (%d: %s) %v", resp.StatusCode, resp.ErrorMessage, err)
+	}
+
+	c.mu.Lock()
+	c.opts.UserAccessToken = resp.Data.AccessToken
+	c.opts.RefreshToken = resp.Data.RefreshToken
+	c.mu.Unlock()
+
+	if cb := c.callbacks.onUserAccessTokenRefreshed; cb != nil {
+		go cb(resp.Data.AccessToken, resp.Data.RefreshToken)
 	}
 
 	return nil
@@ -459,6 +501,17 @@ func (c *Client) SetUserAccessToken(accessToken string) {
 	c.opts.UserAccessToken = accessToken
 }
 
+// GetRefreshToken returns the current refresh token.
+func (c *Client) GetRefreshToken() string {
+	return c.opts.RefreshToken
+}
+
+func (c *Client) SetRefreshToken(refreshToken string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.opts.RefreshToken = refreshToken
+}
+
 // GetAppAccessToken returns the current app access token.
 func (c *Client) GetExtensionSignedJWTToken() string {
 	return c.opts.ExtensionOpts.SignedJWTToken
@@ -480,4 +533,10 @@ func (c *Client) SetRedirectURI(uri string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.opts.RedirectURI = uri
+}
+
+func (c *Client) OnUserAccessTokenRefreshed(f func(newAccessToken, newRefreshToken string)) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.callbacks.onUserAccessTokenRefreshed = f
 }

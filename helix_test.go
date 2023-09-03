@@ -3,10 +3,12 @@ package helix
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -63,6 +65,7 @@ func TestNewClient(t *testing.T) {
 				HTTPClient:      &http.Client{},
 				AppAccessToken:  "my-app-access-token",
 				UserAccessToken: "my-user-access-token",
+				RefreshToken:    "my-refresh-token",
 				UserAgent:       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
 				RateLimitFunc:   func(*Response) error { return nil },
 				RedirectURI:     "http://localhost/auth/callback",
@@ -109,6 +112,10 @@ func TestNewClient(t *testing.T) {
 
 		if opts.UserAccessToken != testCase.options.UserAccessToken {
 			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.UserAccessToken, opts.UserAccessToken)
+		}
+
+		if opts.RefreshToken != testCase.options.RefreshToken {
+			t.Errorf("expected refreshToken to be \"%s\", got \"%s\"", testCase.options.RefreshToken, opts.RefreshToken)
 		}
 
 		if opts.RedirectURI != testCase.options.RedirectURI {
@@ -331,6 +338,45 @@ func TestRatelimitCallbackFailsOnError(t *testing.T) {
 
 	if err.Error() != errMsg {
 		t.Errorf("Expected error to be \"%s\", got \"%s\"", errMsg, err.Error())
+	}
+}
+
+func TestAutomaticUserTokenRefresh(t *testing.T) {
+	t.Parallel()
+
+	options := &Options{
+		ClientID:        "client-id",
+		ClientSecret:    "old-client-secret",
+		UserAccessToken: "old-user-token",
+		RefreshToken:    "old-refresh-token",
+	}
+	client := newMockClient(options, func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/oauth2/token") {
+			w.Write([]byte(`{"access_token":"new-access-token","expires_in":14154,"refresh_token":"new-refresh-token","scope":["analytics:read:games","bits:read","clips:edit","user:edit","user:read:email"]}`))
+		} else if strings.Contains(r.URL.Path, "/channels/followers") {
+			if strings.Contains(r.Header.Get("Authorization"), "old-user-token") {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`))
+			} else {
+				w.Write([]byte(`{"total":8,"data":[],"pagination":{}}`))
+			}
+		} else {
+			log.Printf("Unknown URL sent to test server: %s", r.URL.Path)
+		}
+	})
+
+	_, err := client.GetChannelFollows(&GetChannelFollowsParams{}) // any method works
+	if err != nil {
+		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	time.Sleep(5 * time.Millisecond)
+
+	if client.opts.UserAccessToken != "new-access-token" {
+		t.Errorf("expected UserAccessToken to be %q, got %q", "new-access-token", client.opts.UserAccessToken)
+	}
+	if client.opts.RefreshToken != "new-refresh-token" {
+		t.Errorf("expected RefreshToken to be %q, got %q", "new-refresh-token", client.opts.RefreshToken)
 	}
 }
 
@@ -584,6 +630,44 @@ func TestSetUserAccessToken(t *testing.T) {
 	}
 }
 
+func TestGetRefreshToken(t *testing.T) {
+	t.Parallel()
+
+	refreshToken := "my-refresh-token"
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	client.SetRefreshToken(refreshToken)
+
+	if client.GetRefreshToken() != refreshToken {
+		t.Errorf("expected GetRefreshToken to return \"%s\", got \"%s\"", refreshToken, client.GetRefreshToken())
+	}
+}
+
+func TestSetRefreshToken(t *testing.T) {
+	t.Parallel()
+
+	refreshToken := "my-refresh-token"
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	client.SetRefreshToken(refreshToken)
+
+	if client.opts.RefreshToken != refreshToken {
+		t.Errorf("expected RefreshToken to be \"%s\", got \"%s\"", refreshToken, client.opts.RefreshToken)
+	}
+}
+
 func TestSetUserAgent(t *testing.T) {
 	t.Parallel()
 
@@ -617,6 +701,53 @@ func TestSetRedirectURI(t *testing.T) {
 
 	if client.opts.RedirectURI != redirectURI {
 		t.Errorf("expected redirectURI to be \"%s\", got \"%s\"", redirectURI, client.opts.RedirectURI)
+	}
+}
+
+func TestOnUserAccessTokenRefreshed(t *testing.T) {
+	t.Parallel()
+
+	options := &Options{
+		ClientID:        "client-id",
+		ClientSecret:    "old-client-secret",
+		UserAccessToken: "old-user-token",
+		RefreshToken:    "old-refresh-token",
+	}
+	client := newMockClient(options, func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/oauth2/token") {
+			w.Write([]byte(`{"access_token":"new-access-token","expires_in":14154,"refresh_token":"new-refresh-token","scope":["analytics:read:games","bits:read","clips:edit","user:edit","user:read:email"]}`))
+		} else if strings.Contains(r.URL.Path, "/channels/followers") {
+			if strings.Contains(r.Header.Get("Authorization"), "old-user-token") {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`))
+			} else {
+				w.Write([]byte(`{"total":8,"data":[],"pagination":{}}`))
+			}
+		} else {
+			log.Printf("Unknown URL sent to test server: %s", r.URL.Path)
+		}
+	})
+
+	var newAccessToken, newRefreshToken string
+	client.OnUserAccessTokenRefreshed(func(a, r string) {
+		newAccessToken = a
+		newRefreshToken = r
+	})
+	wantNewAccessToken := "new-access-token"
+	wantNewRefreshToken := "new-refresh-token"
+
+	_, err := client.GetChannelFollows(&GetChannelFollowsParams{}) // any method works
+	if err != nil {
+		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	time.Sleep(5 * time.Millisecond)
+
+	if newAccessToken != wantNewAccessToken {
+		t.Errorf("expected newAccessToken to be %q, got %q", wantNewAccessToken, newAccessToken)
+	}
+	if newRefreshToken != wantNewRefreshToken {
+		t.Errorf("expected newRefreshToken to be %q, got %q", wantNewRefreshToken, newRefreshToken)
 	}
 }
 
