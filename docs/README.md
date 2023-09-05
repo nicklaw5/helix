@@ -133,6 +133,7 @@ type Options struct {
     ClientSecret    string            // Default: empty string
     AppAccessToken  string            // Default: empty string
     UserAccessToken string            // Default: empty string
+    RefreshToken    string            // Default: empty string
     UserAgent       string            // Default: empty string
     RedirectURI     string            // Default: empty string
     HTTPClient      HTTPClient        // Default: http.DefaultClient
@@ -280,6 +281,37 @@ client.SetAppAccessToken("your-app-access-token")
 Note that any subsequent API requests will utilize this same access token. So it is necessary to unset the access
 token when you are finished with it. To do so, simply pass an empty string to the `SetUserAccessToken` or
 `SetAppAccessToken` methods.
+
+### Automatically refresh user access tokens
+
+If you provide a refresh token to the client, either one generated manually or via the below method, the client will automatically refresh the user access token when needed.
+
+Note that client ID, client secret, an existing user access token, and a refresh token must all be present for automatic refreshes to occur.
+
+You can provide a refresh token in the following manner:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:        "your-client-id",
+    ClientSecret:    "your-client-secret",
+    UserAccessToken: "your-access-token",
+    RefreshToken:    "your-refresh-token",
+})
+```
+
+Or, set one later:
+
+```go
+client.SetRefreshToken("your-refresh-token")
+```
+
+To be notified when refreshes take place:
+
+```go
+client.OnUserAccessTokenRefreshed(func(newAccessToken, newRefreshToken string) {
+    // ...
+})
+```
 
 ## User-Agent Header
 
