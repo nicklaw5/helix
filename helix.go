@@ -427,7 +427,13 @@ func (c *Client) canRefreshToken() bool {
 func (c *Client) refreshToken() error {
 	resp, err := c.RefreshUserAccessToken(c.opts.RefreshToken)
 	if err != nil || resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to refresh token: (%d: %s) %v", resp.StatusCode, resp.ErrorMessage, err)
+		statusCode := -1
+		var errorMessage string
+		if resp != nil {
+			statusCode = resp.StatusCode
+			errorMessage = resp.ErrorMessage
+		}
+		return fmt.Errorf("failed to refresh token: (%d: %s) %v", statusCode, errorMessage, err)
 	}
 
 	c.mu.Lock()
