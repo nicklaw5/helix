@@ -741,7 +741,7 @@ func TestOnUserAccessTokenRefreshed(t *testing.T) {
 		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
 	}
 
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	if newAccessToken != wantNewAccessToken {
 		t.Errorf("expected newAccessToken to be %q, got %q", wantNewAccessToken, newAccessToken)
