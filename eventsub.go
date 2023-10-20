@@ -513,7 +513,7 @@ type EventSubOutcome struct {
 
 type EventSubProduct struct {
 	Name          string `json:"name"`
-	Bits          int    `json:"bots"`
+	Bits          int    `json:"bits"`
 	Sku           string `json:"sku"`
 	InDevelopment bool   `json:"in_development"`
 }
