@@ -121,10 +121,10 @@ if err != nil {
 }
 
 if isValid {
-    fmt.Println("%s access token is valid!", userAccessToken)
+    fmt.Printf("%s access token is valid!\n", userAccessToken)
 }
 
-fmt.Println("%+v", resp)
+fmt.Printf("%+v\n", resp)
 ```
 
 ## Get App Access Token
