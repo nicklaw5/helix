@@ -114,12 +114,12 @@ func (c *Client) UnbanUser(params *UnbanUserParams) (*UnbanUserResponse, error) 
 
 type BlockedTermsParams struct {
 	// Required
-	BroadcasterID string `json:"broadcaster_id"`
-	ModeratorID   string `json:"moderator_id"`
+	BroadcasterID string `query:"broadcaster_id"`
+	ModeratorID   string `query:"moderator_id"`
 
 	// Optional
-	After string `json:"after"`
-	First int    `json:"first"`
+	After string `query:"after"`
+	First int    `query:"first"`
 }
 
 type BlockedTermsResponse struct {
