@@ -114,12 +114,12 @@ func (c *Client) UnbanUser(params *UnbanUserParams) (*UnbanUserResponse, error) 
 
 type BlockedTermsParams struct {
 	// Required
-	BroadcasterID string `json:"broadcaster_id"`
-	ModeratorID   string `json:"moderator_id"`
+	BroadcasterID string `query:"broadcaster_id"`
+	ModeratorID   string `query:"moderator_id"`
 
 	// Optional
-	After string `json:"after"`
-	First int    `json:"first"`
+	After string `query:"after"`
+	First int    `query:"first"`
 }
 
 type BlockedTermsResponse struct {
@@ -164,8 +164,8 @@ func (c *Client) GetBlockedTerms(params *BlockedTermsParams) (*BlockedTermsRespo
 }
 
 type AddBlockedTermParams struct {
-	BroadcasterID string `json:"broadcaster_id"`
-	ModeratorID   string `json:"moderator_id"`
+	BroadcasterID string `query:"broadcaster_id"`
+	ModeratorID   string `query:"moderator_id"`
 	Text          string `json:"text"`
 }
 
@@ -189,7 +189,7 @@ func (c *Client) AddBlockedTerm(params *AddBlockedTermParams) (*AddBlockedTermRe
 		return nil, errors.New("the term len must be between 2 and 500")
 	}
 
-	resp, err := c.post("/moderation/blocked_terms", &ManyAddBlockedTerms{}, params)
+	resp, err := c.postAsJSON("/moderation/blocked_terms", &ManyAddBlockedTerms{}, params)
 	if err != nil {
 		return nil, err
 	}
