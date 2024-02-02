@@ -942,3 +942,124 @@ func TestUpdateUserChatColor(t *testing.T) {
 		}
 	}
 }
+
+func TestSendChatMessage(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *SendChatMessageParams
+		respBody   string
+		err        string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&SendChatMessageParams{
+				BroadcasterID: "1234",
+				SenderID:      "5678",
+				Message:       "Hello, world! twitchdevHype",
+			},
+			`{"data":[{"message_id": "abc-123-def","is_sent": true}]}`,
+			``,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&SendChatMessageParams{
+				BroadcasterID: "",
+				SenderID:      "5678",
+				Message:       "Hello, world! twitchdevHype",
+			},
+			``,
+			`error: broadcaster id must be specified`,
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id"},
+			&SendChatMessageParams{
+				BroadcasterID: "1234",
+				SenderID:      "",
+				Message:       "Hello, world! twitchdevHype",
+			},
+			``,
+			`error: sender id must be specified`,
+		},
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id"},
+			&SendChatMessageParams{
+				BroadcasterID: "1234",
+				SenderID:      "5678",
+				Message:       "Hello, world! twitchdevHype",
+			},
+			`{"error":"Unauthorized","status":401,"message":"Missing user:write:chat scope"}`, // missing required scope
+			``,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.SendChatMessage(testCase.params)
+		if err != nil {
+			if err.Error() == testCase.err {
+				continue
+			}
+			t.Errorf("Unmatched error, expected '%v', got '%v'", testCase.err, err)
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode == http.StatusUnauthorized {
+			if resp.Error != "Unauthorized" {
+				t.Errorf("expected error to be \"%s\", got \"%s\"", "Unauthorized", resp.Error)
+			}
+
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be %d, got %d", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if resp.ErrorMessage != "Missing user:write:chat scope" {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", "Missing user:write:chat scope", resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		if len(resp.Data.Messages) < 1 {
+			t.Errorf("Expected the number of messages to be a positive number")
+		}
+
+		if len(resp.Data.Messages[0].MessageID) == 0 {
+			t.Errorf("Expected message_id not to be empty")
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.SendChatMessage(&SendChatMessageParams{BroadcasterID: "123", SenderID: "456", Message: "Hello, world! twitchdevHype"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	const expectedHTTPError = "Failed to execute API request: Oops, that's bad :("
+
+	if err.Error() != expectedHTTPError {
+		t.Errorf("expected error does match return error, got '%s'", err.Error())
+	}
+}
