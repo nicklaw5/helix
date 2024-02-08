@@ -431,10 +431,10 @@ func (c *Client) UpdateUserChatColor(params *UpdateUserChatColorParams) (*Update
 
 type SendChatMessageParams struct {
 	// The ID of the broadcaster whose chat room the message will be sent to
-	BroadcasterID string `query:"broadcaster_id"`
+	BroadcasterID string `json:"broadcaster_id"`
 
 	// The ID of the user sending the message. This ID must match the user ID in the user access token
-	SenderID string `query:"sender_id"`
+	SenderID string `json:"sender_id"`
 
 	// The message to send. The message is limited to a maximum of 500 characters.
 	// Chat messages can also include emoticons.
@@ -442,10 +442,10 @@ type SendChatMessageParams struct {
 	// The names are case sensitive.
 	// Don’t include colons around the name (e.g., :bleedPurple:).
 	// If Twitch recognizes the name, Twitch converts the name to the emote before writing the chat message to the chat room
-	Message string `query:"message"`
+	Message string `json:"message"`
 
 	// The ID of the chat message being replied to
-	ReplyParentMessageID string `query:"reply_parent_message_id"`
+	ReplyParentMessageID string `json:"reply_parent_message_id,omitempty"`
 }
 
 type ChatMessageResponse struct {
@@ -492,7 +492,7 @@ func (c *Client) SendChatMessage(params *SendChatMessageParams) (*ChatMessageRes
 		return nil, errors.New("error: sender id must be specified")
 	}
 
-	resp, err := c.put("/chat/messages", &ManyChatMessages{}, params)
+	resp, err := c.post("/chat/messages", &ManyChatMessages{}, params)
 	if err != nil {
 		return nil, err
 	}
