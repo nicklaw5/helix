@@ -428,3 +428,78 @@ func (c *Client) UpdateUserChatColor(params *UpdateUserChatColorParams) (*Update
 
 	return update, nil
 }
+
+type SendChatMessageParams struct {
+	// The ID of the broadcaster whose chat room the message will be sent to
+	BroadcasterID string `json:"broadcaster_id"`
+
+	// The ID of the user sending the message. This ID must match the user ID in the user access token
+	SenderID string `json:"sender_id"`
+
+	// The message to send. The message is limited to a maximum of 500 characters.
+	// Chat messages can also include emoticons.
+	// To include emoticons, use the name of the emote.
+	// The names are case sensitive.
+	// Don’t include colons around the name (e.g., :bleedPurple:).
+	// If Twitch recognizes the name, Twitch converts the name to the emote before writing the chat message to the chat room
+	Message string `json:"message"`
+
+	// The ID of the chat message being replied to
+	ReplyParentMessageID string `json:"reply_parent_message_id,omitempty"`
+}
+
+type ChatMessageResponse struct {
+	ResponseCommon
+
+	Data ManyChatMessages
+}
+
+type ManyChatMessages struct {
+	Messages []ChatMessage `json:"data"`
+}
+
+type ChatMessage struct {
+	// The message id for the message that was sent
+	MessageID string `json:"message_id"`
+
+	// If the message passed all checks and was sent
+	IsSent bool `json:"is_sent"`
+
+	// The reason the message was dropped, if any
+	DropReasons ManyDropReasons `json:"drop_reason"`
+}
+
+type ManyDropReasons struct {
+	Data DropReason
+}
+
+type DropReason struct {
+	// Code for why the message was dropped
+	Code string `json:"code"`
+
+	// Message for why the message was dropped
+	Message string `json:"message"`
+}
+
+// Requires an app access token or user access token that includes the user:write:chat scope.
+// If app access token used, then additionally requires user:bot scope from chatting user,
+// and either channel:bot scope from broadcaster or moderator status
+func (c *Client) SendChatMessage(params *SendChatMessageParams) (*ChatMessageResponse, error) {
+	if params.BroadcasterID == "" {
+		return nil, errors.New("error: broadcaster id must be specified")
+	}
+	if params.SenderID == "" {
+		return nil, errors.New("error: sender id must be specified")
+	}
+
+	resp, err := c.post("/chat/messages", &ManyChatMessages{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	chatMessages := &ChatMessageResponse{}
+	resp.HydrateResponseCommon(&chatMessages.ResponseCommon)
+	chatMessages.Data.Messages = resp.Data.(*ManyChatMessages).Messages
+
+	return chatMessages, nil
+}
