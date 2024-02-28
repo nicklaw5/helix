@@ -419,6 +419,7 @@ type EventSubHypeTrainProgressEvent struct {
 
 // Data for a hype train end notification
 type EventSubHypeTrainEndEvent struct {
+	ID                   string                 `json:"id"`
 	BroadcasterUserID    string                 `json:"broadcaster_user_id"`
 	BroadcasterUserLogin string                 `json:"broadcaster_user_login"`
 	BroadcasterUserName  string                 `json:"broadcaster_user_name"`
@@ -426,7 +427,7 @@ type EventSubHypeTrainEndEvent struct {
 	Total                int                    `json:"total"`
 	TopContributions     []EventSubContribution `json:"top_contributions"`
 	StartedAt            Time                   `json:"started_at"`
-	ExpiresAt            Time                   `json:"expires_at"`
+	EndedAt              Time                   `json:"ended_at"`
 	CooldownEndsAt       Time                   `json:"cooldown_ends_at"`
 }
 
