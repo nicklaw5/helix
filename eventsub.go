@@ -278,25 +278,25 @@ type EventSubChannelChatClearUserMessagesEvent struct {
 
 // Data for a chat message
 type EventSubChannelChatMessageEvent struct {
-	BroadcasterUserID    string              `json:"broadcaster_user_id"`
-	BroadcasterUserLogin string              `json:"broadcaster_user_login"`
-	BroadcasterUserName  string              `json:"broadcaster_user_name"`
-	ChatterUserID        string              `json:"chatter_user_id"`
-	ChatterUserLogin     string              `json:"chatter_user_login"`
-	ChatterUserName      string              `json:"chatter_user_name"`
-	MessageID            string              `json:"message_id"`
-	Message              EventSubChatMessage `json:"message"`
+	BroadcasterUserID           string                   `json:"broadcaster_user_id"`
+	BroadcasterUserLogin        string                   `json:"broadcaster_user_login"`
+	BroadcasterUserName         string                   `json:"broadcaster_user_name"`
+	ChatterUserID               string                   `json:"chatter_user_id"`
+	ChatterUserLogin            string                   `json:"chatter_user_login"`
+	ChatterUserName             string                   `json:"chatter_user_name"`
+	MessageID                   string                   `json:"message_id"`
+	Message                     EventSubChatMessage      `json:"message"`
+	MessageType                 EventSubChatMessageType  `json:"message_type"`
+	Badges                      []EventSubChatBadge      `json:"badges"`
+	Cheer                       EventSubChatMessageCheer `json:"cheer"`
+	Color                       string                   `json:"color"`
+	Reply                       EventSubChatMessageReply `json:"reply"`
+	ChannelPointsCustomRewardID string                   `json:"channel_points_custom_reward_id"`
 }
 
 type EventSubChatMessage struct {
-	Text                        string                        `json:"text"`
-	Fragments                   []EventSubChatMessageFragment `json:"fragment"`
-	MessageType                 EventSubChatMessageType       `json:"message_type"`
-	Badges                      []EventSubChatBadge           `json:"badges"`
-	Cheer                       EventSubChatMessageCheer      `json:"cheer"`
-	Color                       string                        `json:"color"`
-	Reply                       EventSubChatMessageReply      `json:"reply"`
-	ChannelPointsCustomRewardID string                        `json:"channel_points_custom_reward_id"`
+	Text      string                        `json:"text"`
+	Fragments []EventSubChatMessageFragment `json:"fragment"`
 }
 
 type EventSubChatMessageReply struct {
