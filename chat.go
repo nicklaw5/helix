@@ -492,7 +492,7 @@ func (c *Client) SendChatMessage(params *SendChatMessageParams) (*ChatMessageRes
 		return nil, errors.New("error: sender id must be specified")
 	}
 
-	resp, err := c.post("/chat/messages", &ManyChatMessages{}, params)
+	resp, err := c.postAsJSON("/chat/messages", &ManyChatMessages{}, params)
 	if err != nil {
 		return nil, err
 	}
