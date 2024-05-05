@@ -629,7 +629,7 @@ type EventSubChannelPredictionEndEvent struct {
 	Outcomes             []EventSubOutcome `json:"outcomes"`
 	Status               string            `json:"status"`
 	StartedAt            Time              `json:"started_at"`
-	EndedAt              Time              `json:"eneded_at"`
+	EndedAt              Time              `json:"ended_at"`
 }
 
 // Data for an extension bits transaction creation
