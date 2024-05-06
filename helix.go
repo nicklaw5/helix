@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"reflect"
@@ -364,7 +364,7 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 		setResponseStatusCode(resp, "StatusCode", response.StatusCode)
 
-		bodyBytes, err := ioutil.ReadAll(response.Body)
+		bodyBytes, err := io.ReadAll(response.Body)
 		if err != nil {
 			return err
 		}
