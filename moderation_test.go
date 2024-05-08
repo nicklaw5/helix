@@ -14,7 +14,7 @@ func TestGetBannedUsers(t *testing.T) {
 		statusCode    int
 		options       *Options
 		BroadcasterID string
-		UserID        string
+		UserID        []string
 		After         string
 		Before        string
 		respBody      string
@@ -23,7 +23,7 @@ func TestGetBannedUsers(t *testing.T) {
 			http.StatusBadRequest,
 			&Options{ClientID: "my-client-id"},
 			"", // missing broadcaster id
-			"",
+			[]string{},
 			"",
 			"",
 			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
@@ -32,7 +32,7 @@ func TestGetBannedUsers(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			"23161357",
-			"",
+			[]string{},
 			"",
 			"",
 			`{"data":[{"expires_at":"","user_id":"54946241","user_name":"chronophylos","user_name":"chronophylos"},{"expires_at":"2022-03-15T02:00:28Z","user_id":"423374343","user_name":"glowillig"}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7Ik9mZnNldCI6MX19"}}`,

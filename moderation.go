@@ -23,9 +23,10 @@ type BannedUsersResponse struct {
 // BroadcasterID must match the auth tokens user_id
 type BannedUsersParams struct {
 	BroadcasterID string `query:"broadcaster_id"`
-	UserID        string `query:"user_id"`
-	After         string `query:"after"`
-	Before        string `query:"before"`
+	// Filter by provided UserIDs
+	UserID []string `query:"user_id"`
+	After  string   `query:"after"`
+	Before string   `query:"before"`
 }
 
 // GetBannedUsers returns all banned and timed-out users in a channel.
