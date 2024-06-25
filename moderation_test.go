@@ -949,3 +949,83 @@ func TestRemoveChannelModerator(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+//I think I did this right, but I have not made tests before, so I am not sure.
+// I tried to just follow the example of the other tests and the api docs.
+
+func TestGetModeratedChannels(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *GetModeratedChannelsParams
+		respBody   string
+		errorMsg   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&GetModeratedChannelsParams{UserID: "1234", First: 2},
+			`{
+                "data": [
+                    {
+                        "broadcaster_id": "1234",
+                        "broadcaster_login": "test_login",
+                        "broadcaster_name": "Test Name"
+                    },
+                    {
+                        "broadcaster_id": "5678",
+                        "broadcaster_login": "test_login2",
+                        "broadcaster_name": "Test Name2"
+                    }
+                ],
+                "pagination": {
+                    "cursor": "abcdef"
+                }
+            }`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetModeratedChannels(testCase.params)
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if len(resp.Data.Channels) != testCase.params.First {
+			t.Errorf("expected channels len to be %d, got %d", testCase.params.First, len(resp.Data.Channels))
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.GetModeratedChannels(&GetModeratedChannelsParams{UserID: "1234", First: 2})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}

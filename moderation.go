@@ -337,6 +337,33 @@ type RemoveChannelModeratorResponse struct {
 	ResponseCommon
 }
 
+//Note I did not spend a lot of time looking for similar structs, so there could be duplicated data here.
+
+type GetModeratedChannelsParams struct {
+	// Required
+	UserID string `query:"user_id"` // Required: User ID of the broadcaster. Must match the User ID in the Bearer token.
+
+	// Optional
+	After string `query:"after"` // Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+	First int    `query:"first"` // Maximum number of objects to return. Maximum: 100. Default: 20.
+}
+
+type ModeratedChannel struct {
+	BroadcasterID    string `json:"broadcaster_id"`
+	BroadcasterLogin string `json:"broadcaster_login"`
+	BroadcasterName  string `json:"broadcaster_name"`
+}
+
+type ManyModeratedChannels struct {
+	Channels   []ModeratedChannel `json:"data"`
+	Pagination Pagination         `json:"pagination"`
+}
+
+type ModeratedChannelsResponse struct {
+	ResponseCommon
+	Data ManyModeratedChannels
+}
+
 // GetModerators Gets all users allowed to moderate the broadcaster’s chat room.
 // Required scope: moderation:read
 func (c *Client) GetModerators(params *GetModeratorsParams) (*ModeratorsResponse, error) {
@@ -379,4 +406,24 @@ func (c *Client) RemoveChannelModerator(params *RemoveChannelModeratorParams) (*
 	resp.HydrateResponseCommon(&moderators.ResponseCommon)
 
 	return moderators, nil
+}
+
+// GetModeratedChannels gets a list of channels that the specified user has moderator privileges in.
+// Required scope: user:read:moderated_channels
+func (c *Client) GetModeratedChannels(params *GetModeratedChannelsParams) (*ModeratedChannelsResponse, error) {
+	if params.UserID == "" {
+		return nil, errors.New("user id must be provided")
+	}
+
+	resp, err := c.get("/moderation/channels", &ManyModeratedChannels{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	channels := &ModeratedChannelsResponse{}
+	resp.HydrateResponseCommon(&channels.ResponseCommon)
+	channels.Data.Channels = resp.Data.(*ManyModeratedChannels).Channels
+	channels.Data.Pagination = resp.Data.(*ManyModeratedChannels).Pagination
+
+	return channels, nil
 }
