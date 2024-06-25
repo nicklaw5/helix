@@ -380,3 +380,49 @@ func (c *Client) RemoveChannelModerator(params *RemoveChannelModeratorParams) (*
 
 	return moderators, nil
 }
+
+// `UserID` must match the user ID in the User-Access token
+type GetModeratedChannelsParams struct {
+	// Required
+	UserID string `query:"user_id"`
+
+	// Optional
+	After string `query:"after"`
+	First int    `query:"first"`
+}
+
+type ModeratedChannel struct {
+	BroadcasterID    string `json:"broadcaster_id"`
+	BroadcasterLogin string `json:"broadcaster_login"`
+	BroadcasterName  string `json:"broadcaster_name"`
+}
+
+type ManyModeratedChannels struct {
+	ModeratedChannels []ModeratedChannel `json:"data"`
+	Pagination        Pagination         `json:"pagination"`
+}
+
+type GetModeratedChannelsResponse struct {
+	ResponseCommon
+	Data ManyModeratedChannels
+}
+
+// GetModeratedChannels Gets a list of channels that the specified user has moderator privileges in.
+// Required scope: user:read:moderated_channels
+func (c *Client) GetModeratedChannels(params *GetModeratedChannelsParams) (*GetModeratedChannelsResponse, error) {
+	if params.UserID == "" {
+		return nil, errors.New("user id is required")
+	}
+
+	resp, err := c.get("/moderation/channels", &ManyModeratedChannels{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	moderatedChannels := &GetModeratedChannelsResponse{}
+	resp.HydrateResponseCommon(&moderatedChannels.ResponseCommon)
+	moderatedChannels.Data.ModeratedChannels = resp.Data.(*ManyModeratedChannels).ModeratedChannels
+	moderatedChannels.Data.Pagination = resp.Data.(*ManyModeratedChannels).Pagination
+
+	return moderatedChannels, nil
+}
