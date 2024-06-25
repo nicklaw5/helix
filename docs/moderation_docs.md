@@ -288,3 +288,30 @@ if err != nil {
 
 fmt.Printf("%+v\n", resp)
 ```
+
+
+## Get Moderated Channels
+
+To use this function you need a user access token with the `user:read:moderated_channels` scope. `UserID` is required and needs to be the same as the user id of the user access token.
+
+This is an example of how to get moderated channels of a user.
+
+```go
+
+client, err := helix.NewClient(&helix.Options{
+    ClientID: "your-client-id",
+    UserAccessToken: "your-user-access-token",
+})
+if err != nil {
+// handle error
+}
+
+resp, err := client.GetModeratedChannels(&helix.GetModeratedChannelsParams{
+    UserID: "your-user-id",
+})
+if err != nil {
+// handle error
+}
+
+fmt.Printf("%+v\n", resp)
+```

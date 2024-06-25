@@ -337,8 +337,6 @@ type RemoveChannelModeratorResponse struct {
 	ResponseCommon
 }
 
-//Note I did not spend a lot of time looking for similar structs, so there could be duplicated data here.
-
 type GetModeratedChannelsParams struct {
 	// Required
 	UserID string `query:"user_id"` // Required: User ID of the broadcaster. Must match the User ID in the Bearer token.
