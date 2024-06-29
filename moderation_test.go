@@ -949,3 +949,171 @@ func TestRemoveChannelModerator(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestGetModeratedChannels(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *GetModeratedChannelsParams
+		respBody   string
+		parsed     *ManyModeratedChannels
+		errorMsg   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderatedchannels-access-token"},
+			&GetModeratedChannelsParams{UserID: "154315414", First: 2},
+			`{
+				"data": [
+					{
+						"broadcaster_id": "183094685",
+						"broadcaster_login": "spaceashes",
+						"broadcaster_name": "spaceashes"
+					},
+					{
+						"broadcaster_id": "113944563",
+						"broadcaster_login": "reapex_1",
+						"broadcaster_name": "Reapex_1"
+					}
+				],
+				"pagination": {
+					"cursor": "eyJiIjpudWxsLCJhIjp7IkN1cnNvciI6ImV5SjBjQ0k2SW5WelpYSTZNVFUwTXpFMU5ERTBPbTF2WkdWeVlYUmxjeUlzSW5Seklqb2lZMmhoYm01bGJEb3hNVE01TkRRMU5qTWlMQ0pwY0NJNkluVnpaWEk2TVRVME16RTFOREUwT20xdlpHVnlZWFJsY3lJc0ltbHpJam9pTVRjeE5EVXhNelF4T0RFNE9UTXlPREV4TnlKOSJ9fQ"
+				}
+			}`,
+			&ManyModeratedChannels{
+				ModeratedChannels: []ModeratedChannel{
+					{
+						BroadcasterID:    "183094685",
+						BroadcasterLogin: "spaceashes",
+						BroadcasterName:  "spaceashes",
+					},
+					{
+						BroadcasterID:    "113944563",
+						BroadcasterLogin: "reapex_1",
+						BroadcasterName:  "Reapex_1",
+					},
+				},
+				Pagination: Pagination{
+					Cursor: "eyJiIjpudWxsLCJhIjp7IkN1cnNvciI6ImV5SjBjQ0k2SW5WelpYSTZNVFUwTXpFMU5ERTBPbTF2WkdWeVlYUmxjeUlzSW5Seklqb2lZMmhoYm01bGJEb3hNVE01TkRRMU5qTWlMQ0pwY0NJNkluVnpaWEk2TVRVME16RTFOREUwT20xdlpHVnlZWFJsY3lJc0ltbHpJam9pTVRjeE5EVXhNelF4T0RFNE9UTXlPREV4TnlKOSJ9fQ",
+				},
+			},
+			"",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderatedchannels-access-token"},
+			&GetModeratedChannelsParams{UserID: "154315414", After: "eyJiIjpudWxsLCJhIjp7IkN1cnNvciI6ImV5SjBjQ0k2SW5WelpYSTZNVFUwTXpFMU5ERTBPbTF2WkdWeVlYUmxjeUlzSW5Seklqb2lZMmhoYm01bGJEb3hNVE01TkRRMU5qTWlMQ0pwY0NJNkluVnpaWEk2TVRVME16RTFOREUwT20xdlpHVnlZWFJsY3lJc0ltbHpJam9pTVRjeE5EVXhNelF4T0RFNE9UTXlPREV4TnlKOSJ9fQ"},
+			`{
+				"data": [
+					{
+						"broadcaster_id": "106590483",
+						"broadcaster_login": "vaiastol",
+						"broadcaster_name": "vaiastol"
+					}
+				],
+				"pagination": {}
+			}`,
+			&ManyModeratedChannels{
+				ModeratedChannels: []ModeratedChannel{
+					{
+						BroadcasterID:    "106590483",
+						BroadcasterLogin: "vaiastol",
+						BroadcasterName:  "vaiastol",
+					},
+				},
+			},
+			"",
+		},
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&GetModeratedChannelsParams{UserID: "154315414"},
+			`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`,
+			&ManyModeratedChannels{},
+			"",
+		},
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderatedchannels-access-token"},
+			&GetModeratedChannelsParams{UserID: "123456789"},
+			`{"error":"Unauthorized","status":401,"message":"The ID in user_id must match the user ID found in the request's OAuth token."}`,
+			&ManyModeratedChannels{},
+			"",
+		},
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id", UserAccessToken: "missingscope-access-token"},
+			&GetModeratedChannelsParams{UserID: "154315414"},
+			`{"error":"Unauthorized","status":401,"message":"Missing scope: user:read:moderated_channels"}`,
+			&ManyModeratedChannels{},
+			"",
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderatedchannels-access-token"},
+			&GetModeratedChannelsParams{},
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"user_id\""}`,
+			&ManyModeratedChannels{},
+			"user id is required",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetModeratedChannels(testCase.params)
+
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		for i, channel := range resp.Data.ModeratedChannels {
+			if channel.BroadcasterID != testCase.parsed.ModeratedChannels[i].BroadcasterID {
+				t.Errorf("Expected ModeratedChannel field BroadcasterID = %s, was %s", testCase.parsed.ModeratedChannels[i].BroadcasterID, channel.BroadcasterID)
+			}
+
+			if channel.BroadcasterLogin != testCase.parsed.ModeratedChannels[i].BroadcasterLogin {
+				t.Errorf("Expected ModeratedChannel field BroadcasterLogin = %s, was %s", testCase.parsed.ModeratedChannels[i].BroadcasterLogin, channel.BroadcasterLogin)
+			}
+
+			if channel.BroadcasterName != testCase.parsed.ModeratedChannels[i].BroadcasterName {
+				t.Errorf("Expected ModeratedChannel field BroadcasterName = %s, was %s", testCase.parsed.ModeratedChannels[i].BroadcasterName, channel.BroadcasterName)
+			}
+		}
+
+		if resp.Data.Pagination.Cursor != testCase.parsed.Pagination.Cursor {
+			t.Errorf("Expected Pagination field Cursor = %s, was %s", testCase.parsed.Pagination.Cursor, resp.Data.Pagination.Cursor)
+		}
+
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.GetModeratedChannels(&GetModeratedChannelsParams{UserID: "154315414"})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
