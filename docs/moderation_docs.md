@@ -329,11 +329,11 @@ if err != nil {
 }
 
 resp, err := client.SendModeratorWarnMessage(
-	&SendModeratorWarnChatMessageParams{
-    BroadcasterID: "1234",
-    ModeratorID:   "5678",
-    UserID:        "9876",
-    Reason:        "Test warning message",
+    &SendModeratorWarnChatMessageParams{
+        BroadcasterID: "1234",
+        ModeratorID:   "5678",
+        UserID:        "9876",
+        Reason:        "Test warning message",
     },
 )
 if err != nil {
