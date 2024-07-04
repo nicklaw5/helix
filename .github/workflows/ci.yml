@@ -22,7 +22,6 @@ jobs:
       matrix:
         go:
           - 1.22.x
-          - 1.19.x
           - 1.18.x
     name: Test with Go v${{ matrix.go }}
     steps:
