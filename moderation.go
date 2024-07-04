@@ -438,9 +438,6 @@ type SendModeratorWarnChatMessageParams struct {
 
 	// The warn message to send.
 	Reason string `json:"reason"`
-
-	// The ID of the chat message being replied to
-	ReplyParentMessageID string `json:"reply_parent_message_id,omitempty"`
 }
 
 type ModeratorWarnChatMessage struct {
