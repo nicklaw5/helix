@@ -1141,15 +1141,37 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			"",
 		},
 		{
-			http.StatusUnauthorized,
+			http.StatusOK,
 			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
 			&SendModeratorWarnChatMessageParams{
 				BroadcasterID: "1234",
 				ModeratorID:   "5678",
 				Reason:        "Test warning message",
 			},
-			`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`,
+			"",
 			"error: user id must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				UserID:      "1234",
+				ModeratorID: "5678",
+				Reason:      "Test warning message",
+			},
+			"",
+			"error: broadcaster id must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				UserID:        "1234",
+				BroadcasterID: "12345",
+				Reason:        "Test warning message",
+			},
+			"",
+			"error: moderator id must be specified",
 		},
 		{
 			http.StatusUnauthorized,

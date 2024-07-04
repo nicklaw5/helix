@@ -431,6 +431,7 @@ type SendModeratorWarnChatMessageParams struct {
 	// The ID of the broadcaster whose chat room the message will be sent to
 	BroadcasterID string `query:"broadcaster_id"`
 
+	// The ID of the twitch user who requested the warning.
 	ModeratorID string `query:"moderator_id"`
 
 	// The ID of the user sent the WARN message
