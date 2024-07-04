@@ -124,3 +124,4 @@
 - [x] Delete Videos
 - [x] Send Whisper
 - [x] Get Webhook Subscriptions
+- [x] Warn Chat User

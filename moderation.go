@@ -426,3 +426,64 @@ func (c *Client) GetModeratedChannels(params *GetModeratedChannelsParams) (*GetM
 
 	return moderatedChannels, nil
 }
+
+type SendModeratorWarnChatMessageParams struct {
+	// The ID of the broadcaster whose chat room the message will be sent to
+	BroadcasterID string `query:"broadcaster_id"`
+
+	ModeratorID string `query:"moderator_id"`
+
+	// The ID of the user sent the WARN message
+	UserID string `json:"user_id"`
+
+	// The warn message to send.
+	Reason string `json:"reason"`
+
+	// The ID of the chat message being replied to
+	ReplyParentMessageID string `json:"reply_parent_message_id,omitempty"`
+}
+
+type ModeratorWarnChatMessage struct {
+	BroadcasterID string `json:"broadcaster_id"`
+	ModeratorID   string `json:"moderator_id"`
+	UserID        string `json:"user_id"`
+	Reason        string `json:"reason"`
+}
+
+type ManyModeratorWarnChatMessages struct {
+	Message ModeratorWarnChatMessage `json:"data"`
+}
+
+type SendModeratorWarnChatResponse struct {
+	ResponseCommon
+
+	Data ModeratorWarnChatMessage
+}
+
+// SendModeratorWarnMessage Sends a warning message to a user in the broadcaster’s chat.
+// Required moderator:manage:warnings
+func (c *Client) SendModeratorWarnMessage(params *SendModeratorWarnChatMessageParams) (*SendModeratorWarnChatResponse, error) {
+	if params.BroadcasterID == "" {
+		return nil, errors.New("error: broadcaster id must be specified")
+	}
+	if params.ModeratorID == "" {
+		return nil, errors.New("error: moderator id must be specified")
+	}
+	if params.UserID == "" {
+		return nil, errors.New("error: user id must be specified")
+	}
+
+	resp, err := c.postAsJSON("moderation/warnings", &ManyModeratorWarnChatMessages{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	messageResponse := &SendModeratorWarnChatResponse{}
+	resp.HydrateResponseCommon(&messageResponse.ResponseCommon)
+	messageResponse.Data.UserID = resp.Data.(*ManyModeratorWarnChatMessages).Message.UserID
+	messageResponse.Data.BroadcasterID = resp.Data.(*ManyModeratorWarnChatMessages).Message.BroadcasterID
+	messageResponse.Data.ModeratorID = resp.Data.(*ManyModeratorWarnChatMessages).Message.ModeratorID
+	messageResponse.Data.Reason = resp.Data.(*ManyModeratorWarnChatMessages).Message.Reason
+
+	return messageResponse, nil
+}
