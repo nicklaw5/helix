@@ -449,13 +449,13 @@ type ModeratorWarnChatMessage struct {
 }
 
 type ManyModeratorWarnChatMessages struct {
-	Message ModeratorWarnChatMessage `json:"data"`
+	Warnings []ModeratorWarnChatMessage `json:"data"`
 }
 
 type SendModeratorWarnChatResponse struct {
 	ResponseCommon
 
-	Data ModeratorWarnChatMessage
+	Data ManyModeratorWarnChatMessages
 }
 
 // SendModeratorWarnMessage Sends a warning message to a user in the broadcaster’s chat.
@@ -478,10 +478,7 @@ func (c *Client) SendModeratorWarnMessage(params *SendModeratorWarnChatMessagePa
 
 	messageResponse := &SendModeratorWarnChatResponse{}
 	resp.HydrateResponseCommon(&messageResponse.ResponseCommon)
-	messageResponse.Data.UserID = resp.Data.(*ManyModeratorWarnChatMessages).Message.UserID
-	messageResponse.Data.BroadcasterID = resp.Data.(*ManyModeratorWarnChatMessages).Message.BroadcasterID
-	messageResponse.Data.ModeratorID = resp.Data.(*ManyModeratorWarnChatMessages).Message.ModeratorID
-	messageResponse.Data.Reason = resp.Data.(*ManyModeratorWarnChatMessages).Message.Reason
+	messageResponse.Data.Warnings = resp.Data.(*ManyModeratorWarnChatMessages).Warnings
 
 	return messageResponse, nil
 }

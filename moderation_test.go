@@ -1137,7 +1137,7 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 				UserID:        "9876",
 				Reason:        "Test warning message",
 			},
-			`{"data": {"broadcaster_id": "1234", "moderator_id": "5678", "user_id": "9876", "reason": "Test warning message"}}`,
+			`{"data": [{"broadcaster_id": "1234", "moderator_id": "5678", "user_id": "9876", "reason": "Test warning message"}]}`,
 			"",
 		},
 		{
@@ -1207,20 +1207,25 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			continue
 		}
 
-		if resp.Data.BroadcasterID != testCase.params.BroadcasterID {
-			t.Errorf("expected broadcaster id to be %s, got %s", testCase.params.BroadcasterID, resp.Data.BroadcasterID)
+		if len(resp.Data.Warnings) == 0 {
+			continue
+		}
+		warning := resp.Data.Warnings[0]
+
+		if warning.BroadcasterID != testCase.params.BroadcasterID {
+			t.Errorf("expected broadcaster id to be %s, got %s", testCase.params.BroadcasterID, warning.BroadcasterID)
 		}
 
-		if resp.Data.ModeratorID != testCase.params.ModeratorID {
-			t.Errorf("expected moderator id to be %s, got %s", testCase.params.ModeratorID, resp.Data.ModeratorID)
+		if warning.ModeratorID != testCase.params.ModeratorID {
+			t.Errorf("expected moderator id to be %s, got %s", testCase.params.ModeratorID, warning.ModeratorID)
 		}
 
-		if resp.Data.UserID != testCase.params.UserID {
-			t.Errorf("expected user id to be %s, got %s", testCase.params.UserID, resp.Data.UserID)
+		if warning.UserID != testCase.params.UserID {
+			t.Errorf("expected user id to be %s, got %s", testCase.params.UserID, warning.UserID)
 		}
 
-		if resp.Data.Reason != testCase.params.Reason {
-			t.Errorf("expected reason to be %s, got %s", testCase.params.Reason, resp.Data.Reason)
+		if warning.Reason != testCase.params.Reason {
+			t.Errorf("expected reason to be %s, got %s", testCase.params.Reason, warning.Reason)
 		}
 	}
 
