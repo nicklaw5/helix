@@ -1117,3 +1117,141 @@ func TestGetModeratedChannels(t *testing.T) {
 		t.Error("expected error does match return error")
 	}
 }
+
+func TestSendModeratorWarnMessage(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *SendModeratorWarnChatMessageParams
+		respBody   string
+		errorMsg   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "moderator-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				BroadcasterID: "1234",
+				ModeratorID:   "5678",
+				UserID:        "9876",
+				Reason:        "Test warning message",
+			},
+			`{"data": [{"broadcaster_id": "1234", "moderator_id": "5678", "user_id": "9876", "reason": "Test warning message"}]}`,
+			"",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				BroadcasterID: "1234",
+				ModeratorID:   "5678",
+				Reason:        "Test warning message",
+			},
+			"",
+			"error: user id must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				UserID:      "1234",
+				ModeratorID: "5678",
+				Reason:      "Test warning message",
+			},
+			"",
+			"error: broadcaster id must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				UserID:        "1234",
+				BroadcasterID: "12345",
+				Reason:        "Test warning message",
+			},
+			"",
+			"error: moderator id must be specified",
+		},
+		{
+			http.StatusUnauthorized,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				BroadcasterID: "1234",
+				ModeratorID:   "5678",
+				UserID:        "9876",
+				Reason:        "Test warning message",
+			},
+			`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`,
+			"",
+		},
+		// Add more test cases as needed
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.SendModeratorWarnMessage(testCase.params)
+		if err != nil {
+			if err.Error() != testCase.errorMsg {
+				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be %d, got %d", testCase.statusCode, resp.StatusCode)
+		}
+
+		if resp.StatusCode > http.StatusOK {
+			continue
+		}
+
+		if len(resp.Data.Warnings) == 0 {
+			continue
+		}
+		warning := resp.Data.Warnings[0]
+
+		if warning.BroadcasterID != testCase.params.BroadcasterID {
+			t.Errorf("expected broadcaster id to be %s, got %s", testCase.params.BroadcasterID, warning.BroadcasterID)
+		}
+
+		if warning.ModeratorID != testCase.params.ModeratorID {
+			t.Errorf("expected moderator id to be %s, got %s", testCase.params.ModeratorID, warning.ModeratorID)
+		}
+
+		if warning.UserID != testCase.params.UserID {
+			t.Errorf("expected user id to be %s, got %s", testCase.params.UserID, warning.UserID)
+		}
+
+		if warning.Reason != testCase.params.Reason {
+			t.Errorf("expected reason to be %s, got %s", testCase.params.Reason, warning.Reason)
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.SendModeratorWarnMessage(&SendModeratorWarnChatMessageParams{
+		BroadcasterID: "1234",
+		ModeratorID:   "5678",
+		UserID:        "9876",
+		Reason:        "Test warning message",
+	})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
