@@ -23,7 +23,6 @@ jobs:
         go:
           - 1.22.x
           - 1.21.x
-          - 1.18.x
     name: Test with Go v${{ matrix.go }}
     steps:
       - uses: actions/checkout@v2
