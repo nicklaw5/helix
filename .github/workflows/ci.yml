@@ -11,7 +11,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.19.x
+          go-version: 1.22.x
       - name: Lint
         run: |
           go vet .
@@ -21,8 +21,8 @@ jobs:
     strategy:
       matrix:
         go:
-          - 1.19.x
-          - 1.18.x
+          - 1.22.x
+          - 1.21.x
     name: Test with Go v${{ matrix.go }}
     steps:
       - uses: actions/checkout@v2
