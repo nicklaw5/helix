@@ -508,7 +508,7 @@ type EventSubChannelChatNotificationBitsBadgeTier struct {
 
 type EventSubChatNotificationMessage struct {
 	Text      string                        `json:"text"`
-	Fragments []EventSubChatMessageFragment `json:"fragment"`
+	Fragments []EventSubChatMessageFragment `json:"fragments"`
 }
 
 // Data for a channel poll begin event
