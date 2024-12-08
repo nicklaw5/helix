@@ -657,6 +657,7 @@ type EventSubHypeTrainBeginEvent struct {
 	LastContribution     EventSubContribution   `json:"last_contribution"`
 	StartedAt            Time                   `json:"started_at"`
 	ExpiresAt            Time                   `json:"expires_at"`
+	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
 }
 
 // Data for a hype train progress notification
@@ -672,6 +673,7 @@ type EventSubHypeTrainProgressEvent struct {
 	LastContribution     EventSubContribution   `json:"last_contribution"`
 	StartedAt            Time                   `json:"started_at"`
 	ExpiresAt            Time                   `json:"expires_at"`
+	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
 }
 
 // Data for a hype train end notification
@@ -686,6 +688,7 @@ type EventSubHypeTrainEndEvent struct {
 	StartedAt            Time                   `json:"started_at"`
 	EndedAt              Time                   `json:"ended_at"`
 	CooldownEndsAt       Time                   `json:"cooldown_ends_at"`
+	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
 }
 
 // Data for a stream online notification
