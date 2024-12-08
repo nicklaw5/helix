@@ -296,7 +296,7 @@ type EventSubChannelChatMessageEvent struct {
 
 type EventSubChatMessage struct {
 	Text      string                        `json:"text"`
-	Fragments []EventSubChatMessageFragment `json:"fragment"`
+	Fragments []EventSubChatMessageFragment `json:"fragments"`
 }
 
 type EventSubChatMessageReply struct {
@@ -354,10 +354,10 @@ type EventSubChatMessageCheermote struct {
 }
 
 type EventSubChatMessageEmote struct {
-	ID         string `json:"id"`
-	EmoteSetID string `json:"emote_set_id"`
-	OwnerID    string `json:"owner_id"`
-	Format     string `json:"format"`
+	ID         string   `json:"id"`
+	EmoteSetID string   `json:"emote_set_id"`
+	OwnerID    string   `json:"owner_id"`
+	Format     []string `json:"format"`
 }
 
 type EventSubChatMessageMention struct {
@@ -508,7 +508,7 @@ type EventSubChannelChatNotificationBitsBadgeTier struct {
 
 type EventSubChatNotificationMessage struct {
 	Text      string                        `json:"text"`
-	Fragments []EventSubChatMessageFragment `json:"fragment"`
+	Fragments []EventSubChatMessageFragment `json:"fragments"`
 }
 
 // Data for a channel poll begin event
