@@ -1189,6 +1189,19 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 				ModeratorID:   "5678",
 				Body: SendModeratorWarnMessageRequestBody{
 					UserID: "1234",
+				},
+			},
+			"",
+			"error: reason must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				BroadcasterID: "12345",
+				ModeratorID:   "5678",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "1234",
 					Reason: "Test warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning message",
 				},
 			},
