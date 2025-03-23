@@ -471,7 +471,7 @@ func (c *Client) SendModeratorWarnMessage(params *SendModeratorWarnChatMessagePa
 		return nil, errors.New("error: user id must be specified")
 	}
 
-	resp, err := c.postAsJSON("moderation/warnings", &ManyModeratorWarnChatMessages{}, params)
+	resp, err := c.postAsJSON("/moderation/warnings", &ManyModeratorWarnChatMessages{}, params)
 	if err != nil {
 		return nil, err
 	}
