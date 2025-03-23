@@ -1182,6 +1182,20 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			"error: moderator id must be specified",
 		},
 		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				BroadcasterID: "12345",
+				ModeratorID:   "5678",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "1234",
+					Reason: "Test warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning message",
+				},
+			},
+			"",
+			"error: reason must be less than 500 characters",
+		},
+		{
 			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
 			&SendModeratorWarnChatMessageParams{
