@@ -440,7 +440,7 @@ type SendModeratorWarnChatMessageParams struct {
 	ModeratorID string `query:"moderator_id"`
 
 	// A list that contains information about the warning.
-	Body SendModeratorWarnMessageRequestBody `json:"body"`
+	Body SendModeratorWarnMessageRequestBody `json:"data"`
 }
 
 type ModeratorWarnChatMessage struct {
