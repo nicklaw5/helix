@@ -1134,8 +1134,10 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			&SendModeratorWarnChatMessageParams{
 				BroadcasterID: "1234",
 				ModeratorID:   "5678",
-				UserID:        "9876",
-				Reason:        "Test warning message",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "9876",
+					Reason: "Test warning message",
+				},
 			},
 			`{"data": [{"broadcaster_id": "1234", "moderator_id": "5678", "user_id": "9876", "reason": "Test warning message"}]}`,
 			"",
@@ -1146,7 +1148,9 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			&SendModeratorWarnChatMessageParams{
 				BroadcasterID: "1234",
 				ModeratorID:   "5678",
-				Reason:        "Test warning message",
+				Body: SendModeratorWarnMessageRequestBody{
+					Reason: "Test warning message",
+				},
 			},
 			"",
 			"error: user id must be specified",
@@ -1155,9 +1159,11 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
 			&SendModeratorWarnChatMessageParams{
-				UserID:      "1234",
 				ModeratorID: "5678",
-				Reason:      "Test warning message",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "1234",
+					Reason: "Test warning message",
+				},
 			},
 			"",
 			"error: broadcaster id must be specified",
@@ -1166,12 +1172,41 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			http.StatusOK,
 			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
 			&SendModeratorWarnChatMessageParams{
-				UserID:        "1234",
 				BroadcasterID: "12345",
-				Reason:        "Test warning message",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "1234",
+					Reason: "Test warning message",
+				},
 			},
 			"",
 			"error: moderator id must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				BroadcasterID: "12345",
+				ModeratorID:   "5678",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "1234",
+				},
+			},
+			"",
+			"error: reason must be specified",
+		},
+		{
+			http.StatusOK,
+			&Options{ClientID: "my-client-id", UserAccessToken: "invalid-access-token"},
+			&SendModeratorWarnChatMessageParams{
+				BroadcasterID: "12345",
+				ModeratorID:   "5678",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "1234",
+					Reason: "Test warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning messageTest warning message",
+				},
+			},
+			"",
+			"error: reason must be less than 500 characters",
 		},
 		{
 			http.StatusUnauthorized,
@@ -1179,8 +1214,10 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			&SendModeratorWarnChatMessageParams{
 				BroadcasterID: "1234",
 				ModeratorID:   "5678",
-				UserID:        "9876",
-				Reason:        "Test warning message",
+				Body: SendModeratorWarnMessageRequestBody{
+					UserID: "9876",
+					Reason: "Test warning message",
+				},
 			},
 			`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`,
 			"",
@@ -1220,12 +1257,12 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 			t.Errorf("expected moderator id to be %s, got %s", testCase.params.ModeratorID, warning.ModeratorID)
 		}
 
-		if warning.UserID != testCase.params.UserID {
-			t.Errorf("expected user id to be %s, got %s", testCase.params.UserID, warning.UserID)
+		if warning.UserID != testCase.params.Body.UserID {
+			t.Errorf("expected user id to be %s, got %s", testCase.params.Body.UserID, warning.UserID)
 		}
 
-		if warning.Reason != testCase.params.Reason {
-			t.Errorf("expected reason to be %s, got %s", testCase.params.Reason, warning.Reason)
+		if warning.Reason != testCase.params.Body.Reason {
+			t.Errorf("expected reason to be %s, got %s", testCase.params.Body.Reason, warning.Reason)
 		}
 	}
 
@@ -1244,8 +1281,10 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 	_, err := c.SendModeratorWarnMessage(&SendModeratorWarnChatMessageParams{
 		BroadcasterID: "1234",
 		ModeratorID:   "5678",
-		UserID:        "9876",
-		Reason:        "Test warning message",
+		Body: SendModeratorWarnMessageRequestBody{
+			UserID: "9876",
+			Reason: "Test warning message",
+		},
 	})
 	if err == nil {
 		t.Error("expected error but got nil")

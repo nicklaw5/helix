@@ -427,6 +427,11 @@ func (c *Client) GetModeratedChannels(params *GetModeratedChannelsParams) (*GetM
 	return moderatedChannels, nil
 }
 
+type SendModeratorWarnMessageRequestBody struct {
+	UserID string `json:"user_id"`
+	Reason string `json:"reason"`
+}
+
 type SendModeratorWarnChatMessageParams struct {
 	// The ID of the broadcaster whose chat room the message will be sent to
 	BroadcasterID string `query:"broadcaster_id"`
@@ -434,11 +439,8 @@ type SendModeratorWarnChatMessageParams struct {
 	// The ID of the twitch user who requested the warning.
 	ModeratorID string `query:"moderator_id"`
 
-	// The ID of the user sent the WARN message
-	UserID string `json:"user_id"`
-
-	// The warn message to send.
-	Reason string `json:"reason"`
+	// A list that contains information about the warning.
+	Body SendModeratorWarnMessageRequestBody `json:"data"`
 }
 
 type ModeratorWarnChatMessage struct {
@@ -467,11 +469,17 @@ func (c *Client) SendModeratorWarnMessage(params *SendModeratorWarnChatMessagePa
 	if params.ModeratorID == "" {
 		return nil, errors.New("error: moderator id must be specified")
 	}
-	if params.UserID == "" {
+	if params.Body.UserID == "" {
 		return nil, errors.New("error: user id must be specified")
 	}
+	if params.Body.Reason == "" {
+		return nil, errors.New("error: reason must be specified")
+	}
+	if len(params.Body.Reason) > 500 {
+		return nil, errors.New("error: reason must be less than 500 characters")
+	}
 
-	resp, err := c.postAsJSON("moderation/warnings", &ManyModeratorWarnChatMessages{}, params)
+	resp, err := c.postAsJSON("/moderation/warnings", &ManyModeratorWarnChatMessages{}, params)
 	if err != nil {
 		return nil, err
 	}
