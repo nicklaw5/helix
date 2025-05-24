@@ -59,7 +59,7 @@ type EventSubSubscriptionsResponse struct {
 	Data ManyEventSubSubscriptions
 }
 
-// Parameter for filtering subscriptions
+// Parameter for filtering subscriptions. The filters are mutually exclusive; the request fails if you specify more than one filter (except After).
 type EventSubSubscriptionsParams struct {
 	Status         string `query:"status"`
 	Type           string `query:"type"`
