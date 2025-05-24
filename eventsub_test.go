@@ -23,6 +23,13 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 			0,
 			`{"error":"Unauthorized","status":401,"message":"OAuth token is missing"}`,
 		},
+    {
+      http.StatusBadRequest,
+      &Options{ClientID: "my-client-id"},
+      &EventSubSubscriptionsParams{Status: "event-sub-status", Type: "event-sub-type", SubscriptionID: "event-sub-id", UserID: "user-id"},
+      0,
+      `{"error":"Bad Request","status":400,"message":"The request may specify only one filter query parameter. For example, either type or status or user_id."}`,
+    },
 		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
