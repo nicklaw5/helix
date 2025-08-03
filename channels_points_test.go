@@ -77,6 +77,87 @@ func TestCreateCustomReward(t *testing.T) {
 	}
 }
 
+func TestGetCustomRewardsRedemptions(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode int
+		options    *Options
+		params     *GetCustomRewardsRedemptionsParams
+		respBody   string
+	}{
+		{
+			http.StatusOK,
+			&Options{ClientID: "gx2pv4208cff0ig9ou7nk3riccffxt"},
+			&GetCustomRewardsRedemptionsParams{
+				BroadcasterID: "274637212",
+				RewardID:      "92af127c-7326-4483-a52b-b0da0be61c01",
+				Status:        "CANCELED",
+			},
+			`{"data":[{"broadcaster_name":"torpedo09","broadcaster_login":"torpedo09","broadcaster_id":"274637212","id":"17fa2df1-ad76-4804-bfa5-a40ef63efe63","user_login":"torpedo09","user_id":"274637212","user_name":"torpedo09","user_input":"","status":"CANCELED","redeemed_at":"2020-07-01T18:37:32Z","reward":{"id":"92af127c-7326-4483-a52b-b0da0be61c01","title":"game analysis","prompt":"","cost":50000}}],"pagination":{"cursor":"eyJiIjpudWxsLCJhIjp7IkN1cnNvciI6Ik1UZG1ZVEprWmpFdFlXUTNOaTAwT0RBMExXSm1ZVFV0WVRRd1pXWTJNMlZtWlRZelgxOHlNREl3TFRBM0xUQXhWREU0T2pNM09qTXlMakl6TXpFeU56RTFOMW89In19"}}`,
+		},
+		{
+			http.StatusBadRequest,
+			&Options{ClientID: "gx2pv4208cff0ig9ou7nk3riccffxt"},
+			&GetCustomRewardsRedemptionsParams{
+				BroadcasterID: "",
+				RewardID:      "92af127c-7326-4483-a52b-b0da0be61c01",
+				Status:        "CANCELED",
+			},
+			`{"error":"Bad Request","status":400,"message":"Missing required parameter \"broadcaster_id\""}`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.GetCustomRewardsRedemptions(testCase.params)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Test Bad Request Responses
+		if resp.StatusCode == http.StatusBadRequest {
+			firstErrStr := "Missing required parameter \"broadcaster_id\""
+			if resp.ErrorMessage != firstErrStr {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", firstErrStr, resp.ErrorMessage)
+			}
+			continue
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		if testCase.statusCode == http.StatusOK {
+			if len(resp.Data.Redemptions) != 1 {
+				t.Errorf("expected 1 redemption, got %d", len(resp.Data.Redemptions))
+			}
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "gx2pv4208cff0ig9ou7nk3riccffxt",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.GetCustomRewardsRedemptions(&GetCustomRewardsRedemptionsParams{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
 func TestUpdateCustomReward(t *testing.T) {
 	t.Parallel()
 

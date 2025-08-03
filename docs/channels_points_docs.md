@@ -106,8 +106,10 @@ if err != nil {
     // handle error
 }
 
-resp, err := client.GetCustomRewards(&helix.GetCustomRewardsParams{
+resp, err := client.GetCustomRewardsRedemptions(&helix.GetCustomRewardsRedemptionsParams{
     BroadcasterID : "145328278",
+    RewardID      : "48d3a271-0571-49e0-91db-d9919274bbd3",
+    Status        : "UNFULFILLED",
 })
 if err != nil {
     // handle error
