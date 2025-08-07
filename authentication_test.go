@@ -152,6 +152,232 @@ func TestRequestAppAccessToken(t *testing.T) {
 	}
 }
 
+func TestRequestDeviceVerificationURI(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		scopes         []string
+		options        *Options
+		respBody       string
+		expectedErrMsg string
+	}{
+		{
+			http.StatusBadRequest,
+			[]string{"user:read:email"},
+			&Options{
+				ClientID: "invalid-client-id", // invalid client id
+			},
+			`{"status":400,"message":"invalid client"}`,
+			"invalid client",
+		},
+		{
+			http.StatusOK,
+			[]string{}, // no scopes
+			&Options{
+				ClientID: "valid-client-id",
+			},
+			`{"device_code":"2mdjwJNygVNDpNiLZnygtCJTQjedpevQsoST7fi1","expires_in":1800,"interval":5,"user_code":"RGVPJWCX","verification_uri":"https://www.twitch.tv/activate?device-code=RGVPJWCX"}`,
+			"",
+		},
+		{
+			http.StatusOK,
+			[]string{"user:read:email", "user:read:subscriptions", "channel:read:subscriptions"},
+			&Options{
+				ClientID: "valid-client-id",
+			},
+			`{"device_code":"uZqmEQqkOZO1NWsh0gMHWvsiEevIDLyYV3Y3Beku","expires_in":1800,"interval":5,"user_code":"RFFJTTBK","verification_uri":"https://www.twitch.tv/activate?device-code=RFFJTTBK"}`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.RequestDeviceVerificationURI(testCase.scopes)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		// Test error cases
+		if resp.StatusCode != http.StatusOK {
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", testCase.expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		// Test success cases
+		if resp.Data.DeviceCode == "" {
+			t.Errorf("expected a device code but got an empty string")
+		}
+
+		if resp.Data.ExpiresIn == 0 {
+			t.Errorf("expected ExpiresIn to not be \"0\"")
+		}
+
+		if resp.Data.Interval == 0 {
+			t.Errorf("expected Interval to not be \"0\"")
+		}
+
+		if resp.Data.UserCode == "" {
+			t.Errorf("expected an user code but got an empty string")
+		}
+
+		if resp.Data.VerificationURI == "" {
+			t.Errorf("expected a verificaion uri but got an empty string")
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.RequestDeviceVerificationURI([]string{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
+func TestRequestDeviceAccessToken(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		statusCode     int
+		deviceCode     string
+		scopes         []string
+		options        *Options
+		respBody       string
+		expectedErrMsg string
+	}{
+		{
+			http.StatusBadRequest,
+			"invalid-device-code", // invalid auth code
+			[]string{"user:read:email"},
+			&Options{
+				ClientID: "valid-client-id",
+			},
+			`{"status":400,"message":"invalid device code"}`,
+			"invalid device code",
+		},
+		{
+			http.StatusBadRequest,
+			"valid-device-code",
+			[]string{"user:read:email"},
+			&Options{
+				ClientID: "invalid-client-id", // invalid client id
+			},
+			`{"status":400,"message":"invalid client"}`,
+			"invalid client",
+		},
+		{
+			http.StatusOK,
+			"valid-auth-code",
+			[]string{}, // no scopes
+			&Options{
+				ClientID: "valid-client-id",
+			},
+			`{"access_token":"kagsfkgiuowegfkjsbdcuiwebf","expires_in":14146,"refresh_token":"fiuhgaofohofhohdflhoiwephvlhowiehfoi"}`,
+			"",
+		},
+		{
+			http.StatusOK,
+			"valid-auth-code",
+			[]string{"analytics:read:games", "bits:read", "clips:edit", "user:edit", "user:read:email"},
+			&Options{
+				ClientID: "valid-client-id",
+			},
+			`{"access_token":"kagsfkgiuowegfkjsbdcuiwebf","expires_in":14154,"refresh_token":"fiuhgaofohofhohdflhoiwephvlhowiehfoi","scope":["analytics:read:games","bits:read","clips:edit","user:edit","user:read:email"]}`,
+			"",
+		},
+	}
+
+	for _, testCase := range testCases {
+		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
+
+		resp, err := c.RequestDeviceAccessToken(testCase.deviceCode, testCase.scopes)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if resp.StatusCode != testCase.statusCode {
+			t.Errorf("expected status code to be \"%d\", got \"%d\"", testCase.statusCode, resp.StatusCode)
+		}
+
+		// Test error cases
+		if resp.StatusCode != http.StatusOK {
+			if resp.ErrorStatus != testCase.statusCode {
+				t.Errorf("expected error status to be \"%d\", got \"%d\"", testCase.statusCode, resp.ErrorStatus)
+			}
+
+			if resp.ErrorMessage != testCase.expectedErrMsg {
+				t.Errorf("expected error message to be \"%s\", got \"%s\"", testCase.expectedErrMsg, resp.ErrorMessage)
+			}
+
+			continue
+		}
+
+		// Test success cases
+		if resp.Data.AccessToken == "" {
+			t.Errorf("expected an access token but got an empty string")
+		}
+
+		if resp.Data.RefreshToken == "" {
+			t.Errorf("expected a refresh token but got an empty string")
+		}
+
+		if resp.Data.ExpiresIn == 0 {
+			t.Errorf("expected ExpiresIn to not be \"0\"")
+		}
+
+		if len(resp.Data.Scopes) != len(testCase.scopes) {
+			t.Errorf("expected number of scope to be \"%d\", got \"%d\"", len(testCase.scopes), len(resp.Data.Scopes))
+		}
+	}
+
+	// Test with HTTP Failure
+	options := &Options{
+		ClientID: "my-client-id",
+		HTTPClient: &badMockHTTPClient{
+			newMockHandler(0, "", nil),
+		},
+	}
+	c := &Client{
+		opts: options,
+		ctx:  context.Background(),
+	}
+
+	_, err := c.RequestDeviceAccessToken("valid-device-code", []string{})
+	if err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	if err.Error() != "Failed to execute API request: Oops, that's bad :(" {
+		t.Error("expected error does match return error")
+	}
+}
+
 func TestRequestUserAccessToken(t *testing.T) {
 	t.Parallel()
 

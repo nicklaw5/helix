@@ -60,16 +60,17 @@ func TestNewClient(t *testing.T) {
 		{
 			false,
 			&Options{
-				ClientID:        "my-client-id",
-				ClientSecret:    "my-client-secret",
-				HTTPClient:      &http.Client{},
-				AppAccessToken:  "my-app-access-token",
-				UserAccessToken: "my-user-access-token",
-				RefreshToken:    "my-refresh-token",
-				UserAgent:       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
-				RateLimitFunc:   func(*Response) error { return nil },
-				RedirectURI:     "http://localhost/auth/callback",
-				APIBaseURL:      "http://localhost/proxy",
+				ClientID:          "my-client-id",
+				ClientSecret:      "my-client-secret",
+				HTTPClient:        &http.Client{},
+				AppAccessToken:    "my-app-access-token",
+				DeviceAccessToken: "my-device-access-token",
+				UserAccessToken:   "my-user-access-token",
+				RefreshToken:      "my-refresh-token",
+				UserAgent:         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+				RateLimitFunc:     func(*Response) error { return nil },
+				RedirectURI:       "http://localhost/auth/callback",
+				APIBaseURL:        "http://localhost/proxy",
 			},
 		},
 	}
@@ -108,6 +109,10 @@ func TestNewClient(t *testing.T) {
 
 		if opts.AppAccessToken != testCase.options.AppAccessToken {
 			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.AppAccessToken, opts.AppAccessToken)
+		}
+
+		if opts.DeviceAccessToken != testCase.options.DeviceAccessToken {
+			t.Errorf("expected accessToken to be \"%s\", got \"%s\"", testCase.options.DeviceAccessToken, opts.DeviceAccessToken)
 		}
 
 		if opts.UserAccessToken != testCase.options.UserAccessToken {
@@ -152,6 +157,14 @@ func TestNewClientDefault(t *testing.T) {
 		t.Errorf("expected userAgent to be \"%s\", got \"%s\"", "", opts.UserAgent)
 	}
 
+	if opts.AppAccessToken != "" {
+		t.Errorf("expected accesstoken to be \"\", got \"%s\"", opts.AppAccessToken)
+	}
+
+	if opts.DeviceAccessToken != "" {
+		t.Errorf("expected accesstoken to be \"\", got \"%s\"", opts.DeviceAccessToken)
+	}
+
 	if opts.UserAccessToken != "" {
 		t.Errorf("expected accesstoken to be \"\", got \"%s\"", opts.UserAccessToken)
 	}
@@ -187,7 +200,6 @@ func TestNewClientHasContext(t *testing.T) {
 	}
 
 	_, err = c.GetStreams(nil)
-
 	if err != nil {
 		t.Errorf("Did not expect error, got \"%s\"", err)
 	}
@@ -220,7 +232,6 @@ func TestNewClientWithContext(t *testing.T) {
 	}
 
 	_, err = c.GetStreams(nil)
-
 	if err != nil {
 		t.Errorf("Did not expect error, got \"%s\"", err)
 	}
@@ -253,7 +264,6 @@ func TestNewClientWithContextCancel(t *testing.T) {
 
 	cancel()
 	_, err = c.GetStreams(nil)
-
 	if err != nil {
 		t.Errorf("Did not expect error, got \"%s\"", err)
 	}
@@ -275,7 +285,6 @@ func TestNoContext(t *testing.T) {
 
 	c := newMockClient(&Options{}, handlerFunc)
 	_, err := c.GetStreams(nil)
-
 	if err != nil {
 		t.Errorf("Did not expect error, got \"%s\"", err)
 	}
@@ -384,22 +393,25 @@ func TestSetRequestHeaders(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		endpoint        string
-		method          string
-		userBearerToken string
-		appBearerToken  string
+		endpoint          string
+		method            string
+		userBearerToken   string
+		deviceBearerToken string
+		appBearerToken    string
 	}{
-		{"/users", "GET", "my-user-access-token", "my-app-access-token"},
-		{"/entitlements/upload", "POST", "", "my-app-access-token"},
-		{"/streams", "GET", "", ""},
+		{"/users", "GET", "my-user-access-token", "my-device-access-token", "my-app-access-token"},
+		{"/entitlements/upload", "POST", "", "", "my-app-access-token"},
+		{"/streams", "GET", "", "", ""},
+		{"/channels", "GET", "", "my-device-access-token", ""},
 	}
 
 	for _, testCase := range testCases {
 		client, err := NewClient(&Options{
-			ClientID:        "my-client-id",
-			UserAgent:       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
-			AppAccessToken:  testCase.appBearerToken,
-			UserAccessToken: testCase.userBearerToken,
+			ClientID:          "my-client-id",
+			UserAgent:         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+			AppAccessToken:    testCase.appBearerToken,
+			DeviceAccessToken: testCase.deviceBearerToken,
+			UserAccessToken:   testCase.userBearerToken,
 		})
 		if err != nil {
 			t.Errorf("Did not expect an error, got \"%s\"", err.Error())
@@ -422,7 +434,14 @@ func TestSetRequestHeaders(t *testing.T) {
 			}
 		}
 
-		if testCase.userBearerToken == "" && testCase.appBearerToken == "" {
+		if testCase.userBearerToken == "" && testCase.deviceBearerToken != "" {
+			expectedAuthHeader := "Bearer " + testCase.deviceBearerToken
+			if req.Header.Get("Authorization") != expectedAuthHeader {
+				t.Errorf("expected Authorization header to be \"%s\", got \"%s\"", expectedAuthHeader, req.Header.Get("Authorization"))
+			}
+		}
+
+		if testCase.userBearerToken == "" && testCase.deviceBearerToken == "" && testCase.appBearerToken == "" {
 			if req.Header.Get("Authorization") != "" {
 				t.Error("did not expect Authorization header to be set")
 			}
@@ -589,6 +608,44 @@ func TestSetAppAccessToken(t *testing.T) {
 
 	if client.opts.AppAccessToken != accessToken {
 		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.opts.AppAccessToken)
+	}
+}
+
+func TestGetDeviceAccessToken(t *testing.T) {
+	t.Parallel()
+
+	accessToken := "my-device-access-token"
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	client.SetDeviceAccessToken(accessToken)
+
+	if client.GetDeviceAccessToken() != accessToken {
+		t.Errorf("expected GetDeviceAccessToken to return \"%s\", got \"%s\"", accessToken, client.GetDeviceAccessToken())
+	}
+}
+
+func TestSetDeviceAccessToken(t *testing.T) {
+	t.Parallel()
+
+	accessToken := "my-device-access-token"
+
+	client, err := NewClient(&Options{
+		ClientID: "cid",
+	})
+	if err != nil {
+		t.Errorf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	client.SetDeviceAccessToken(accessToken)
+
+	if client.opts.DeviceAccessToken != accessToken {
+		t.Errorf("expected accessToken to be \"%s\", got \"%s\"", accessToken, client.opts.DeviceAccessToken)
 	}
 }
 
