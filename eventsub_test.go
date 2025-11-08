@@ -24,6 +24,13 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 			`{"error":"Unauthorized","status":401,"message":"OAuth token is missing"}`,
 		},
 		{
+			http.StatusBadRequest,
+			&Options{ClientID: "my-client-id"},
+			&EventSubSubscriptionsParams{Status: "event-sub-status", Type: "event-sub-type", SubscriptionID: "event-sub-id", UserID: "user-id"},
+			0,
+			`{"error":"Bad Request","status":400,"message":"The request may specify only one filter query parameter. For example, either type or status or user_id."}`,
+		},
+		{
 			http.StatusOK,
 			&Options{ClientID: "my-client-id"},
 			&EventSubSubscriptionsParams{},
@@ -37,6 +44,13 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 			0,
 			`{"total":1,"data":[],"limit":100000000,"max_total_cost":10000,"total_cost":1,"pagination":{}}`,
 		},
+    {
+      http.StatusOK,
+      &Options{ClientID: "my-client-id"},
+      &EventSubSubscriptionsParams{SubscriptionID: "832389eb-0d0b-41f8-b564-da039f6c4c75"},
+      1,
+      `{"total":1,"data":[{"id":"832389eb-0d0b-41f8-b564-da039f6c4c75","status":"enabled","type":"channel.follow","version":"1","condition":{"broadcaster_user_id":"12345678"},"created_at":"2021-03-09T10:37:32.308415339Z","transport":{"method":"webhook","callback":"https://example.com/eventsub/follow"},"cost":1}],"limit":100000000,"max_total_cost":10000,"total_cost":1,"pagination":{}}`,
+    },
 	}
 
 	for _, testCase := range testCases {

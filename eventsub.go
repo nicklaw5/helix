@@ -59,12 +59,13 @@ type EventSubSubscriptionsResponse struct {
 	Data ManyEventSubSubscriptions
 }
 
-// Parameter for filtering subscriptions, currently only the status is filterable
+// Parameter for filtering subscriptions. The filters are mutually exclusive; the request fails if you specify more than one filter (except After).
 type EventSubSubscriptionsParams struct {
-	Status string `query:"status"`
-	Type   string `query:"type"`
-	UserID string `query:"user_id"`
-	After  string `query:"after"`
+	Status         string `query:"status"`
+	Type           string `query:"type"`
+	UserID         string `query:"user_id"`
+	SubscriptionID string `query:"subscription_id"`
+	After          string `query:"after"`
 }
 
 // Parameter for removing a subscription.
@@ -956,7 +957,6 @@ func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (
 
 // Remove an EventSub Subscription
 func (c *Client) RemoveEventSubSubscription(id string) (*RemoveEventSubSubscriptionParamsResponse, error) {
-
 	resp, err := c.delete("/eventsub/subscriptions", nil, &RemoveEventSubSubscriptionParams{ID: id})
 	if err != nil {
 		return nil, err
