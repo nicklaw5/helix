@@ -345,6 +345,7 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	c.setRequestHeaders(req)
 
 	rateLimitFunc := c.opts.RateLimitFunc
+	attempt := 0
 
 	for {
 		if c.lastResponse != nil && rateLimitFunc != nil {
@@ -354,10 +355,22 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			}
 		}
 
+		if attempt > 0 &&
+			req.Body != nil &&
+			req.GetBody != nil {
+
+			var err error
+			req.Body, err = req.GetBody()
+			if err != nil {
+				return err
+			}
+		}
+
 		response, err := c.opts.HTTPClient.Do(req)
 		if err != nil {
 			return fmt.Errorf("Failed to execute API request: %s", err.Error())
 		}
+		attempt++
 		defer response.Body.Close()
 
 		resp.Header = response.Header
