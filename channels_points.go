@@ -134,6 +134,16 @@ type ChannelCustomRewardsRedemption struct {
 	Reward           ChannelCustomReward `json:"reward"`
 }
 
+type GetCustomRewardsRedemptionsParams struct {
+	BroadcasterID string `query:"broadcaster_id"` // required
+	RewardID      string `query:"reward_id"`      // required
+	Status        string `query:"status"`         // required if ID is null
+	ID            string `query:"id"`             // max 50
+	Sort          string `query:"sort"`
+	First         int    `query:"first"` // max 50
+	After         string `query:"after"`
+}
+
 // CreateCustomReward : Creates a Custom Reward on a channel.
 // Required scope: channel:manage:redemptions
 func (c *Client) CreateCustomReward(params *ChannelCustomRewardsParams) (*ChannelCustomRewardResponse, error) {
@@ -191,6 +201,21 @@ func (c *Client) GetCustomRewards(params *GetCustomRewardsParams) (*ChannelCusto
 	rewards.Data.ChannelCustomRewards = resp.Data.(*ManyChannelCustomRewards).ChannelCustomRewards
 
 	return rewards, nil
+}
+
+// GetCustomRewardsRedemptions : Gets Custom Reward Redemption statuses on a channel.
+// Required scope: channel:manage:redemptions
+func (c *Client) GetCustomRewardsRedemptions(params *GetCustomRewardsRedemptionsParams) (*ChannelCustomRewardsRedemptionResponse, error) {
+	resp, err := c.get("/channel_points/custom_rewards/redemptions", &ManyChannelCustomRewardsRedemptions{}, params)
+	if err != nil {
+		return nil, err
+	}
+
+	redemptions := &ChannelCustomRewardsRedemptionResponse{}
+	resp.HydrateResponseCommon(&redemptions.ResponseCommon)
+	redemptions.Data.Redemptions = resp.Data.(*ManyChannelCustomRewardsRedemptions).Redemptions
+
+	return redemptions, nil
 }
 
 // UpdateChannelCustomRewardsRedemptionStatus : Update a Custom Reward Redemption status on a channel.
