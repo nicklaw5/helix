@@ -158,15 +158,15 @@ func TestNewClientDefault(t *testing.T) {
 	}
 
 	if opts.AppAccessToken != "" {
-		t.Errorf("expected accesstoken to be \"\", got \"%s\"", opts.AppAccessToken)
+		t.Errorf("expected accessToken to be \"\", got \"%s\"", opts.AppAccessToken)
 	}
 
 	if opts.DeviceAccessToken != "" {
-		t.Errorf("expected accesstoken to be \"\", got \"%s\"", opts.DeviceAccessToken)
+		t.Errorf("expected accessToken to be \"\", got \"%s\"", opts.DeviceAccessToken)
 	}
 
 	if opts.UserAccessToken != "" {
-		t.Errorf("expected accesstoken to be \"\", got \"%s\"", opts.UserAccessToken)
+		t.Errorf("expected accessToken to be \"\", got \"%s\"", opts.UserAccessToken)
 	}
 
 	if opts.HTTPClient != http.DefaultClient {
