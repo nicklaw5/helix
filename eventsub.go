@@ -646,50 +646,59 @@ type EventSubExtensionBitsTransactionCreateEvent struct {
 	Product              EventSubProduct `json:"product"`
 }
 
-// Data for a hype train begin notification
+// Data for a hype train begin notification (V2)
 type EventSubHypeTrainBeginEvent struct {
-	BroadcasterUserID    string                 `json:"broadcaster_user_id"`
-	BroadcasterUserLogin string                 `json:"broadcaster_user_login"`
-	BroadcasterUserName  string                 `json:"broadcaster_user_name"`
-	Total                int                    `json:"total"`
-	Progress             int                    `json:"progress"`
-	Goal                 int                    `json:"goal"`
-	TopContributions     []EventSubContribution `json:"top_contributions"`
-	LastContribution     EventSubContribution   `json:"last_contribution"`
-	StartedAt            Time                   `json:"started_at"`
-	ExpiresAt            Time                   `json:"expires_at"`
-	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
+	ID                      string                           `json:"id"`
+	BroadcasterUserID       string                           `json:"broadcaster_user_id"`
+	BroadcasterUserLogin    string                           `json:"broadcaster_user_login"`
+	BroadcasterUserName     string                           `json:"broadcaster_user_name"`
+	Total                   int                              `json:"total"`
+	Progress                int                              `json:"progress"`
+	Goal                    int                              `json:"goal"`
+	Level                   int                              `json:"level"`
+	AllTimeHighLevel        int                              `json:"all_time_high_level"`
+	AllTimeHighTotal        int                              `json:"all_time_high_total"`
+	TopContributions        []EventSubContribution           `json:"top_contributions"`
+	SharedTrainParticipants []EventSubSharedTrainParticipant `json:"shared_train_participants"`
+	StartedAt               Time                             `json:"started_at"`
+	ExpiresAt               Time                             `json:"expires_at"`
+	Type                    string                           `json:"type"`
+	IsSharedTrain           bool                             `json:"is_shared_train"`
 }
 
-// Data for a hype train progress notification
+// Data for a hype train progress notification (V2)
 type EventSubHypeTrainProgressEvent struct {
-	BroadcasterUserID    string                 `json:"broadcaster_user_id"`
-	BroadcasterUserLogin string                 `json:"broadcaster_user_login"`
-	BroadcasterUserName  string                 `json:"broadcaster_user_name"`
-	Level                int                    `json:"level"`
-	Total                int                    `json:"total"`
-	Progress             int                    `json:"progress"`
-	Goal                 int                    `json:"goal"`
-	TopContributions     []EventSubContribution `json:"top_contributions"`
-	LastContribution     EventSubContribution   `json:"last_contribution"`
-	StartedAt            Time                   `json:"started_at"`
-	ExpiresAt            Time                   `json:"expires_at"`
-	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
+	ID                      string                           `json:"id"`
+	BroadcasterUserID       string                           `json:"broadcaster_user_id"`
+	BroadcasterUserLogin    string                           `json:"broadcaster_user_login"`
+	BroadcasterUserName     string                           `json:"broadcaster_user_name"`
+	Total                   int                              `json:"total"`
+	Progress                int                              `json:"progress"`
+	Goal                    int                              `json:"goal"`
+	Level                   int                              `json:"level"`
+	TopContributions        []EventSubContribution           `json:"top_contributions"`
+	SharedTrainParticipants []EventSubSharedTrainParticipant `json:"shared_train_participants"`
+	StartedAt               Time                             `json:"started_at"`
+	ExpiresAt               Time                             `json:"expires_at"`
+	Type                    string                           `json:"type"`
+	IsSharedTrain           bool                             `json:"is_shared_train"`
 }
 
-// Data for a hype train end notification
+// Data for a hype train end notification (V2)
 type EventSubHypeTrainEndEvent struct {
-	ID                   string                 `json:"id"`
-	BroadcasterUserID    string                 `json:"broadcaster_user_id"`
-	BroadcasterUserLogin string                 `json:"broadcaster_user_login"`
-	BroadcasterUserName  string                 `json:"broadcaster_user_name"`
-	Level                int                    `json:"level"`
-	Total                int                    `json:"total"`
-	TopContributions     []EventSubContribution `json:"top_contributions"`
-	StartedAt            Time                   `json:"started_at"`
-	EndedAt              Time                   `json:"ended_at"`
-	CooldownEndsAt       Time                   `json:"cooldown_ends_at"`
-	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
+	ID                      string                           `json:"id"`
+	BroadcasterUserID       string                           `json:"broadcaster_user_id"`
+	BroadcasterUserLogin    string                           `json:"broadcaster_user_login"`
+	BroadcasterUserName     string                           `json:"broadcaster_user_name"`
+	Total                   int                              `json:"total"`
+	Level                   int                              `json:"level"`
+	TopContributions        []EventSubContribution           `json:"top_contributions"`
+	SharedTrainParticipants []EventSubSharedTrainParticipant `json:"shared_train_participants"`
+	StartedAt               Time                             `json:"started_at"`
+	EndedAt                 Time                             `json:"ended_at"`
+	CooldownEndsAt          Time                             `json:"cooldown_ends_at"`
+	Type                    string                           `json:"type"`
+	IsSharedTrain           bool                             `json:"is_shared_train"`
 }
 
 // Data for a stream online notification
@@ -745,7 +754,14 @@ type EventSubContribution struct {
 	UserLogin string `json:"user_login"`
 	UserName  string `json:"user_name"`
 	Type      string `json:"type"`
-	Total     int64  `json:"total"`
+	Total     int    `json:"total"`
+}
+
+// This belongs to a hype train and defines a shared train participant
+type EventSubSharedTrainParticipant struct {
+	BroadcasterUserID    string `json:"broadcaster_user_id"`
+	BroadcasterUserLogin string `json:"broadcaster_user_login"`
+	BroadcasterUserName  string `json:"broadcaster_user_name"`
 }
 
 // This belong to an outcome and defines user reward
@@ -841,6 +857,7 @@ type EventSubChannelGoalEndEvent struct {
 
 type EventSubCharityAmount struct {
 	Value         int64  `json:"value"`
+	Amount        int64  `json:"amount"`
 	DecimalPlaces int64  `json:"decimal_places"`
 	Currency      string `json:"currency"`
 }
