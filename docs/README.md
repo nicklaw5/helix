@@ -128,17 +128,19 @@ if err != nil {
 Below is a list of all available options that can be passed in when creating a new client:
 
 ```go
+
 type Options struct {
-    ClientID        string            // Required
-    ClientSecret    string            // Default: empty string
-    AppAccessToken  string            // Default: empty string
-    UserAccessToken string            // Default: empty string
-    RefreshToken    string            // Default: empty string
-    UserAgent       string            // Default: empty string
-    RedirectURI     string            // Default: empty string
-    HTTPClient      HTTPClient        // Default: http.DefaultClient
-    RateLimitFunc   RateLimitFunc     // Default: nil
-    APIBaseURL      string            // Default: https://api.twitch.tv/helix
+    ClientID          string            // Required
+    ClientSecret      string            // Default: empty string
+    AppAccessToken    string            // Default: empty string
+    DeviceAccessToken string            // Default: empty string
+    UserAccessToken   string            // Default: empty string
+    RefreshToken      string            // Default: empty string
+    UserAgent         string            // Default: empty string
+    RedirectURI       string            // Default: empty string
+    HTTPClient        HTTPClient        // Default: http.DefaultClient
+    RateLimitFunc     RateLimitFunc     // Default: nil
+    APIBaseURL        string            // Default: https://api.twitch.tv/helix
 }
 ```
 
@@ -232,8 +234,8 @@ a 429 (Too Many Requests) response. Before retrying the request, the `RateLimitF
 
 ## Access Tokens
 
-Some API endpoints require that you have a valid access token in order to fulfill the request. There are two types
-of access tokens: app access tokens and user access tokens.
+Some API endpoints require that you have a valid access token in order to fulfill the request. There are three types
+of access tokens: app access tokens, user access tokens and device access tokens.
 
 App access tokens allow game developers to integrate their game into Twitch's viewing experience.
 [Drops](https://dev.twitch.tv/drops) are an example of this.
@@ -242,18 +244,20 @@ User access tokens, on the other hand, are used to interact with the Twitch API 
 If you're only looking to consume the standard API, such as getting access to a user's registered email address, user
 access tokens are what you will need.
 
-It is worth noting that both app and user access tokens have the ability to extend the request rate limit enforced by
-Twitch. However, if you provide both an app and a user token - as is the case in the below example - the app access
-token will be ignored as user access tokens are prioritized when setting the request _Authorization_ header.
+Device access tokens are used to authenticate stand alone devices, such as videogame consoles, CLIs, etc. 
 
-In order to set the access token for a request, you can either supply it as an option or use the `SetUserAccessToken`
-or `SetAppAccessToken` methods. For example:
+It is worth noting that both app and user access tokens have the ability to extend the request rate limit enforced by Twitch.
+
+However, if you provide all three tokens: an app token, a user token and a device token - as is the case in the below example - both the app access token and the device access token will be ignored as user access tokens are prioritized when setting the request _Authorization_ header.
+
+In order to set the access token for a request, you can either supply it as an option or use the `SetUserAccessToken`, `SetAppAccessToken` or `SetDeviceAccessToken` methods. For example:
 
 ```go
 client, err := helix.NewClient(&helix.Options{
-    ClientID:        "your-client-id",
-    UserAccessToken: "your-user-access-token",
-    AppAccessToken:  "your-app-access-token"
+    ClientID:           "your-client-id",
+    UserAccessToken:    "your-user-access-token",
+    AppAccessToken:     "your-app-access-token",
+    DeviceAccessToken:  "your-device-access-token"
 })
 if err != nil {
     // handle error
@@ -274,13 +278,13 @@ if err != nil {
 
 client.SetUserAccessToken("your-user-access-token")
 client.SetAppAccessToken("your-app-access-token")
+client.SetDeviceAccessToken("your-device-access-token")
 
 // send API request...
 ```
 
 Note that any subsequent API requests will utilize this same access token. So it is necessary to unset the access
-token when you are finished with it. To do so, simply pass an empty string to the `SetUserAccessToken` or
-`SetAppAccessToken` methods.
+token when you are finished with it. To do so, simply pass an empty string to the `SetUserAccessToken`, `SetAppAccessToken` or `SetDeviceAccessToken` methods.
 
 ### Automatically refresh user access tokens
 
@@ -317,8 +321,6 @@ client.OnUserAccessTokenRefreshed(func(newAccessToken, newRefreshToken string) {
 
 It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each
 request. You can do so by passing it through as an option when creating a new client, like so:
-
-with the `SetUserAgent()` method before sending a request. For example:
 
 ```go
 client, err := helix.NewClient(&helix.Options{

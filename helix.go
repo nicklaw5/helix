@@ -39,17 +39,18 @@ type Client struct {
 }
 
 type Options struct {
-	ClientID        string
-	ClientSecret    string
-	AppAccessToken  string
-	UserAccessToken string
-	RefreshToken    string
-	UserAgent       string
-	RedirectURI     string
-	HTTPClient      HTTPClient
-	RateLimitFunc   RateLimitFunc
-	APIBaseURL      string
-	ExtensionOpts   ExtensionOptions
+	ClientID          string
+	ClientSecret      string
+	AppAccessToken    string
+	DeviceAccessToken string
+	UserAccessToken   string
+	RefreshToken      string
+	UserAgent         string
+	RedirectURI       string
+	HTTPClient        HTTPClient
+	RateLimitFunc     RateLimitFunc
+	APIBaseURL        string
+	ExtensionOpts     ExtensionOptions
 }
 
 type ExtensionOptions struct {
@@ -418,10 +419,9 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 }
 
 func (c *Client) canRefreshToken() bool {
-	return c.opts.ClientID != "" &&
-		c.opts.ClientSecret != "" &&
-		c.opts.UserAccessToken != "" &&
-		c.opts.RefreshToken != ""
+	return ((c.opts.UserAccessToken != "" && c.opts.ClientSecret != "") ||
+		c.opts.DeviceAccessToken != "") &&
+		(c.opts.ClientID != "" && c.opts.RefreshToken != "")
 }
 
 func (c *Client) refreshToken() error {
@@ -461,6 +461,9 @@ func (c *Client) setRequestHeaders(req *http.Request) {
 	if opts.AppAccessToken != "" {
 		bearerToken = opts.AppAccessToken
 	}
+	if opts.DeviceAccessToken != "" {
+		bearerToken = opts.DeviceAccessToken
+	}
 	if opts.UserAccessToken != "" {
 		bearerToken = opts.UserAccessToken
 	}
@@ -494,6 +497,18 @@ func (c *Client) SetAppAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.opts.AppAccessToken = accessToken
+}
+
+// GetDeviceAccessToken returns the current device access token.
+func (c *Client) GetDeviceAccessToken() string {
+	return c.opts.DeviceAccessToken
+}
+
+// SetDeviceAccessToken sets the current device access token.
+func (c *Client) SetDeviceAccessToken(accessToken string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.opts.DeviceAccessToken = accessToken
 }
 
 // GetUserAccessToken returns the current user access token.

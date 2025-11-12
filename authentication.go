@@ -6,6 +6,7 @@ import (
 )
 
 var authPaths = map[string]string{
+	"device":   "/device",
 	"token":    "/token",
 	"revoke":   "/revoke",
 	"validate": "/validate",
@@ -106,6 +107,83 @@ func (c *Client) RequestUserAccessToken(code string) (*UserAccessTokenResponse, 
 	}
 
 	token := &UserAccessTokenResponse{}
+	resp.HydrateResponseCommon(&token.ResponseCommon)
+	token.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
+	token.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
+	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
+	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
+
+	return token, nil
+}
+
+type DeviceVerificationURIResponse struct {
+	ResponseCommon
+	Data DeviceVerificationCredentials
+}
+
+type DeviceVerificationCredentials struct {
+	DeviceCode      string `json:"device_code"`
+	ExpiresIn       int    `json:"expires_in"`
+	Interval        int    `json:"interval"`
+	UserCode        string `json:"user_code"`
+	VerificationURI string `json:"verification_uri"`
+}
+
+type DeviceVerificationRequestData struct {
+	ClientID string `query:"client_id"`
+	Scopes   string `query:"scope"`
+}
+
+func (c *Client) RequestDeviceVerificationURI(scopes []string) (*DeviceVerificationURIResponse, error) {
+	opts := c.opts
+	data := &DeviceVerificationRequestData{
+		ClientID: opts.ClientID,
+		Scopes:   strings.Join(scopes, " "),
+	}
+
+	resp, err := c.post(authPaths["device"], &DeviceVerificationCredentials{}, data)
+	if err != nil {
+		return nil, err
+	}
+
+	uri := &DeviceVerificationURIResponse{}
+	resp.HydrateResponseCommon(&uri.ResponseCommon)
+	uri.Data.DeviceCode = resp.Data.(*DeviceVerificationCredentials).DeviceCode
+	uri.Data.ExpiresIn = resp.Data.(*DeviceVerificationCredentials).ExpiresIn
+	uri.Data.Interval = resp.Data.(*DeviceVerificationCredentials).Interval
+	uri.Data.UserCode = resp.Data.(*DeviceVerificationCredentials).UserCode
+	uri.Data.VerificationURI = resp.Data.(*DeviceVerificationCredentials).VerificationURI
+
+	return uri, nil
+}
+
+type DeviceAccessTokenResponse struct {
+	ResponseCommon
+	Data AccessCredentials
+}
+
+type DeviceAccessTokenRequestData struct {
+	ClientID   string `query:"client_id"`
+	DeviceCode string `query:"device_code"`
+	GrantType  string `query:"grant_type"`
+	Scopes     string `query:"scope"`
+}
+
+func (c *Client) RequestDeviceAccessToken(deviceCode string, scopes []string) (*DeviceAccessTokenResponse, error) {
+	opts := c.opts
+	data := &DeviceAccessTokenRequestData{
+		ClientID:   opts.ClientID,
+		DeviceCode: deviceCode,
+		GrantType:  "urn:ietf:params:oauth:grant-type:device_code",
+		Scopes:     strings.Join(scopes, " "),
+	}
+
+	resp, err := c.post(authPaths["token"], &AccessCredentials{}, data)
+	if err != nil {
+		return nil, err
+	}
+
+	token := &DeviceAccessTokenResponse{}
 	resp.HydrateResponseCommon(&token.ResponseCommon)
 	token.Data.AccessToken = resp.Data.(*AccessCredentials).AccessToken
 	token.Data.RefreshToken = resp.Data.(*AccessCredentials).RefreshToken
