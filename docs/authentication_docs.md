@@ -200,7 +200,7 @@ if err != nil {
 // Get the refresh token from the client
 refreshToken := client.GetRefreshToken() 
 
-if canRefresh := client.canRefreshToken(); canRefresh {
+if refreshToken != "" {
   resp, err := client.RefreshToken(refreshToken)
   if err != nil {
       // handle error

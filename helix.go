@@ -504,6 +504,7 @@ func (c *Client) GetDeviceAccessToken() string {
 	return c.opts.DeviceAccessToken
 }
 
+// SetDeviceAccessToken sets the current device access token.
 func (c *Client) SetDeviceAccessToken(accessToken string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

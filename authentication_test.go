@@ -234,7 +234,7 @@ func TestRequestDeviceVerificationURI(t *testing.T) {
 		}
 
 		if resp.Data.VerificationURI == "" {
-			t.Errorf("expected a verificaion uri but got an empty string")
+			t.Errorf("expected a verification uri but got an empty string")
 		}
 	}
 
