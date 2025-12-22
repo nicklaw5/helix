@@ -123,6 +123,14 @@ func TestCreateClip(t *testing.T) {
 			"598",
 		},
 		{
+			http.StatusAccepted,
+			&Options{ClientID: "my-client-id"},
+			&CreateClipParams{BroadcasterID: "26490481", Title: "Title", Duration: 0.5}, // summit1g
+			`{"data":[{"id":"IronicHedonisticOryxSquadGoals","edit_url":"https://clips.twitch.tv/IronicHedonisticOryxSquadGoals/edit"}]}`,
+			"600",
+			"598",
+		},
+		{
 			http.StatusUnauthorized,
 			&Options{ClientID: "my-client-id"},
 			&CreateClipParams{BroadcasterID: "26490481"},                                 // summit1g

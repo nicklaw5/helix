@@ -85,10 +85,12 @@ func (ccr *CreateClipResponse) GetClipsCreationRateLimitRemaining() int {
 }
 
 type CreateClipParams struct {
+	// BroadcasterID The ID of the broadcaster whose stream you want to create a clip from.
 	BroadcasterID string `query:"broadcaster_id"`
-
-	// Optional
-	HasDelay bool `query:"has_delay,false"`
+	// Optional. The title of the clip.
+	Title string `query:"title"`
+	// Optional. The length of the clip in seconds. Possible values range from 5 to 60 inclusively with a precision of 0.1. The default is 30.
+	Duration float32 `query:"duration"`
 }
 
 // CreateClip creates a clip programmatically. This returns both an ID and
