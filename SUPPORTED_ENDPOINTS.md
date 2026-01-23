@@ -111,7 +111,7 @@
 - [x] Get Broadcaster Subscriptions
 - [x] Check User Subscription
 - [ ] Get Channel Teams
-- [ ] Get Teams
+- [x] Get Teams
 - [x] Get Users
 - [x] Update User
 - [x] Get Users Follows

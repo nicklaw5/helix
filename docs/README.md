@@ -22,6 +22,7 @@ Follow the links below to their respective API usage examples:
 - [Stream Markers](stream_markers_docs.md)
 - [Streams](streams_docs.md)
 - [Subscriptions](subscriptions_docs.md)
+- [Teams](teams_docs.md)
 - [User Extensions](user_extensions.md)
 - [Users](users_docs.md)
 - [Videos](videos_docs.md)
