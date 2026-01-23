@@ -33,6 +33,8 @@ type TeamUser struct {
 	UserName  string `json:"user_name"`
 }
 
+// GetTeams gets information about the specified Twitch team.
+// Specify the team using the name or ID parameter (but not both).
 func (c *Client) GetTeams(params *GetTeamsParams) (*GetTeamsResponse, error) {
 	resp, err := c.get("/teams", &ManyTeams{}, params)
 	if err != nil {
