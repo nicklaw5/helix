@@ -96,7 +96,7 @@ func (c *Client) UpdateSchedule(params *UpdateScheduleParams) (*UpdateScheduleRe
 }
 
 type CreateScheduleSegmentParams struct {
-	BroadcasterID string `json:"broadcaster_id"`
+	BroadcasterID string `query:"broadcaster_id" json:"-"`
 	StartTime     Time   `json:"start_time"`
 	Timezone      string `json:"timezone"`
 	Duration      string `json:"duration"`
@@ -117,7 +117,7 @@ type CreateScheduleSegmentData struct {
 
 // Updates the broadcaster’s schedule settings, such as scheduling a vacation
 func (c *Client) CreateScheduleSegment(params *CreateScheduleSegmentParams) (*CreateScheduleSegmentResponse, error) {
-	resp, err := c.post("/schedule/segment", &CreateScheduleSegmentData{}, params)
+	resp, err := c.postAsJSON("/schedule/segment", &CreateScheduleSegmentData{}, params)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func (c *Client) CreateScheduleSegment(params *CreateScheduleSegmentParams) (*Cr
 }
 
 type UpdateScheduleSegmentParams struct {
-	BroadcasterID string `json:"broadcaster_id"`
-	ID            string `json:"id"`
+	BroadcasterID string `query:"broadcaster_id" json:"-"`
+	ID            string `query:"id" json:"-"`
 	StartTime     Time   `json:"start_time"`
 	Duration      string `json:"duration"`
 	CategoryID    string `json:"category_id"`
@@ -165,8 +165,8 @@ func (c *Client) UpdateScheduleSegment(params *UpdateScheduleSegmentParams) (*Up
 }
 
 type DeleteScheduleSegmentParams struct {
-	BroadcasterID string `json:"broadcaster_id"`
-	ID            string `json:"id"`
+	BroadcasterID string `query:"broadcaster_id"`
+	ID            string `query:"id"`
 }
 
 type DeleteScheduleSegmentResponse struct {
