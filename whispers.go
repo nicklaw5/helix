@@ -29,5 +29,5 @@ func (c *Client) SendUserWhisper(params *SendUserWhisperParams) (*SendUserWhispe
 	whisperResp := &SendUserWhisperResponse{}
 	resp.HydrateResponseCommon(&whisperResp.ResponseCommon)
 
-	return whisperResp, nil
+	return whisperResp, pullErrorFromResponse(whisperResp.ResponseCommon)
 }

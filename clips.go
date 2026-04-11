@@ -55,7 +55,7 @@ func (c *Client) GetClips(params *ClipsParams) (*ClipsResponse, error) {
 	clips.Data.Clips = resp.Data.(*ManyClips).Clips
 	clips.Data.Pagination = resp.Data.(*ManyClips).Pagination
 
-	return clips, nil
+	return clips, pullErrorFromResponse(clips.ResponseCommon)
 }
 
 type ClipEditURL struct {
@@ -111,5 +111,5 @@ func (c *Client) CreateClip(params *CreateClipParams) (*CreateClipResponse, erro
 	resp.HydrateResponseCommon(&clips.ResponseCommon)
 	clips.Data.ClipEditURLs = resp.Data.(*ManyClipEditURLs).ClipEditURLs
 
-	return clips, nil
+	return clips, pullErrorFromResponse(clips.ResponseCommon)
 }

@@ -71,7 +71,7 @@ func (c *Client) GetVideos(params *VideosParams) (*VideosResponse, error) {
 	videos.Data.Videos = resp.Data.(*ManyVideos).Videos
 	videos.Data.Pagination = resp.Data.(*ManyVideos).Pagination
 
-	return videos, nil
+	return videos, pullErrorFromResponse(videos.ResponseCommon)
 }
 
 // DeleteVideos delete one or more videos (max 5)
@@ -85,5 +85,5 @@ func (c *Client) DeleteVideos(params *DeleteVideosParams) (*DeleteVideosResponse
 	videos := &DeleteVideosResponse{}
 	resp.HydrateResponseCommon(&videos.ResponseCommon)
 
-	return videos, nil
+	return videos, pullErrorFromResponse(videos.ResponseCommon)
 }

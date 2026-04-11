@@ -80,7 +80,7 @@ func (c *Client) SetExtensionSegmentConfig(params *ExtensionSetConfigurationPara
 	setExtCnfgResp := &ExtensionSetConfigurationResponse{}
 	resp.HydrateResponseCommon(&setExtCnfgResp.ResponseCommon)
 
-	return setExtCnfgResp, nil
+	return setExtCnfgResp, pullErrorFromResponse(setExtCnfgResp.ResponseCommon)
 }
 
 func (c *Client) GetExtensionConfigurationSegment(params *ExtensionGetConfigurationParams) (*ExtensionGetConfigurationSegmentResponse, error) {
@@ -104,7 +104,7 @@ func (c *Client) GetExtensionConfigurationSegment(params *ExtensionGetConfigurat
 	resp.HydrateResponseCommon(&extCfgSegResp.ResponseCommon)
 	extCfgSegResp.Data.Segments = resp.Data.(*ManyExtensionConfigurationSegments).Segments
 
-	return extCfgSegResp, nil
+	return extCfgSegResp, pullErrorFromResponse(extCfgSegResp.ResponseCommon)
 }
 
 func (c *Client) SetExtensionRequiredConfiguration(params *ExtensionSetRequiredConfigurationParams) (*ExtensionSetRequiredConfigurationResponse, error) {
@@ -117,5 +117,5 @@ func (c *Client) SetExtensionRequiredConfiguration(params *ExtensionSetRequiredC
 	extReqCfgResp := &ExtensionSetRequiredConfigurationResponse{}
 	resp.HydrateResponseCommon(&extReqCfgResp.ResponseCommon)
 
-	return extReqCfgResp, nil
+	return extReqCfgResp, pullErrorFromResponse(extReqCfgResp.ResponseCommon)
 }

@@ -69,7 +69,7 @@ func (c *Client) GetStreams(params *StreamsParams) (*StreamsResponse, error) {
 	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
 	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
 
-	return streams, nil
+	return streams, pullErrorFromResponse(streams.ResponseCommon)
 }
 
 type FollowedStreamsParams struct {
@@ -96,7 +96,7 @@ func (c *Client) GetFollowedStream(params *FollowedStreamsParams) (*StreamsRespo
 	streams.Data.Streams = resp.Data.(*ManyStreams).Streams
 	streams.Data.Pagination = resp.Data.(*ManyStreams).Pagination
 
-	return streams, nil
+	return streams, pullErrorFromResponse(streams.ResponseCommon)
 }
 
 // GetStreamKey : Returns the secret stream key of the broadcaster
@@ -112,5 +112,5 @@ func (c *Client) GetStreamKey(params *StreamKeyParams) (*StreamKeysResponse, err
 	resp.HydrateResponseCommon(&streams.ResponseCommon)
 	streams.Data.Data = resp.Data.(*ManyStreamKeys).Data
 
-	return streams, nil
+	return streams, pullErrorFromResponse(streams.ResponseCommon)
 }

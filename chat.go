@@ -42,7 +42,7 @@ func (c *Client) GetChannelChatChatters(params *GetChatChattersParams) (*GetChat
 	chatters.Data.Total = resp.Data.(*ManyChatChatters).Total
 	chatters.Data.Pagination = resp.Data.(*ManyChatChatters).Pagination
 
-	return chatters, nil
+	return chatters, pullErrorFromResponse(chatters.ResponseCommon)
 }
 
 type GetChatBadgeParams struct {
@@ -80,7 +80,7 @@ func (c *Client) GetChannelChatBadges(params *GetChatBadgeParams) (*GetChatBadge
 	resp.HydrateResponseCommon(&channels.ResponseCommon)
 	channels.Data.Badges = resp.Data.(*ManyChatBadge).Badges
 
-	return channels, nil
+	return channels, pullErrorFromResponse(channels.ResponseCommon)
 }
 
 func (c *Client) GetGlobalChatBadges() (*GetChatBadgeResponse, error) {
@@ -93,7 +93,7 @@ func (c *Client) GetGlobalChatBadges() (*GetChatBadgeResponse, error) {
 	resp.HydrateResponseCommon(&channels.ResponseCommon)
 	channels.Data.Badges = resp.Data.(*ManyChatBadge).Badges
 
-	return channels, nil
+	return channels, pullErrorFromResponse(channels.ResponseCommon)
 }
 
 type GetChannelEmotesParams struct {
@@ -164,7 +164,7 @@ func (c *Client) GetChannelEmotes(params *GetChannelEmotesParams) (*GetChannelEm
 	resp.HydrateResponseCommon(&emotes.ResponseCommon)
 	emotes.Data.Emotes = resp.Data.(*ManyEmotes).Emotes
 
-	return emotes, nil
+	return emotes, pullErrorFromResponse(emotes.ResponseCommon)
 }
 
 func (c *Client) GetGlobalEmotes() (*GetChannelEmotesResponse, error) {
@@ -177,7 +177,7 @@ func (c *Client) GetGlobalEmotes() (*GetChannelEmotesResponse, error) {
 	resp.HydrateResponseCommon(&emotes.ResponseCommon)
 	emotes.Data.Emotes = resp.Data.(*ManyEmotes).Emotes
 
-	return emotes, nil
+	return emotes, pullErrorFromResponse(emotes.ResponseCommon)
 }
 
 // GetEmoteSets
@@ -191,7 +191,7 @@ func (c *Client) GetEmoteSets(params *GetEmoteSetsParams) (*GetEmoteSetsResponse
 	resp.HydrateResponseCommon(&emotes.ResponseCommon)
 	emotes.Data.Emotes = resp.Data.(*ManyEmotesWithOwner).Emotes
 
-	return emotes, nil
+	return emotes, pullErrorFromResponse(emotes.ResponseCommon)
 }
 
 // SendChatAnnouncement sends an announcement to the broadcaster’s chat room.
@@ -205,7 +205,7 @@ func (c *Client) SendChatAnnouncement(params *SendChatAnnouncementParams) (*Send
 	chatResp := &SendChatAnnouncementResponse{}
 	resp.HydrateResponseCommon(&chatResp.ResponseCommon)
 
-	return chatResp, nil
+	return chatResp, pullErrorFromResponse(chatResp.ResponseCommon)
 }
 
 type GetChatSettingsParams struct {
@@ -269,7 +269,7 @@ func (c *Client) GetChatSettings(params *GetChatSettingsParams) (*GetChatSetting
 	resp.HydrateResponseCommon(&settings.ResponseCommon)
 	settings.Data.Settings = resp.Data.(*ManyChatSettings).Settings
 
-	return settings, nil
+	return settings, pullErrorFromResponse(settings.ResponseCommon)
 }
 
 type UpdateChatSettingsParams struct {
@@ -346,7 +346,7 @@ func (c *Client) UpdateChatSettings(params *UpdateChatSettingsParams) (*UpdateCh
 	resp.HydrateResponseCommon(&settings.ResponseCommon)
 	settings.Data.Settings = resp.Data.(*ManyChatSettings).Settings
 
-	return settings, nil
+	return settings, pullErrorFromResponse(settings.ResponseCommon)
 }
 
 // UserChatColorResponse is the response from GetUserChatColor
@@ -383,7 +383,7 @@ func (c *Client) GetUserChatColor(params *GetUserChatColorParams) (*UserChatColo
 	userColor := &UserChatColorResponse{}
 	resp.HydrateResponseCommon(&userColor.ResponseCommon)
 
-	return userColor, nil
+	return userColor, pullErrorFromResponse(userColor.ResponseCommon)
 }
 
 // UpdateUserChatColorResponse is the response for UpdateUserChatColor
@@ -426,7 +426,7 @@ func (c *Client) UpdateUserChatColor(params *UpdateUserChatColorParams) (*Update
 	update := &UpdateUserChatColorResponse{}
 	resp.HydrateResponseCommon(&update.ResponseCommon)
 
-	return update, nil
+	return update, pullErrorFromResponse(update.ResponseCommon)
 }
 
 type SendChatMessageParams struct {
@@ -501,5 +501,5 @@ func (c *Client) SendChatMessage(params *SendChatMessageParams) (*ChatMessageRes
 	resp.HydrateResponseCommon(&chatMessages.ResponseCommon)
 	chatMessages.Data.Messages = resp.Data.(*ManyChatMessages).Messages
 
-	return chatMessages, nil
+	return chatMessages, pullErrorFromResponse(chatMessages.ResponseCommon)
 }

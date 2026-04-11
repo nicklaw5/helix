@@ -63,7 +63,7 @@ func TestSearchChannels(t *testing.T) {
 		resp, err := c.SearchChannels(&SearchChannelsParams{
 			First: testCase.First,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -222,7 +222,7 @@ func TestGetChannelInformation(t *testing.T) {
 				BroadcasterIDs: testCase.BroadcasterIDs,
 			})
 		}
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -337,7 +337,7 @@ func TestEditChannelInformation(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.EditChannelInformation(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -413,7 +413,7 @@ func TestChannelFollows(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetChannelFollows(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -485,7 +485,7 @@ func TestFollowedChannels(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetFollowedChannels(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

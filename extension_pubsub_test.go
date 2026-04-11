@@ -117,7 +117,9 @@ func TestExtensionSendPubSubMessage(t *testing.T) {
 				continue
 			}
 
-			t.Error(err)
+			if resp == nil || resp.StatusCode < 400 {
+				t.Error(err)
+			}
 		}
 
 		if resp.StatusCode != testCase.statusCode {

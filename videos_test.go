@@ -33,7 +33,7 @@ func TestGetVideos(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetVideos(testCase.VideosParams)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -120,7 +120,7 @@ func TestDeleteVideos(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.DeleteVideos(testCase.DeleteVideosParams)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

@@ -48,7 +48,7 @@ func TestSearchCategories(t *testing.T) {
 		resp, err := c.SearchCategories(&SearchCategoriesParams{
 			First: testCase.First,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

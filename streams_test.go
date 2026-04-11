@@ -35,7 +35,7 @@ func TestGetStreams(t *testing.T) {
 		resp, err := c.GetStreams(&StreamsParams{
 			First: testCase.First,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -111,7 +111,7 @@ func TestGetFollowedStreams(t *testing.T) {
 		resp, err := c.GetFollowedStream(&FollowedStreamsParams{
 			UserID: testCase.UserID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -186,7 +186,7 @@ func TestGetStreamKeys(t *testing.T) {
 		resp, err := c.GetStreamKey(&StreamKeyParams{
 			BroadcasterID: testCase.broadcasterID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

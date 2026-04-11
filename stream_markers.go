@@ -60,7 +60,7 @@ func (c *Client) GetStreamMarkers(params *StreamMarkersParams) (*StreamMarkersRe
 	markers.Data.StreamMarkers = resp.Data.(*ManyStreamMarkers).StreamMarkers
 	markers.Data.Pagination = resp.Data.(*ManyStreamMarkers).Pagination
 
-	return markers, nil
+	return markers, pullErrorFromResponse(markers.ResponseCommon)
 }
 
 type CreateStreamMarker struct {
@@ -102,5 +102,5 @@ func (c *Client) CreateStreamMarker(params *CreateStreamMarkerParams) (*CreateSt
 	resp.HydrateResponseCommon(&markers.ResponseCommon)
 	markers.Data.CreateStreamMarkers = resp.Data.(*ManyCreateStreamMarkers).CreateStreamMarkers
 
-	return markers, nil
+	return markers, pullErrorFromResponse(markers.ResponseCommon)
 }

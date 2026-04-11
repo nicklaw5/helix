@@ -42,7 +42,7 @@ func TestGetUsers(t *testing.T) {
 			IDs:    testCase.IDs,
 			Logins: testCase.Logins,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -127,7 +127,7 @@ func TestUpdateUser(t *testing.T) {
 		resp, err := c.UpdateUser(&UpdateUserParams{
 			Description: testCase.description,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -212,7 +212,7 @@ func TestGetUsersFollows(t *testing.T) {
 			First:  testCase.First,
 			FromID: testCase.FromID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -303,7 +303,7 @@ func TestGetUsersBlocked(t *testing.T) {
 			First:         testCase.First,
 			BroadcasterID: testCase.BroadcasterID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -410,7 +410,7 @@ func TestBlockUser(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.BlockUser(testCase.Params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -489,7 +489,7 @@ func TestUnblockUser(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.UnblockUser(testCase.Params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

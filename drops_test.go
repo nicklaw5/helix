@@ -53,7 +53,7 @@ func TestGetDropsEntitlements(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetDropsEntitlements(&GetDropEntitlementsParams{GameID: testCase.gameID})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -154,7 +154,7 @@ func TestUpdateDropsEntitlements(t *testing.T) {
 			EntitlementIDs:    testCase.requestedIDs,
 			FulfillmentStatus: testCase.fulfillmentStatus,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

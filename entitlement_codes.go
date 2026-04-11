@@ -48,7 +48,7 @@ func (c *Client) GetEntitlementCodeStatus(params *CodesParams) (*CodeResponse, e
 	resp.HydrateResponseCommon(&codes.ResponseCommon)
 	codes.Data.Codes = resp.Data.(*ManyCodes).Codes
 
-	return codes, nil
+	return codes, pullErrorFromResponse(codes.ResponseCommon)
 }
 
 // RedeemEntitlementCode
@@ -65,5 +65,5 @@ func (c *Client) RedeemEntitlementCode(params *CodesParams) (*CodeResponse, erro
 	resp.HydrateResponseCommon(&codes.ResponseCommon)
 	codes.Data.Codes = resp.Data.(*ManyCodes).Codes
 
-	return codes, nil
+	return codes, pullErrorFromResponse(codes.ResponseCommon)
 }

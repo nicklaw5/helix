@@ -38,5 +38,5 @@ func (c *Client) SearchCategories(params *SearchCategoriesParams) (*SearchCatego
 	categories.Data.Categories = resp.Data.(*ManySearchCategories).Categories
 	categories.Data.Pagination = resp.Data.(*ManySearchCategories).Pagination
 
-	return categories, nil
+	return categories, pullErrorFromResponse(categories.ResponseCommon)
 }

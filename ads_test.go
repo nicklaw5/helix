@@ -51,7 +51,7 @@ func TestClient_StartCommercial(t *testing.T) {
 		}
 
 		resp, err := c.StartCommercial(params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

@@ -51,7 +51,7 @@ func TestGetSchedule(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetSchedule(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -111,7 +111,7 @@ func TestUpdateSchedule(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, ``, nil))
 
 		resp, err := c.UpdateSchedule(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -191,7 +191,7 @@ func TestCreateScheduleSegment(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.CreateScheduleSegment(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -274,7 +274,7 @@ func TestUpdateScheduleSegment(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.UpdateScheduleSegment(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -338,7 +338,7 @@ func TestDeleteScheduleSegment(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, ``, nil))
 
 		resp, err := c.DeleteScheduleSegment(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

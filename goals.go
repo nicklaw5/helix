@@ -38,5 +38,5 @@ func (c *Client) GetCreatorGoals(payload *GetCreatorGoalsParams) (*CreatorGoalsR
 	goals.Data.Goals = resp.Data.(*ManyGoals).Goals
 	goals.Data.Pagination = resp.Data.(*ManyGoals).Pagination
 
-	return goals, nil
+	return goals, pullErrorFromResponse(goals.ResponseCommon)
 }

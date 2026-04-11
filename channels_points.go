@@ -156,7 +156,7 @@ func (c *Client) CreateCustomReward(params *ChannelCustomRewardsParams) (*Channe
 	resp.HydrateResponseCommon(&reward.ResponseCommon)
 	reward.Data.ChannelCustomRewards = resp.Data.(*ManyChannelCustomRewards).ChannelCustomRewards
 
-	return reward, nil
+	return reward, pullErrorFromResponse(reward.ResponseCommon)
 }
 
 // UpdateCustomReward : Update a Custom Reward on a channel.
@@ -171,7 +171,7 @@ func (c *Client) UpdateCustomReward(params *UpdateChannelCustomRewardsParams) (*
 	resp.HydrateResponseCommon(&reward.ResponseCommon)
 	reward.Data.ChannelCustomRewards = resp.Data.(*ManyChannelCustomRewards).ChannelCustomRewards
 
-	return reward, nil
+	return reward, pullErrorFromResponse(reward.ResponseCommon)
 }
 
 // DeleteCustomRewards : Deletes a Custom Rewards on a channel
@@ -185,7 +185,7 @@ func (c *Client) DeleteCustomRewards(params *DeleteCustomRewardsParams) (*Delete
 	reward := &DeleteCustomRewardsResponse{}
 	resp.HydrateResponseCommon(&reward.ResponseCommon)
 
-	return reward, nil
+	return reward, pullErrorFromResponse(reward.ResponseCommon)
 }
 
 // GetCustomRewards : Get Custom Rewards on a channel
@@ -200,7 +200,7 @@ func (c *Client) GetCustomRewards(params *GetCustomRewardsParams) (*ChannelCusto
 	resp.HydrateResponseCommon(&rewards.ResponseCommon)
 	rewards.Data.ChannelCustomRewards = resp.Data.(*ManyChannelCustomRewards).ChannelCustomRewards
 
-	return rewards, nil
+	return rewards, pullErrorFromResponse(rewards.ResponseCommon)
 }
 
 // GetCustomRewardsRedemptions : Gets Custom Reward Redemption statuses on a channel.
@@ -215,7 +215,7 @@ func (c *Client) GetCustomRewardsRedemptions(params *GetCustomRewardsRedemptions
 	resp.HydrateResponseCommon(&redemptions.ResponseCommon)
 	redemptions.Data.Redemptions = resp.Data.(*ManyChannelCustomRewardsRedemptions).Redemptions
 
-	return redemptions, nil
+	return redemptions, pullErrorFromResponse(redemptions.ResponseCommon)
 }
 
 // UpdateChannelCustomRewardsRedemptionStatus : Update a Custom Reward Redemption status on a channel.
@@ -230,5 +230,5 @@ func (c *Client) UpdateChannelCustomRewardsRedemptionStatus(params *UpdateChanne
 	resp.HydrateResponseCommon(&redemptions.ResponseCommon)
 	redemptions.Data.Redemptions = resp.Data.(*ManyChannelCustomRewardsRedemptions).Redemptions
 
-	return redemptions, nil
+	return redemptions, pullErrorFromResponse(redemptions.ResponseCommon)
 }

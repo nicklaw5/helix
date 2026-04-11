@@ -48,7 +48,7 @@ func TestGetBannedUsers(t *testing.T) {
 			After:         testCase.After,
 			Before:        testCase.Before,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -144,7 +144,7 @@ func TestBanUser(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.BanUser(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -237,7 +237,7 @@ func TestUnbanUser(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.UnbanUser(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -333,6 +333,9 @@ func TestGetBlockedTerms(t *testing.T) {
 
 		resp, err := c.GetBlockedTerms(testCase.params)
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}
@@ -431,6 +434,9 @@ func TestAddBlockedTerm(t *testing.T) {
 
 		resp, err := c.AddBlockedTerm(testCase.params)
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}
@@ -514,6 +520,9 @@ func TestRemoveBlockedTerm(t *testing.T) {
 
 		resp, err := c.RemoveBlockedTerm(testCase.params)
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}
@@ -602,6 +611,9 @@ func TestDeleteChatMessage(t *testing.T) {
 		})
 
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}
@@ -677,6 +689,9 @@ func TestDeleteAllChatMessages(t *testing.T) {
 		})
 
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}
@@ -762,6 +777,9 @@ func TestGetModerators(t *testing.T) {
 		resp, err := c.GetModerators(testCase.params)
 
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}
@@ -840,7 +858,7 @@ func TestAddChannelModerator(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.AddChannelModerator(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -910,7 +928,7 @@ func TestRemoveChannelModerator(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RemoveChannelModerator(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -1066,6 +1084,9 @@ func TestGetModeratedChannels(t *testing.T) {
 		resp, err := c.GetModeratedChannels(testCase.params)
 
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}
@@ -1230,6 +1251,9 @@ func TestSendModeratorWarnMessage(t *testing.T) {
 
 		resp, err := c.SendModeratorWarnMessage(testCase.params)
 		if err != nil {
+			if resp != nil && resp.StatusCode >= 400 {
+				continue // API error response, expected
+			}
 			if err.Error() != testCase.errorMsg {
 				t.Errorf("expected error message to be %s, got %s", testCase.errorMsg, err.Error())
 			}

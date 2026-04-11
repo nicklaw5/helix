@@ -99,7 +99,7 @@ func TestRequestAppAccessToken(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RequestAppAccessToken([]string{"some-scope"})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -195,7 +195,7 @@ func TestRequestDeviceVerificationURI(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RequestDeviceVerificationURI(testCase.scopes)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -317,7 +317,7 @@ func TestRequestDeviceAccessToken(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RequestDeviceAccessToken(testCase.deviceCode, testCase.scopes)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -467,7 +467,7 @@ func TestRequestUserAccessToken(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RequestUserAccessToken(testCase.code)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -611,7 +611,7 @@ func TestRefreshUserAccessToken(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RefreshUserAccessToken(testCase.refreshToken)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -716,7 +716,7 @@ func TestRevokeUserAccessToken(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RevokeUserAccessToken(testCase.accessToken)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -798,7 +798,7 @@ func TestValidateToken(t *testing.T) {
 		c := newMockClient(&Options{UserAccessToken: initialUserToken}, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		isValid, resp, err := c.ValidateToken(testCase.accessToken)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

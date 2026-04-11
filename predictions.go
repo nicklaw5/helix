@@ -67,7 +67,7 @@ func (c *Client) GetPredictions(params *PredictionsParams) (*PredictionsResponse
 	predictions.Data.Predictions = resp.Data.(*ManyPredictions).Predictions
 	predictions.Data.Pagination = resp.Data.(*ManyPredictions).Pagination
 
-	return predictions, nil
+	return predictions, pullErrorFromResponse(predictions.ResponseCommon)
 }
 
 type CreatePredictionParams struct {
@@ -93,7 +93,7 @@ func (c *Client) CreatePrediction(params *CreatePredictionParams) (*PredictionsR
 	predictions.Data.Predictions = resp.Data.(*ManyPredictions).Predictions
 	predictions.Data.Pagination = resp.Data.(*ManyPredictions).Pagination
 
-	return predictions, nil
+	return predictions, pullErrorFromResponse(predictions.ResponseCommon)
 }
 
 type EndPredictionParams struct {
@@ -115,5 +115,5 @@ func (c *Client) EndPrediction(params *EndPredictionParams) (*PredictionsRespons
 	predictions.Data.Predictions = resp.Data.(*ManyPredictions).Predictions
 	predictions.Data.Pagination = resp.Data.(*ManyPredictions).Pagination
 
-	return predictions, nil
+	return predictions, pullErrorFromResponse(predictions.ResponseCommon)
 }

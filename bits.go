@@ -44,7 +44,7 @@ func (c *Client) GetBitsLeaderboard(params *BitsLeaderboardParams) (*BitsLeaderb
 	bits.Data.DateRange = resp.Data.(*ManyUserBitTotals).DateRange
 	bits.Data.UserBitTotals = resp.Data.(*ManyUserBitTotals).UserBitTotals
 
-	return bits, nil
+	return bits, pullErrorFromResponse(bits.ResponseCommon)
 }
 
 type CheermotesParams struct {
@@ -106,5 +106,5 @@ func (c *Client) GetCheermotes(params *CheermotesParams) (*CheermotesResponse, e
 	resp.HydrateResponseCommon(&cheermoteResp.ResponseCommon)
 	cheermoteResp.Data.Cheermotes = resp.Data.(*ManyCheermotes).Cheermotes
 
-	return cheermoteResp, nil
+	return cheermoteResp, pullErrorFromResponse(cheermoteResp.ResponseCommon)
 }

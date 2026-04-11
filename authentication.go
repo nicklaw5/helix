@@ -74,7 +74,7 @@ func (c *Client) RequestAppAccessToken(scopes []string) (*AppAccessTokenResponse
 	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
 	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
 
-	return token, nil
+	return token, pullErrorFromResponse(token.ResponseCommon)
 }
 
 type UserAccessTokenResponse struct {
@@ -113,7 +113,7 @@ func (c *Client) RequestUserAccessToken(code string) (*UserAccessTokenResponse, 
 	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
 	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
 
-	return token, nil
+	return token, pullErrorFromResponse(token.ResponseCommon)
 }
 
 type DeviceVerificationURIResponse struct {
@@ -154,7 +154,7 @@ func (c *Client) RequestDeviceVerificationURI(scopes []string) (*DeviceVerificat
 	uri.Data.UserCode = resp.Data.(*DeviceVerificationCredentials).UserCode
 	uri.Data.VerificationURI = resp.Data.(*DeviceVerificationCredentials).VerificationURI
 
-	return uri, nil
+	return uri, pullErrorFromResponse(uri.ResponseCommon)
 }
 
 type DeviceAccessTokenResponse struct {
@@ -190,7 +190,7 @@ func (c *Client) RequestDeviceAccessToken(deviceCode string, scopes []string) (*
 	token.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
 	token.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
 
-	return token, nil
+	return token, pullErrorFromResponse(token.ResponseCommon)
 }
 
 type RefreshTokenResponse struct {
@@ -230,7 +230,7 @@ func (c *Client) RefreshUserAccessToken(refreshToken string) (*RefreshTokenRespo
 	refresh.Data.ExpiresIn = resp.Data.(*AccessCredentials).ExpiresIn
 	refresh.Data.Scopes = resp.Data.(*AccessCredentials).Scopes
 
-	return refresh, nil
+	return refresh, pullErrorFromResponse(refresh.ResponseCommon)
 }
 
 type RevokeAccessTokenResponse struct {
@@ -261,7 +261,7 @@ func (c *Client) RevokeUserAccessToken(accessToken string) (*RevokeAccessTokenRe
 	revoke := &RevokeAccessTokenResponse{}
 	resp.HydrateResponseCommon(&revoke.ResponseCommon)
 
-	return revoke, nil
+	return revoke, pullErrorFromResponse(revoke.ResponseCommon)
 }
 
 type ValidateTokenResponse struct {
@@ -300,5 +300,5 @@ func (c *Client) ValidateToken(accessToken string) (bool, *ValidateTokenResponse
 	}
 	resp.HydrateResponseCommon(&tokenResp.ResponseCommon)
 
-	return isValid, tokenResp, nil
+	return isValid, tokenResp, pullErrorFromResponse(tokenResp.ResponseCommon)
 }

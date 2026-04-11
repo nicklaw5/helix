@@ -59,7 +59,7 @@ func (c *Client) GetPolls(params *PollsParams) (*PollsResponse, error) {
 	polls.Data.Polls = resp.Data.(*ManyPolls).Polls
 	polls.Data.Pagination = resp.Data.(*ManyPolls).Pagination
 
-	return polls, nil
+	return polls, pullErrorFromResponse(polls.ResponseCommon)
 }
 
 type CreatePollParams struct {
@@ -89,7 +89,7 @@ func (c *Client) CreatePoll(params *CreatePollParams) (*PollsResponse, error) {
 	polls.Data.Polls = resp.Data.(*ManyPolls).Polls
 	polls.Data.Pagination = resp.Data.(*ManyPolls).Pagination
 
-	return polls, nil
+	return polls, pullErrorFromResponse(polls.ResponseCommon)
 }
 
 type EndPollParams struct {
@@ -110,5 +110,5 @@ func (c *Client) EndPoll(params *EndPollParams) (*PollsResponse, error) {
 	polls.Data.Polls = resp.Data.(*ManyPolls).Polls
 	polls.Data.Pagination = resp.Data.(*ManyPolls).Pagination
 
-	return polls, nil
+	return polls, pullErrorFromResponse(polls.ResponseCommon)
 }

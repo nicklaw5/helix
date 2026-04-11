@@ -69,7 +69,7 @@ func (c *Client) GetDropsEntitlements(params *GetDropEntitlementsParams) (*GetDr
 	entitlements.Data.Entitlements = resp.Data.(*ManyEntitlementsWithPagination).Entitlements
 	entitlements.Data.Pagination = resp.Data.(*ManyEntitlementsWithPagination).Pagination
 
-	return entitlements, nil
+	return entitlements, pullErrorFromResponse(entitlements.ResponseCommon)
 }
 
 // UpdateDropsEntitlements updates the fulfillment status of a set of entitlements, owned by the authenticated user or
@@ -91,5 +91,5 @@ func (c *Client) UpdateDropsEntitlements(params *UpdateDropsEntitlementsParams) 
 	resp.HydrateResponseCommon(&entitlementSets.ResponseCommon)
 	entitlementSets.Data.EntitlementSets = resp.Data.(*ManyUpdatedEntitlementSet).EntitlementSets
 
-	return entitlementSets, nil
+	return entitlementSets, pullErrorFromResponse(entitlementSets.ResponseCommon)
 }

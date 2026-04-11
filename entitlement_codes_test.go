@@ -37,7 +37,7 @@ func TestClient_GetEntitlementCodeStatus(t *testing.T) {
 		}
 
 		resp, err := c.GetEntitlementCodeStatus(params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -114,7 +114,7 @@ func TestClient_RedeemEntitlementCode(t *testing.T) {
 		}
 
 		resp, err := c.GetEntitlementCodeStatus(params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

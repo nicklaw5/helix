@@ -65,7 +65,9 @@ func TestSetExtensionConfigurationSegmentS(t *testing.T) {
 				continue
 			}
 
-			t.Error(err)
+			if resp == nil || resp.StatusCode < 400 {
+				t.Error(err)
+			}
 		}
 
 		if resp.StatusCode != testCase.statusCode {
@@ -146,7 +148,9 @@ func TestGetExtensionConfigurationSegmentS(t *testing.T) {
 				continue
 			}
 
-			t.Error(err)
+			if resp == nil || resp.StatusCode < 400 {
+				t.Error(err)
+			}
 		}
 
 		if resp.StatusCode != testCase.statusCode {
@@ -222,7 +226,9 @@ func TestExtensionSetConfigurationSegmentRequired(t *testing.T) {
 				continue
 			}
 
-			t.Error(err)
+			if resp == nil || resp.StatusCode < 400 {
+				t.Error(err)
+			}
 		}
 
 		if resp.StatusCode != testCase.statusCode {

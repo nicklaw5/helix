@@ -56,5 +56,5 @@ func (c *Client) GetHypeTrainEvents(params *HypeTrainEventsParams) (*HypeTrainEv
 	events.Data.Events = resp.Data.(*ManyHypeTrainEvents).Events
 	events.Data.Pagination = resp.Data.(*ManyHypeTrainEvents).Pagination
 
-	return events, nil
+	return events, pullErrorFromResponse(events.ResponseCommon)
 }

@@ -57,7 +57,7 @@ func TestClient_GetBitsLeaderboard(t *testing.T) {
 		}
 
 		resp, err := c.GetBitsLeaderboard(params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -592,7 +592,7 @@ func TestClient_GetCheermotes(t *testing.T) {
 		}
 
 		resp, err := c.GetCheermotes(params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

@@ -76,7 +76,7 @@ func (c *Client) GetSubscriptions(params *SubscriptionsParams) (*SubscriptionsRe
 	subscriptions.Data.Total = resp.Data.(*ManySubscriptions).Total
 	subscriptions.Data.Points = resp.Data.(*ManySubscriptions).Points
 
-	return subscriptions, nil
+	return subscriptions, pullErrorFromResponse(subscriptions.ResponseCommon)
 }
 
 // CheckUserSubscription Check if a specific user is subscribed to a specific channel
@@ -92,5 +92,5 @@ func (c *Client) CheckUserSubscription(params *UserSubscriptionsParams) (*UserSu
 	resp.HydrateResponseCommon(&subscriptions.ResponseCommon)
 	subscriptions.Data.UserSubscriptions = resp.Data.(*ManyUserSubscriptions).UserSubscriptions
 
-	return subscriptions, nil
+	return subscriptions, pullErrorFromResponse(subscriptions.ResponseCommon)
 }

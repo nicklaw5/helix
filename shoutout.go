@@ -23,5 +23,5 @@ func (c *Client) SendShoutout(params *SendShoutoutParams) (*SendShoutoutResponse
 	shoutoutResp := &SendShoutoutResponse{}
 	resp.HydrateResponseCommon(&shoutoutResp.ResponseCommon)
 
-	return shoutoutResp, nil
+	return shoutoutResp, pullErrorFromResponse(shoutoutResp.ResponseCommon)
 }
