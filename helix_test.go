@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"log"
@@ -918,5 +919,93 @@ func TestQueryStringBuilderNoQuery(t *testing.T) {
 	}
 	if q != expectedQueryString {
 		t.Errorf(`expected q to be "%s", got "%s"`, expectedQueryString, q)
+	}
+}
+
+func TestDebugModeDefaultLogger(t *testing.T) {
+	t.Parallel()
+
+	// When DebugMode is true and no Logger is provided, a default logger should be set.
+	options := &Options{
+		ClientID:  "my-client-id",
+		DebugMode: true,
+	}
+
+	client, err := NewClient(options)
+	if err != nil {
+		t.Fatalf("did not expect an error, got %q", err.Error())
+	}
+
+	if client.opts.Logger == nil {
+		t.Error("expected a default logger to be set when DebugMode is true and no Logger is provided")
+	}
+}
+
+func TestDebugModeCustomLogger(t *testing.T) {
+	t.Parallel()
+
+	// When DebugMode is true and a custom Logger is provided, it should be used as-is.
+	var buf bytes.Buffer
+	customLogger := log.New(&buf, "", 0)
+
+	options := &Options{
+		ClientID:  "my-client-id",
+		DebugMode: true,
+		Logger:    customLogger,
+	}
+
+	client, err := NewClient(options)
+	if err != nil {
+		t.Fatalf("did not expect an error, got %q", err.Error())
+	}
+
+	if client.opts.Logger != customLogger {
+		t.Error("expected the custom logger to be preserved")
+	}
+}
+
+func TestDebugModeDisabledNoLogger(t *testing.T) {
+	t.Parallel()
+
+	// When DebugMode is false (default), Logger should remain nil.
+	options := &Options{ClientID: "my-client-id"}
+
+	client, err := NewClient(options)
+	if err != nil {
+		t.Fatalf("did not expect an error, got %q", err.Error())
+	}
+
+	if client.opts.Logger != nil {
+		t.Error("expected Logger to remain nil when DebugMode is false")
+	}
+}
+
+func TestDebugLogging(t *testing.T) {
+	t.Parallel()
+
+	var buf bytes.Buffer
+	customLogger := log.New(&buf, "", 0)
+
+	mockHandler := newMockHandler(http.StatusOK, `{"data":[]}`, nil)
+	client := newMockClient(&Options{
+		ClientID:  "my-client-id",
+		DebugMode: true,
+		Logger:    customLogger,
+	}, mockHandler)
+
+	// Trigger a real request path via GetUsers which does a GET.
+	_, err := client.GetUsers(&UsersParams{})
+	if err != nil {
+		t.Fatalf("did not expect an error, got %q", err.Error())
+	}
+
+	logged := buf.String()
+
+	if !strings.Contains(logged, "helix: request GET") {
+		t.Errorf("expected log to contain request line, got: %s", logged)
+	}
+
+	if !strings.Contains(logged, "helix: response 200") {
+		t.Errorf("expected log to contain response line, got: %s", logged)
 	}
 }

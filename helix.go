@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -26,6 +27,12 @@ const (
 
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
+}
+
+// Logger is the interface used by the helix client for debug logging.
+// The stdlib *log.Logger satisfies this interface.
+type Logger interface {
+	Printf(format string, v ...interface{})
 }
 
 type Client struct {
@@ -51,6 +58,8 @@ type Options struct {
 	RateLimitFunc     RateLimitFunc
 	APIBaseURL        string
 	ExtensionOpts     ExtensionOptions
+	DebugMode         bool
+	Logger            Logger
 }
 
 type ExtensionOptions struct {
@@ -133,12 +142,22 @@ func NewClientWithContext(ctx context.Context, options *Options) (*Client, error
 		options.APIBaseURL = DefaultAPIBaseURL
 	}
 
+	if options.DebugMode && options.Logger == nil {
+		options.Logger = log.New(os.Stderr, "", log.LstdFlags)
+	}
+
 	client := &Client{
 		ctx:  ctx,
 		opts: options,
 	}
 
 	return client, nil
+}
+
+func (c *Client) logf(format string, v ...interface{}) {
+	if c.opts.DebugMode && c.opts.Logger != nil {
+		c.opts.Logger.Printf(format, v...)
+	}
 }
 
 func (c *Client) get(path string, respData, reqData interface{}) (*Response, error) {
@@ -355,6 +374,8 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			}
 		}
 
+		c.logf("helix: request %s %s", req.Method, req.URL.String())
+
 		response, err := c.opts.HTTPClient.Do(req)
 		if err != nil {
 			return fmt.Errorf("Failed to execute API request: %s", err.Error())
@@ -369,6 +390,8 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		if err != nil {
 			return err
 		}
+
+		c.logf("helix: response %d %s", response.StatusCode, string(bodyBytes))
 
 		// Only attempt to decode the response if we have a response we can handle
 		if len(bodyBytes) > 0 && resp.StatusCode < http.StatusInternalServerError {
