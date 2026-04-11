@@ -58,8 +58,14 @@ type Options struct {
 	RateLimitFunc     RateLimitFunc
 	APIBaseURL        string
 	ExtensionOpts     ExtensionOptions
-	DebugMode         bool
-	Logger            Logger
+	// DebugMode enables debug logging of outgoing requests and incoming responses.
+	// WARNING: debug logs may contain sensitive data such as tokens and API responses.
+	// Only enable in non-production environments.
+	DebugMode bool
+	// Logger is the logger used when DebugMode is true. If nil, a default logger
+	// writing to os.Stderr is used. Any type implementing Printf(string, ...interface{})
+	// is accepted (e.g. *log.Logger).
+	Logger Logger
 }
 
 type ExtensionOptions struct {
