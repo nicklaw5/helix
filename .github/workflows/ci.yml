@@ -37,6 +37,11 @@ jobs:
         run: |
           go test -v -parallel=10 -covermode=count -coverprofile=coverage.out
       - name: Send coverage
+        # Only upload coverage from the first matrix entry (index 0) to avoid
+        # Coveralls 422 "build already closed" errors from parallel uploads.
+        # Changing the order of the matrix list will automatically update which
+        # job uploads coverage.
+        if: strategy.job-index == 0
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
