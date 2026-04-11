@@ -329,6 +329,39 @@ client.OnUserAccessTokenRefreshed(func(newAccessToken, newRefreshToken string) {
 })
 ```
 
+### Automatically refresh app access tokens
+
+If you set an app access token along with the client ID and client secret, the client will automatically request a new app access token when the current one expires (i.e. when a 401 Unauthorized response is received).
+
+You can enable automatic app access token refreshes in the following manner:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:       "your-client-id",
+    ClientSecret:   "your-client-secret",
+    AppAccessToken: "your-app-access-token",
+})
+```
+
+To also include specific scopes when the token is automatically refreshed:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:        "your-client-id",
+    ClientSecret:    "your-client-secret",
+    AppAccessToken:  "your-app-access-token",
+    AppAccessScopes: []string{"your-scope"},
+})
+```
+
+To be notified when refreshes take place:
+
+```go
+client.OnAppAccessTokenRefreshed(func(newAccessToken string) {
+    // ...
+})
+```
+
 ## User-Agent Header
 
 It's entirely possible that you may want to set or change the *User-Agent* header value that is sent with each

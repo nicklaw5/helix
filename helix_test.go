@@ -437,6 +437,80 @@ func TestAutomaticUserTokenRefresh(t *testing.T) {
 	}
 }
 
+func TestAutomaticAppTokenRefresh(t *testing.T) {
+	t.Parallel()
+
+	options := &Options{
+		ClientID:       "client-id",
+		ClientSecret:   "client-secret",
+		AppAccessToken: "old-app-token",
+	}
+	client := newMockClient(options, func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/oauth2/token") {
+			w.Write([]byte(`{"access_token":"new-app-token","expires_in":5035145,"token_type":"bearer"}`))
+		} else if strings.Contains(r.URL.Path, "/streams") {
+			if strings.Contains(r.Header.Get("Authorization"), "old-app-token") {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`))
+			} else {
+				w.Write([]byte(`{"data":[],"pagination":{}}`))
+			}
+		} else {
+			log.Printf("Unknown URL sent to test server: %s", r.URL.Path)
+		}
+	})
+
+	_, err := client.GetStreams(&StreamsParams{})
+	if err != nil {
+		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	if client.opts.AppAccessToken != "new-app-token" {
+		t.Errorf("expected AppAccessToken to be %q, got %q", "new-app-token", client.opts.AppAccessToken)
+	}
+}
+
+func TestOnAppAccessTokenRefreshed(t *testing.T) {
+	t.Parallel()
+
+	options := &Options{
+		ClientID:       "client-id",
+		ClientSecret:   "client-secret",
+		AppAccessToken: "old-app-token",
+	}
+	client := newMockClient(options, func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/oauth2/token") {
+			w.Write([]byte(`{"access_token":"new-app-token","expires_in":5035145,"token_type":"bearer"}`))
+		} else if strings.Contains(r.URL.Path, "/streams") {
+			if strings.Contains(r.Header.Get("Authorization"), "old-app-token") {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`))
+			} else {
+				w.Write([]byte(`{"data":[],"pagination":{}}`))
+			}
+		} else {
+			log.Printf("Unknown URL sent to test server: %s", r.URL.Path)
+		}
+	})
+
+	var newAccessToken string
+	client.OnAppAccessTokenRefreshed(func(a string) {
+		newAccessToken = a
+	})
+	wantNewAccessToken := "new-app-token"
+
+	_, err := client.GetStreams(&StreamsParams{})
+	if err != nil {
+		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	time.Sleep(10 * time.Millisecond)
+
+	if newAccessToken != wantNewAccessToken {
+		t.Errorf("expected newAccessToken to be %q, got %q", wantNewAccessToken, newAccessToken)
+	}
+}
+
 func TestSetRequestHeaders(t *testing.T) {
 	t.Parallel()
 

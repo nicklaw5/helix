@@ -42,6 +42,7 @@ type Client struct {
 	lastResponse *Response
 	callbacks    struct {
 		onUserAccessTokenRefreshed func(newAccessToken, newRefreshToken string)
+		onAppAccessTokenRefreshed  func(newAccessToken string)
 	}
 }
 
@@ -49,6 +50,7 @@ type Options struct {
 	ClientID          string
 	ClientSecret      string
 	AppAccessToken    string
+	AppAccessScopes   []string
 	DeviceAccessToken string
 	UserAccessToken   string
 	RefreshToken      string
@@ -426,14 +428,17 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			} else {
 				// A 401 means Twitch wants us to refresh our token:
 				// https://dev.twitch.tv/docs/authentication/refresh-tokens/
-				if resp.StatusCode == http.StatusUnauthorized && c.canRefreshToken() {
-					if refreshErr := c.refreshToken(); refreshErr != nil {
-						log.Printf("Failed to refresh helix auth token: %v", refreshErr)
+				if resp.StatusCode == http.StatusUnauthorized {
+					refreshed, refreshErr := c.tryRefreshToken()
+					if refreshErr != nil {
+						log.Printf("Failed to refresh helix token: %v", refreshErr)
 						return err
 					}
-					// Try again now that we have a new token
-					c.setRequestHeaders(req)
-					continue
+					if refreshed {
+						// Try again now that we have a new token
+						c.setRequestHeaders(req)
+						continue
+					}
 				}
 
 				// Failed request
@@ -472,6 +477,19 @@ func (c *Client) canRefreshToken() bool {
 		(c.opts.ClientID != "" && c.opts.RefreshToken != "")
 }
 
+// tryRefreshToken attempts to refresh whichever token type is currently in use.
+// It returns true if a refresh was successfully performed, false if no refresh
+// was applicable, and an error if a refresh was attempted but failed.
+func (c *Client) tryRefreshToken() (bool, error) {
+	if c.canRefreshToken() {
+		return true, c.refreshToken()
+	}
+	if c.canRefreshAppToken() {
+		return true, c.refreshAppToken()
+	}
+	return false, nil
+}
+
 func (c *Client) refreshToken() error {
 	resp, err := c.RefreshUserAccessToken(c.opts.RefreshToken)
 	if err != nil || resp.StatusCode != http.StatusOK {
@@ -491,6 +509,33 @@ func (c *Client) refreshToken() error {
 
 	if cb := c.callbacks.onUserAccessTokenRefreshed; cb != nil {
 		go cb(resp.Data.AccessToken, resp.Data.RefreshToken)
+	}
+
+	return nil
+}
+
+func (c *Client) canRefreshAppToken() bool {
+	return c.opts.AppAccessToken != "" && c.opts.ClientID != "" && c.opts.ClientSecret != ""
+}
+
+func (c *Client) refreshAppToken() error {
+	resp, err := c.RequestAppAccessToken(c.opts.AppAccessScopes)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		statusCode := -1
+		var errorMessage string
+		if resp != nil {
+			statusCode = resp.StatusCode
+			errorMessage = resp.ErrorMessage
+		}
+		return fmt.Errorf("failed to refresh app token: (%d: %s) %v", statusCode, errorMessage, err)
+	}
+
+	c.mu.Lock()
+	c.opts.AppAccessToken = resp.Data.AccessToken
+	c.mu.Unlock()
+
+	if cb := c.callbacks.onAppAccessTokenRefreshed; cb != nil {
+		go cb(resp.Data.AccessToken)
 	}
 
 	return nil
@@ -608,4 +653,10 @@ func (c *Client) OnUserAccessTokenRefreshed(f func(newAccessToken, newRefreshTok
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.callbacks.onUserAccessTokenRefreshed = f
+}
+
+func (c *Client) OnAppAccessTokenRefreshed(f func(newAccessToken string)) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.callbacks.onAppAccessTokenRefreshed = f
 }
