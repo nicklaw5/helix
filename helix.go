@@ -392,6 +392,7 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	c.setRequestHeaders(req)
 
 	rateLimitFunc := c.opts.RateLimitFunc
+	tokenRefreshed := false
 
 	for {
 		if c.lastResponse != nil && rateLimitFunc != nil {
@@ -426,23 +427,30 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 				// Successful request
 				err = json.Unmarshal(bodyBytes, &resp.Data)
 			} else {
-				// A 401 means Twitch wants us to refresh our token:
+				// Failed request
+				err = json.Unmarshal(bodyBytes, &resp)
+				if err != nil {
+					return fmt.Errorf("Failed to decode API response: %s", err.Error())
+				}
+
+				// A 401 may mean Twitch wants us to refresh our token:
 				// https://dev.twitch.tv/docs/authentication/refresh-tokens/
-				if resp.StatusCode == http.StatusUnauthorized {
+				// However, if the error is about missing scopes, refreshing
+				// won't help and would cause an infinite loop.
+				if resp.StatusCode == http.StatusUnauthorized && !tokenRefreshed &&
+					!strings.HasPrefix(resp.ErrorMessage, "Missing scope") {
 					refreshed, refreshErr := c.tryRefreshToken()
 					if refreshErr != nil {
 						log.Printf("Failed to refresh helix token: %v", refreshErr)
-						return err
+						break
 					}
 					if refreshed {
+						tokenRefreshed = true
 						// Try again now that we have a new token
 						c.setRequestHeaders(req)
 						continue
 					}
 				}
-
-				// Failed request
-				err = json.Unmarshal(bodyBytes, &resp)
 			}
 
 			if err != nil {
