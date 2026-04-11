@@ -437,6 +437,87 @@ func TestAutomaticUserTokenRefresh(t *testing.T) {
 	}
 }
 
+func TestNoTokenRefreshOnMissingScope(t *testing.T) {
+	t.Parallel()
+
+	refreshCalled := false
+	options := &Options{
+		ClientID:        "client-id",
+		ClientSecret:    "old-client-secret",
+		UserAccessToken: "old-user-token",
+		RefreshToken:    "old-refresh-token",
+	}
+	client := newMockClient(options, func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/oauth2/token") {
+			refreshCalled = true
+			w.Write([]byte(`{"access_token":"new-access-token","expires_in":14154,"refresh_token":"new-refresh-token","scope":[]}`))
+		} else if strings.Contains(r.URL.Path, "/channels/followers") {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`{"error":"Unauthorized","status":401,"message":"Missing scope: moderator:read:followers"}`))
+		} else {
+			log.Printf("Unknown URL sent to test server: %s", r.URL.Path)
+		}
+	})
+
+	resp, err := client.GetChannelFollows(&GetChannelFollowsParams{})
+	if err != nil {
+		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Errorf("expected status code to be %d, got %d", http.StatusUnauthorized, resp.StatusCode)
+	}
+
+	if resp.ErrorMessage != "Missing scope: moderator:read:followers" {
+		t.Errorf("expected error message to be %q, got %q", "Missing scope: moderator:read:followers", resp.ErrorMessage)
+	}
+
+	if refreshCalled {
+		t.Error("expected token refresh to NOT be called for missing scope errors")
+	}
+
+	if client.opts.UserAccessToken != "old-user-token" {
+		t.Errorf("expected UserAccessToken to remain %q, got %q", "old-user-token", client.opts.UserAccessToken)
+	}
+}
+
+func TestNoInfiniteLoopOnPersistent401(t *testing.T) {
+	t.Parallel()
+
+	refreshCount := 0
+	options := &Options{
+		ClientID:        "client-id",
+		ClientSecret:    "old-client-secret",
+		UserAccessToken: "old-user-token",
+		RefreshToken:    "old-refresh-token",
+	}
+	client := newMockClient(options, func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/oauth2/token") {
+			refreshCount++
+			w.Write([]byte(`{"access_token":"new-access-token","expires_in":14154,"refresh_token":"new-refresh-token","scope":[]}`))
+		} else if strings.Contains(r.URL.Path, "/channels/followers") {
+			// Always return 401, even after refresh
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`))
+		} else {
+			log.Printf("Unknown URL sent to test server: %s", r.URL.Path)
+		}
+	})
+
+	resp, err := client.GetChannelFollows(&GetChannelFollowsParams{})
+	if err != nil {
+		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
+	}
+
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Errorf("expected status code to be %d, got %d", http.StatusUnauthorized, resp.StatusCode)
+	}
+
+	if refreshCount != 1 {
+		t.Errorf("expected token refresh to be called exactly 1 time, got %d", refreshCount)
+	}
+}
+
 func TestSetRequestHeaders(t *testing.T) {
 	t.Parallel()
 
