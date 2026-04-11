@@ -195,9 +195,22 @@ This package also allows users to provide a rate limit callback of their own whi
 before a request is sent. That way you can provide functionality for limiting the requests sent
 and prevent spamming Twitch with requests.
 
-The below snippet provides an example of how you might structure your rate limit callback to approach limiting
-requests. In this example, once we've reached our rate limit, we'll simply wait for the limit to pass before
-sending the next request.
+The helix package provides a built-in `DefaultRateLimitFunc` that waits until the rate limit reset time
+before retrying. You can use it directly:
+
+```go
+client, err := helix.NewClient(&helix.Options{
+    ClientID:      "your-client-id",
+    RateLimitFunc: helix.DefaultRateLimitFunc,
+})
+if err != nil {
+    // handle error
+}
+```
+
+Alternatively, the below snippet provides an example of how you might structure your own rate limit callback.
+In this example, once we've reached our rate limit, we log and wait for the limit to pass before sending the
+next request.
 
 ```go
 func rateLimitCallback(lastResponse *helix.Response) error {
@@ -205,16 +218,14 @@ func rateLimitCallback(lastResponse *helix.Response) error {
         return nil
     }
 
-    var reset64 int64
-    reset64 = int64(lastResponse.GetRateLimitReset())
-
+    reset64 := int64(lastResponse.GetRateLimitReset())
     currentTime := time.Now().Unix()
 
     if currentTime < reset64 {
-        timeDiff := time.Duration(reset64 - currentTime)
+        timeDiff := time.Duration(reset64-currentTime) * time.Second
         if timeDiff > 0 {
-            fmt.Printf("Waiting on rate limit to pass before sending next request (%d seconds)\n", timeDiff)
-            time.Sleep(timeDiff * time.Second)
+            fmt.Printf("Waiting on rate limit to pass before sending next request (%s)\n", timeDiff)
+            time.Sleep(timeDiff)
         }
     }
 

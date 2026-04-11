@@ -351,6 +351,53 @@ func TestRatelimitCallbackFailsOnError(t *testing.T) {
 	}
 }
 
+func TestDefaultRateLimitFunc(t *testing.T) {
+	t.Parallel()
+
+	// When rate limit remaining > 0, should return nil immediately
+	resp := &Response{}
+	resp.Header = http.Header{}
+	resp.Header.Set("RateLimit-Remaining", "10")
+	resp.Header.Set("RateLimit-Reset", strconv.Itoa(int(time.Now().Add(10*time.Second).Unix())))
+
+	err := DefaultRateLimitFunc(resp)
+	if err != nil {
+		t.Errorf("Expected nil error, got \"%s\"", err.Error())
+	}
+
+	// When rate limit remaining == 0 and reset time is in the past, should return nil quickly without sleeping
+	resp2 := &Response{}
+	resp2.Header = http.Header{}
+	resp2.Header.Set("RateLimit-Remaining", "0")
+	resp2.Header.Set("RateLimit-Reset", strconv.Itoa(int(time.Now().Add(-1*time.Second).Unix())))
+
+	start := time.Now()
+	err = DefaultRateLimitFunc(resp2)
+	elapsed := time.Since(start)
+	if err != nil {
+		t.Errorf("Expected nil error, got \"%s\"", err.Error())
+	}
+	if elapsed > 100*time.Millisecond {
+		t.Errorf("Expected DefaultRateLimitFunc to return quickly when reset is in the past, took %s", elapsed)
+	}
+
+	// When rate limit remaining == 0 and reset time is in the future, should sleep until reset
+	resp3 := &Response{}
+	resp3.Header = http.Header{}
+	resp3.Header.Set("RateLimit-Remaining", "0")
+	resp3.Header.Set("RateLimit-Reset", strconv.Itoa(int(time.Now().Add(1*time.Second).Unix())))
+
+	start = time.Now()
+	err = DefaultRateLimitFunc(resp3)
+	elapsed = time.Since(start)
+	if err != nil {
+		t.Errorf("Expected nil error, got \"%s\"", err.Error())
+	}
+	if elapsed < 500*time.Millisecond {
+		t.Errorf("Expected DefaultRateLimitFunc to sleep when reset is in the future, only waited %s", elapsed)
+	}
+}
+
 func TestAutomaticUserTokenRefresh(t *testing.T) {
 	t.Parallel()
 

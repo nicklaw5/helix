@@ -82,6 +82,25 @@ type DateRange struct {
 
 type RateLimitFunc func(*Response) error
 
+// DefaultRateLimitFunc is a default rate limit function that sleeps until the
+// rate limit reset time if the rate limit has been reached (i.e. no remaining
+// requests). It can be used as the RateLimitFunc in Options.
+func DefaultRateLimitFunc(lastResponse *Response) error {
+	if lastResponse.GetRateLimitRemaining() > 0 {
+		return nil
+	}
+
+	reset64 := int64(lastResponse.GetRateLimitReset())
+	currentTime := time.Now().Unix()
+
+	if currentTime < reset64 {
+		timeDiff := time.Duration(reset64-currentTime) * time.Second
+		time.Sleep(timeDiff)
+	}
+
+	return nil
+}
+
 type ResponseCommon struct {
 	StatusCode   int
 	Header       http.Header
