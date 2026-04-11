@@ -22,7 +22,7 @@ type Video struct {
 
 type VideoMutedSegment struct {
 	Duration int `json:"duration"`
-	Offest   int `json:"offset"`
+	Offset   int `json:"offset"`
 }
 
 type ManyVideos struct {

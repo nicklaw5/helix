@@ -88,7 +88,7 @@ type ManyFollowedChannels struct {
 type FollowedChannel struct {
 	BroadcasterID   string `json:"broadcaster_id"`
 	BroadcasterName string `json:"broadcaster_name"`
-	BroadcaserLogin string `json:"broadcaster_login"`
+	BroadcasterLogin string `json:"broadcaster_login"`
 	Followed        Time   `json:"followed_at"`
 }
 
