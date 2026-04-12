@@ -814,6 +814,23 @@ func TestHTMLResponseOnError(t *testing.T) {
 	}
 }
 
+func TestHTMLResponseCaseInsensitiveContentType(t *testing.T) {
+	t.Parallel()
+
+	// Content-Type header values are case-insensitive per RFC 2045
+	htmlBody := `<!DOCTYPE html><html><body><h1>Attention Required</h1></body></html>`
+	c := newMockClient(&Options{ClientID: "my-client-id"}, newMockHandler(http.StatusOK, htmlBody, map[string]string{
+		"Content-Type": "Text/HTML; charset=utf-8",
+	}))
+
+	_, err := c.GetUsers(&UsersParams{
+		Logins: []string{"summit1g"},
+	})
+	if err != nil {
+		t.Errorf("expected no error for HTML response with mixed-case Content-Type, but got: %s", err.Error())
+	}
+}
+
 func TestGetAppAccessToken(t *testing.T) {
 	t.Parallel()
 

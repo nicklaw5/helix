@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"reflect"
@@ -421,9 +422,12 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 		c.logf("helix: response %d %s", response.StatusCode, string(bodyBytes))
 
-		// Only attempt to decode the response if we have a response we can handle
 		contentType := response.Header.Get("Content-Type")
-		if len(bodyBytes) > 0 && resp.StatusCode < http.StatusInternalServerError && !strings.Contains(contentType, "text/html") {
+		mt, _, _ := mime.ParseMediaType(contentType)
+		isHTML := strings.EqualFold(mt, "text/html")
+
+		// Only attempt to decode the response if we have a response we can handle
+		if len(bodyBytes) > 0 && resp.StatusCode < http.StatusInternalServerError && !isHTML {
 			if resp.Data != nil && resp.StatusCode < http.StatusBadRequest {
 				// Successful request
 				err = json.Unmarshal(bodyBytes, &resp.Data)
