@@ -776,6 +776,44 @@ func TestDecodingBadJSON(t *testing.T) {
 	}
 }
 
+func TestHTMLResponseOnSuccess(t *testing.T) {
+	t.Parallel()
+
+	// HTML response body with Content-Type: text/html (e.g. Cloudflare interstitial)
+	htmlBody := `<!DOCTYPE html><html><body><h1>Attention Required</h1></body></html>`
+	c := newMockClient(&Options{ClientID: "my-client-id"}, newMockHandler(http.StatusOK, htmlBody, map[string]string{
+		"Content-Type": "text/html; charset=utf-8",
+	}))
+
+	_, err := c.GetUsers(&UsersParams{
+		Logins: []string{"summit1g"},
+	})
+	if err != nil {
+		t.Errorf("expected no error for HTML response on 2xx, but got: %s", err.Error())
+	}
+}
+
+func TestHTMLResponseOnError(t *testing.T) {
+	t.Parallel()
+
+	// HTML response body with Content-Type: text/html (e.g. CDN-level 403)
+	htmlBody := `<!DOCTYPE html><html><body><h1>403 Forbidden</h1></body></html>`
+	c := newMockClient(&Options{ClientID: "my-client-id"}, newMockHandler(http.StatusForbidden, htmlBody, map[string]string{
+		"Content-Type": "text/html; charset=utf-8",
+	}))
+
+	resp, err := c.GetUsers(&UsersParams{
+		Logins: []string{"summit1g"},
+	})
+	if err != nil {
+		t.Errorf("expected no error for HTML response on 4xx, but got: %s", err.Error())
+		return
+	}
+	if resp.StatusCode != http.StatusForbidden {
+		t.Errorf("expected status code %d, got %d", http.StatusForbidden, resp.StatusCode)
+	}
+}
+
 func TestGetAppAccessToken(t *testing.T) {
 	t.Parallel()
 

@@ -422,7 +422,8 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 		c.logf("helix: response %d %s", response.StatusCode, string(bodyBytes))
 
 		// Only attempt to decode the response if we have a response we can handle
-		if len(bodyBytes) > 0 && resp.StatusCode < http.StatusInternalServerError {
+		contentType := response.Header.Get("Content-Type")
+		if len(bodyBytes) > 0 && resp.StatusCode < http.StatusInternalServerError && !strings.Contains(contentType, "text/html") {
 			if resp.Data != nil && resp.StatusCode < http.StatusBadRequest {
 				// Successful request
 				err = json.Unmarshal(bodyBytes, &resp.Data)
