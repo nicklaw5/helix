@@ -394,6 +394,8 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 	rateLimitFunc := c.opts.RateLimitFunc
 	tokenRefreshed := false
+	// attempt counts how many times the loop has executed so that the body can
+	// be reset before each retry (the first iteration never needs a reset).
 	attempt := 0
 
 	for {
@@ -404,6 +406,10 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			}
 		}
 
+		// On retries, the request body has already been consumed by the previous
+		// attempt. GetBody is set automatically by http.NewRequest for in-memory
+		// bodies (e.g. *bytes.Buffer), so calling it here rewinds the body for
+		// the next attempt without requiring callers to manage this themselves.
 		if attempt > 0 &&
 			req.Body != nil &&
 			req.GetBody != nil {
