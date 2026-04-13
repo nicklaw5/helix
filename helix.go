@@ -394,6 +394,7 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 
 	rateLimitFunc := c.opts.RateLimitFunc
 	tokenRefreshed := false
+	attempt := 0
 
 	for {
 		if c.lastResponse != nil && rateLimitFunc != nil {
@@ -403,9 +404,21 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 			}
 		}
 
+		if attempt > 0 &&
+			req.Body != nil &&
+			req.GetBody != nil {
+
+			var err error
+			req.Body, err = req.GetBody()
+			if err != nil {
+				return err
+			}
+		}
+
 		c.logf("helix: request %s %s", req.Method, req.URL.String())
 
 		response, err := c.opts.HTTPClient.Do(req)
+		attempt++
 		if err != nil {
 			return fmt.Errorf("Failed to execute API request: %s", err.Error())
 		}

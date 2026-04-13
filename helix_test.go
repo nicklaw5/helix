@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -20,6 +21,14 @@ type mockHTTPClient struct {
 
 func (mtc *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	rr := httptest.NewRecorder()
+	if req.Body != nil {
+		defer req.Body.Close()
+		if out, err := io.ReadAll(req.Body); err != nil {
+			return nil, err
+		} else if len(out) != int(req.ContentLength) {
+			return nil, errors.New("content length mismatch")
+		}
+	}
 	handler := http.HandlerFunc(mtc.mockHandler)
 	handler.ServeHTTP(rr, req)
 
@@ -589,6 +598,50 @@ func TestNoInfiniteLoopOnPersistent401(t *testing.T) {
 
 	if refreshCount != 1 {
 		t.Errorf("expected token refresh to be called exactly 1 time, got %d", refreshCount)
+	}
+}
+
+func TestAutomaticUserTokenRefreshWithRequestBody(t *testing.T) {
+	t.Parallel()
+
+	options := &Options{
+		ClientID:        "client-id",
+		ClientSecret:    "old-client-secret",
+		UserAccessToken: "old-user-token",
+		RefreshToken:    "old-refresh-token",
+	}
+	client := newMockClient(options, func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/oauth2/token") {
+			w.Write([]byte(`{"access_token":"new-access-token","expires_in":14154,"refresh_token":"new-refresh-token","scope":["analytics:read:games","bits:read","clips:edit","user:edit","user:read:email"]}`))
+		} else if strings.Contains(r.URL.Path, "/eventsub/subscriptions") {
+			if strings.Contains(r.Header.Get("Authorization"), "old-user-token") {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"error":"Unauthorized","status":401,"message":"Invalid OAuth token"}`))
+			} else {
+				w.Write([]byte(`{"total":8,"data":[],"pagination":{}}`))
+			}
+		} else {
+			log.Printf("Unknown URL sent to test server: %s", r.URL.Path)
+		}
+	})
+
+	_, err := client.CreateEventSubSubscription(&EventSubSubscription{
+		Transport: EventSubTransport{
+			Method:   "webhook",
+			Callback: "https://localhost",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Did not expect an error, got %q", err.Error())
+	}
+
+	time.Sleep(5 * time.Millisecond)
+
+	if client.opts.UserAccessToken != "new-access-token" {
+		t.Errorf("expected UserAccessToken to be %q, got %q", "new-access-token", client.opts.UserAccessToken)
+	}
+	if client.opts.RefreshToken != "new-refresh-token" {
+		t.Errorf("expected RefreshToken to be %q, got %q", "new-refresh-token", client.opts.RefreshToken)
 	}
 }
 
