@@ -38,7 +38,7 @@ func (c *Client) GetExtensionAnalytics(params *ExtensionAnalyticsParams) (*Exten
 	resp.HydrateResponseCommon(&users.ResponseCommon)
 	users.Data.ExtensionAnalytics = resp.Data.(*ManyExtensionAnalytics).ExtensionAnalytics
 	users.Data.Pagination = resp.Data.(*ManyExtensionAnalytics).Pagination
-	return users, nil
+	return users, pullErrorFromResponse(users.ResponseCommon)
 }
 
 type GameAnalytic struct {
@@ -81,5 +81,5 @@ func (c *Client) GetGameAnalytics(params *GameAnalyticsParams) (*GameAnalyticsRe
 	users.Data.GameAnalytics = resp.Data.(*ManyGameAnalytics).GameAnalytics
 	users.Data.Pagination = resp.Data.(*ManyGameAnalytics).Pagination
 
-	return users, nil
+	return users, pullErrorFromResponse(users.ResponseCommon)
 }

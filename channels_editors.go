@@ -32,5 +32,5 @@ func (c *Client) GetChannelEditors(params *ChannelEditorsParams) (*ChannelEditor
 	resp.HydrateResponseCommon(&editors.ResponseCommon)
 	editors.Data.ChannelEditors = resp.Data.(*ManyChannelEditors).ChannelEditors
 
-	return editors, nil
+	return editors, pullErrorFromResponse(editors.ResponseCommon)
 }

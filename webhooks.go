@@ -41,7 +41,7 @@ func (c *Client) GetWebhookSubscriptions(params *WebhookSubscriptionsParams) (*W
 	webhooks.Data.WebhookSubscriptions = resp.Data.(*ManyWebhookSubscriptions).WebhookSubscriptions
 	webhooks.Data.Pagination = resp.Data.(*ManyWebhookSubscriptions).Pagination
 
-	return webhooks, nil
+	return webhooks, pullErrorFromResponse(webhooks.ResponseCommon)
 }
 
 type WebhookSubscriptionResponse struct {
@@ -64,7 +64,7 @@ func (c *Client) PostWebhookSubscription(payload *WebhookSubscriptionPayload) (*
 
 	webhook := &WebhookSubscriptionResponse{}
 	resp.HydrateResponseCommon(&webhook.ResponseCommon)
-	return webhook, nil
+	return webhook, pullErrorFromResponse(webhook.ResponseCommon)
 }
 
 // Regular expressions used for parsing webhook link headers

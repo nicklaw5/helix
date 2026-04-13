@@ -70,5 +70,5 @@ func (c *Client) SendExtensionPubSubMessage(params *ExtensionSendPubSubMessagePa
 	sndExtPubSubMsgRsp := &ExtensionSendPubSubMessageResponse{}
 	resp.HydrateResponseCommon(&sndExtPubSubMsgRsp.ResponseCommon)
 
-	return sndExtPubSubMsgRsp, nil
+	return sndExtPubSubMsgRsp, pullErrorFromResponse(sndExtPubSubMsgRsp.ResponseCommon)
 }

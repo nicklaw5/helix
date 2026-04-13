@@ -952,7 +952,7 @@ func (c *Client) GetEventSubSubscriptions(params *EventSubSubscriptionsParams) (
 	eventSubs.Data.EventSubSubscriptions = resp.Data.(*ManyEventSubSubscriptions).EventSubSubscriptions
 	eventSubs.Data.Pagination = resp.Data.(*ManyEventSubSubscriptions).Pagination
 
-	return eventSubs, nil
+	return eventSubs, pullErrorFromResponse(eventSubs.ResponseCommon)
 }
 
 // Remove an EventSub Subscription
@@ -964,7 +964,7 @@ func (c *Client) RemoveEventSubSubscription(id string) (*RemoveEventSubSubscript
 
 	eventsub := &RemoveEventSubSubscriptionParamsResponse{}
 	resp.HydrateResponseCommon(&eventsub.ResponseCommon)
-	return eventsub, nil
+	return eventsub, pullErrorFromResponse(eventsub.ResponseCommon)
 }
 
 // Creates an EventSub subscription
@@ -990,7 +990,7 @@ func (c *Client) CreateEventSubSubscription(payload *EventSubSubscription) (*Eve
 	eventsub := &EventSubSubscriptionsResponse{}
 	resp.HydrateResponseCommon(&eventsub.ResponseCommon)
 	eventsub.Data = *resp.Data.(*ManyEventSubSubscriptions)
-	return eventsub, nil
+	return eventsub, pullErrorFromResponse(eventsub.ResponseCommon)
 }
 
 // Verifys that a notification came from twitch using the a signature and the secret used when creating the subscription

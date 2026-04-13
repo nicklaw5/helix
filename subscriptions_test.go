@@ -39,7 +39,7 @@ func TestGetSubscriptions(t *testing.T) {
 			BroadcasterID: testCase.BroadcasterID,
 			UserID:        testCase.UserID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -126,7 +126,7 @@ func TestChechUserSubscription(t *testing.T) {
 			BroadcasterID: testCase.BroadcasterID,
 			UserID:        testCase.UserID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

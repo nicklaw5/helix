@@ -43,7 +43,7 @@ func (c *Client) GetBannedUsers(params *BannedUsersParams) (*BannedUsersResponse
 	bans.Data.Bans = resp.Data.(*ManyBans).Bans
 	bans.Data.Pagination = resp.Data.(*ManyBans).Pagination
 
-	return bans, nil
+	return bans, pullErrorFromResponse(bans.ResponseCommon)
 }
 
 type BanUserParams struct {
@@ -87,7 +87,7 @@ func (c *Client) BanUser(params *BanUserParams) (*BanUserResponse, error) {
 	resp.HydrateResponseCommon(&banResp.ResponseCommon)
 	banResp.Data.Bans = resp.Data.(*ManyBanUser).Bans
 
-	return banResp, nil
+	return banResp, pullErrorFromResponse(banResp.ResponseCommon)
 }
 
 type UnbanUserParams struct {
@@ -110,7 +110,7 @@ func (c *Client) UnbanUser(params *UnbanUserParams) (*UnbanUserResponse, error) 
 
 	unbanResp := &UnbanUserResponse{}
 	resp.HydrateResponseCommon(&unbanResp.ResponseCommon)
-	return unbanResp, nil
+	return unbanResp, pullErrorFromResponse(unbanResp.ResponseCommon)
 }
 
 type BlockedTermsParams struct {
@@ -161,7 +161,7 @@ func (c *Client) GetBlockedTerms(params *BlockedTermsParams) (*BlockedTermsRespo
 	blockedTermsResp.Data.Terms = resp.Data.(*ManyBlockedTerms).Terms
 	blockedTermsResp.Data.Pagination = resp.Data.(*ManyBlockedTerms).Pagination
 
-	return blockedTermsResp, nil
+	return blockedTermsResp, pullErrorFromResponse(blockedTermsResp.ResponseCommon)
 }
 
 type AddBlockedTermParams struct {
@@ -199,7 +199,7 @@ func (c *Client) AddBlockedTerm(params *AddBlockedTermParams) (*AddBlockedTermRe
 	resp.HydrateResponseCommon(&addTermResp.ResponseCommon)
 	addTermResp.Data.Terms = resp.Data.(*ManyAddBlockedTerms).Terms
 
-	return addTermResp, nil
+	return addTermResp, pullErrorFromResponse(addTermResp.ResponseCommon)
 }
 
 type RemoveBlockedTermParams struct {
@@ -231,7 +231,7 @@ func (c *Client) RemoveBlockedTerm(params *RemoveBlockedTermParams) (*RemoveBloc
 	blockedTermResp := &RemoveBlockedTermResponse{}
 	resp.HydrateResponseCommon(&blockedTermResp.ResponseCommon)
 
-	return blockedTermResp, nil
+	return blockedTermResp, pullErrorFromResponse(blockedTermResp.ResponseCommon)
 }
 
 type DeleteChatMessageParams struct {
@@ -263,7 +263,7 @@ func (c *Client) DeleteChatMessage(params *DeleteChatMessageParams) (*DeleteChat
 	deletedMessageResp := &DeleteChatMessageResponse{}
 	resp.HydrateResponseCommon(&deletedMessageResp.ResponseCommon)
 
-	return deletedMessageResp, nil
+	return deletedMessageResp, pullErrorFromResponse(deletedMessageResp.ResponseCommon)
 }
 
 type DeleteAllChatMessagesParams struct {
@@ -290,7 +290,7 @@ func (c *Client) DeleteAllChatMessages(params *DeleteAllChatMessagesParams) (*De
 	deletedMessagesResp := &DeleteAllChatMessagesResponse{}
 	resp.HydrateResponseCommon(&deletedMessagesResp.ResponseCommon)
 
-	return deletedMessagesResp, nil
+	return deletedMessagesResp, pullErrorFromResponse(deletedMessagesResp.ResponseCommon)
 }
 
 type GetModeratorsParams struct {
@@ -354,7 +354,7 @@ func (c *Client) GetModerators(params *GetModeratorsParams) (*ModeratorsResponse
 	moderators.Data.Moderators = resp.Data.(*ManyModerators).Moderators
 	moderators.Data.Pagination = resp.Data.(*ManyModerators).Pagination
 
-	return moderators, nil
+	return moderators, pullErrorFromResponse(moderators.ResponseCommon)
 }
 
 func (c *Client) AddChannelModerator(params *AddChannelModeratorParams) (*AddChannelModeratorResponse, error) {
@@ -366,7 +366,7 @@ func (c *Client) AddChannelModerator(params *AddChannelModeratorParams) (*AddCha
 	moderators := &AddChannelModeratorResponse{}
 	resp.HydrateResponseCommon(&moderators.ResponseCommon)
 
-	return moderators, nil
+	return moderators, pullErrorFromResponse(moderators.ResponseCommon)
 }
 
 func (c *Client) RemoveChannelModerator(params *RemoveChannelModeratorParams) (*RemoveChannelModeratorResponse, error) {
@@ -378,7 +378,7 @@ func (c *Client) RemoveChannelModerator(params *RemoveChannelModeratorParams) (*
 	moderators := &RemoveChannelModeratorResponse{}
 	resp.HydrateResponseCommon(&moderators.ResponseCommon)
 
-	return moderators, nil
+	return moderators, pullErrorFromResponse(moderators.ResponseCommon)
 }
 
 // `UserID` must match the user ID in the User-Access token
@@ -424,7 +424,7 @@ func (c *Client) GetModeratedChannels(params *GetModeratedChannelsParams) (*GetM
 	moderatedChannels.Data.ModeratedChannels = resp.Data.(*ManyModeratedChannels).ModeratedChannels
 	moderatedChannels.Data.Pagination = resp.Data.(*ManyModeratedChannels).Pagination
 
-	return moderatedChannels, nil
+	return moderatedChannels, pullErrorFromResponse(moderatedChannels.ResponseCommon)
 }
 
 type SendModeratorWarnMessageRequestBody struct {
@@ -488,5 +488,5 @@ func (c *Client) SendModeratorWarnMessage(params *SendModeratorWarnChatMessagePa
 	resp.HydrateResponseCommon(&messageResponse.ResponseCommon)
 	messageResponse.Data.Warnings = resp.Data.(*ManyModeratorWarnChatMessages).Warnings
 
-	return messageResponse, nil
+	return messageResponse, pullErrorFromResponse(messageResponse.ResponseCommon)
 }

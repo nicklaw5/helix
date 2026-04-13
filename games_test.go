@@ -42,7 +42,7 @@ func TestGetGames(t *testing.T) {
 			IDs:   testCase.IDs,
 			Names: testCase.Names,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -117,7 +117,7 @@ func TestGetTopGames(t *testing.T) {
 			First: testCase.First,
 			After: testCase.AfterCursor,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

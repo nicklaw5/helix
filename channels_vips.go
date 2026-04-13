@@ -54,7 +54,7 @@ func (c *Client) GetChannelVips(params *GetChannelVipsParams) (*ChannelVipsRespo
 	vips.Data.ChannelsVips = resp.Data.(*ManyChannelVips).ChannelsVips
 	vips.Data.Pagination = resp.Data.(*ManyChannelVips).Pagination
 
-	return vips, nil
+	return vips, pullErrorFromResponse(vips.ResponseCommon)
 }
 
 // AddChannelVip Adds the specified user as a VIP in the broadcaster’s channel.
@@ -69,7 +69,7 @@ func (c *Client) AddChannelVip(params *AddChannelVipParams) (*AddChannelVipRespo
 	vips := &AddChannelVipResponse{}
 	resp.HydrateResponseCommon(&vips.ResponseCommon)
 
-	return vips, nil
+	return vips, pullErrorFromResponse(vips.ResponseCommon)
 }
 
 // RemoveChannelVip : Removes the specified user as a VIP in the broadcaster’s channel.
@@ -84,5 +84,5 @@ func (c *Client) RemoveChannelVip(params *RemoveChannelVipParams) (*RemoveChanne
 	vips := &RemoveChannelVipResponse{}
 	resp.HydrateResponseCommon(&vips.ResponseCommon)
 
-	return vips, nil
+	return vips, pullErrorFromResponse(vips.ResponseCommon)
 }

@@ -40,7 +40,7 @@ func TestGetExtensionAnalytics(t *testing.T) {
 			First:       1,
 			Type:        "overview_v1",
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -125,7 +125,7 @@ func TestGetGameAnalytics(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetGameAnalytics(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

@@ -39,7 +39,7 @@ func TestStartRaid(t *testing.T) {
 			FromBroadcasterID: testCase.FromBroadcasterID,
 			ToBroadcasterID:   testCase.ToBroadcasterID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -116,7 +116,7 @@ func TestCancelRaid(t *testing.T) {
 		resp, err := c.CancelRaid(&CancelRaidParams{
 			BroadcasterID: testCase.BroadcasterID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

@@ -47,7 +47,9 @@ func TestGetChannelChatChatterss(t *testing.T) {
 			if err.Error() == testCase.validationErr {
 				continue
 			}
-			t.Error(err)
+			if resp == nil || resp.StatusCode < 400 {
+				t.Error(err)
+			}
 		}
 
 		if resp.StatusCode != testCase.statusCode {
@@ -103,7 +105,7 @@ func TestGetChannelChatBadges(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetChannelChatBadges(testCase.GetChatBadgeParams)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -175,7 +177,7 @@ func TestGetGlobalChatBadges(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetGlobalChatBadges()
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -250,7 +252,7 @@ func TestGetChannelEmotes(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetChannelEmotes(testCase.GetChannelEmotesParams)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -322,7 +324,7 @@ func TestGetGlobalEmotes(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetGlobalEmotes()
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -415,7 +417,7 @@ func TestGetEmoteSets(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetEmoteSets(testCase.GetEmoteSetsParams)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -501,7 +503,7 @@ func TestSendChatAnnouncement(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.SendChatAnnouncement(testCase.SendChatAnnouncementParams)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -640,7 +642,9 @@ func TestGetChatSettings(t *testing.T) {
 			if err.Error() == testCase.validationErr {
 				continue
 			}
+			if resp == nil || resp.StatusCode < 400 {
 			t.Errorf("Unmatched error, expected '%v', got '%v'", testCase.validationErr, err)
+			}
 			continue
 		}
 
@@ -765,7 +769,9 @@ func TestUpdateChatSettings(t *testing.T) {
 			if err.Error() == testCase.validationErr {
 				continue
 			}
+			if resp == nil || resp.StatusCode < 400 {
 			t.Errorf("Unmatched error, expected '%v', got '%v'", testCase.validationErr, err)
+			}
 			continue
 		}
 
@@ -856,7 +862,7 @@ func TestGetUserChatColor(t *testing.T) {
 		resp, err := c.GetUserChatColor(&GetUserChatColorParams{
 			UserID: testCase.UserID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -916,7 +922,7 @@ func TestUpdateUserChatColor(t *testing.T) {
 			UserID: testCase.UserID,
 			Color:  testCase.Color,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -1007,7 +1013,9 @@ func TestSendChatMessage(t *testing.T) {
 			if err.Error() == testCase.err {
 				continue
 			}
+			if resp == nil || resp.StatusCode < 400 {
 			t.Errorf("Unmatched error, expected '%v', got '%v'", testCase.err, err)
+			}
 			continue
 		}
 

@@ -28,7 +28,7 @@ func TestGetCreatorGoals(t *testing.T) {
 		resp, err := c.GetCreatorGoals(&GetCreatorGoalsParams{
 			BroadcasterID: testCase.BroadcasterID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

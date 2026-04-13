@@ -105,7 +105,7 @@ func (c *Client) SearchChannels(params *SearchChannelsParams) (*SearchChannelsRe
 	channels.Data.Channels = resp.Data.(*ManySearchChannels).Channels
 	channels.Data.Pagination = resp.Data.(*ManySearchChannels).Pagination
 
-	return channels, nil
+	return channels, pullErrorFromResponse(channels.ResponseCommon)
 }
 
 type GetChannelInformationParams struct {
@@ -157,7 +157,7 @@ func (c *Client) GetChannelInformation(params *GetChannelInformationParams) (*Ge
 	resp.HydrateResponseCommon(&channels.ResponseCommon)
 	channels.Data.Channels = resp.Data.(*ManyChannelInformation).Channels
 
-	return channels, nil
+	return channels, pullErrorFromResponse(channels.ResponseCommon)
 }
 
 func (c *Client) EditChannelInformation(params *EditChannelInformationParams) (*EditChannelInformationResponse, error) {
@@ -169,7 +169,7 @@ func (c *Client) EditChannelInformation(params *EditChannelInformationParams) (*
 	channels := &EditChannelInformationResponse{}
 	resp.HydrateResponseCommon(&channels.ResponseCommon)
 
-	return channels, nil
+	return channels, pullErrorFromResponse(channels.ResponseCommon)
 }
 
 // GetChannelFollows Gets a list of users that follow the specified broadcaster.
@@ -187,7 +187,7 @@ func (c *Client) GetChannelFollows(params *GetChannelFollowsParams) (*GetChannel
 	channelFollows.Data.Channels = resp.Data.(*ManyChannelFollows).Channels
 	channelFollows.Data.Pagination = resp.Data.(*ManyChannelFollows).Pagination
 
-	return channelFollows, nil
+	return channelFollows, pullErrorFromResponse(channelFollows.ResponseCommon)
 }
 
 // GetFollowedChannels Gets a list of broadcasters that the specified user follows.
@@ -205,5 +205,5 @@ func (c *Client) GetFollowedChannels(params *GetFollowedChannelParams) (*GetFoll
 	followedChannels.Data.FollowedChannels = resp.Data.(*ManyFollowedChannels).FollowedChannels
 	followedChannels.Data.Pagination = resp.Data.(*ManyFollowedChannels).Pagination
 
-	return followedChannels, nil
+	return followedChannels, pullErrorFromResponse(followedChannels.ResponseCommon)
 }

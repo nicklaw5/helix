@@ -35,7 +35,7 @@ func TestGetChannelEditors(t *testing.T) {
 		resp, err := c.GetChannelEditors(&ChannelEditorsParams{
 			BroadcasterID: testCase.BroadcasterID,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

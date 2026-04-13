@@ -49,7 +49,7 @@ func (c *Client) CreateExtensionSecret(params *ExtensionSecretCreationParams) (*
 	resp.HydrateResponseCommon(&events.ResponseCommon)
 	events.Data.SecretInfo = resp.Data.(*ManyExtensionSecrets).SecretInfo
 
-	return events, nil
+	return events, pullErrorFromResponse(events.ResponseCommon)
 }
 
 func (c *Client) GetExtensionSecrets(params *GetExtensionSecretParams) (*GetExtensionSecretResponse, error) {
@@ -62,5 +62,5 @@ func (c *Client) GetExtensionSecrets(params *GetExtensionSecretParams) (*GetExte
 	resp.HydrateResponseCommon(&events.ResponseCommon)
 	events.Data.SecretInfo = resp.Data.(*ManyExtensionSecrets).SecretInfo
 
-	return events, nil
+	return events, pullErrorFromResponse(events.ResponseCommon)
 }

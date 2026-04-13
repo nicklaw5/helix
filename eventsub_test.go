@@ -57,7 +57,7 @@ func TestGetEventSubSubscriptions(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.GetEventSubSubscriptions(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -142,7 +142,7 @@ func TestRemoveEventSubSubscriptions(t *testing.T) {
 		c := newMockClient(testCase.options, newMockHandler(testCase.statusCode, testCase.respBody, nil))
 
 		resp, err := c.RemoveEventSubSubscription(testCase.params)
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -312,8 +312,9 @@ func TestCreateEventSubSubscriptions(t *testing.T) {
 			if err.Error() == testCase.validationErr {
 				continue
 			}
-
-			t.Error(err)
+			if resp == nil || resp.StatusCode < 400 {
+				t.Error(err)
+			}
 		}
 
 		if resp.StatusCode != testCase.statusCode {

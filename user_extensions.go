@@ -31,7 +31,7 @@ func (c *Client) GetUserExtensions() (*UserExtensionsResponse, error) {
 	resp.HydrateResponseCommon(&userExtensions.ResponseCommon)
 	userExtensions.Data.UserExtensions = resp.Data.(*ManyUserExtensions).UserExtensions
 
-	return userExtensions, nil
+	return userExtensions, pullErrorFromResponse(userExtensions.ResponseCommon)
 }
 
 type UserActiveExtensionInfo struct {
@@ -76,7 +76,7 @@ func (c *Client) GetUserActiveExtensions(params *UserActiveExtensionsParams) (*U
 	resp.HydrateResponseCommon(&userActiveExtensions.ResponseCommon)
 	userActiveExtensions.Data.UserActiveExtensions = resp.Data.(*UserActiveExtensionSet).UserActiveExtensions
 
-	return userActiveExtensions, nil
+	return userActiveExtensions, pullErrorFromResponse(userActiveExtensions.ResponseCommon)
 }
 
 type UpdateUserExtensionsPayload struct {
@@ -108,5 +108,5 @@ func (c *Client) UpdateUserExtensions(payload *UpdateUserExtensionsPayload) (*Us
 	userActiveExtensions.ErrorMessage = resp.ErrorMessage
 	userActiveExtensions.Data.UserActiveExtensions = resp.Data.(*UserActiveExtensionSet).UserActiveExtensions
 
-	return userActiveExtensions, nil
+	return userActiveExtensions, pullErrorFromResponse(userActiveExtensions.ResponseCommon)
 }

@@ -72,7 +72,7 @@ func (c *Client) GetCharityCampaigns(params *CharityCampaignsParams) (*CharityCa
 	events.Data.Campaigns = resp.Data.(*ManyCharityCampaigns).Campaigns
 	events.Data.Pagination = resp.Data.(*ManyCharityCampaigns).Pagination
 
-	return events, nil
+	return events, pullErrorFromResponse(events.ResponseCommon)
 }
 
 // Required scope: channel:read:charity
@@ -87,5 +87,5 @@ func (c *Client) GetCharityDonations(params *CharityDonationParams) (*CharityDon
 	events.Data.Donations = resp.Data.(*ManyCharityDonations).Donations
 	events.Data.Pagination = resp.Data.(*ManyCharityDonations).Pagination
 
-	return events, nil
+	return events, pullErrorFromResponse(events.ResponseCommon)
 }

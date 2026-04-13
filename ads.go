@@ -45,5 +45,5 @@ func (c *Client) StartCommercial(params *StartCommercialParams) (*StartCommercia
 	resp.HydrateResponseCommon(&commercials.ResponseCommon)
 	commercials.Data.AdDetails = resp.Data.(*ManyAdDetails).AdDetails
 
-	return commercials, nil
+	return commercials, pullErrorFromResponse(commercials.ResponseCommon)
 }

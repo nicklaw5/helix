@@ -45,7 +45,7 @@ func (c *Client) GetUsers(params *UsersParams) (*UsersResponse, error) {
 	resp.HydrateResponseCommon(&users.ResponseCommon)
 	users.Data.Users = resp.Data.(*ManyUsers).Users
 
-	return users, nil
+	return users, pullErrorFromResponse(users.ResponseCommon)
 }
 
 type UpdateUserParams struct {
@@ -66,7 +66,7 @@ func (c *Client) UpdateUser(params *UpdateUserParams) (*UsersResponse, error) {
 	resp.HydrateResponseCommon(&users.ResponseCommon)
 	users.Data.Users = resp.Data.(*ManyUsers).Users
 
-	return users, nil
+	return users, pullErrorFromResponse(users.ResponseCommon)
 }
 
 type UserFollow struct {
@@ -112,7 +112,7 @@ func (c *Client) GetUsersFollows(params *UsersFollowsParams) (*UsersFollowsRespo
 	users.Data.Follows = resp.Data.(*ManyFollows).Follows
 	users.Data.Pagination = resp.Data.(*ManyFollows).Pagination
 
-	return users, nil
+	return users, pullErrorFromResponse(users.ResponseCommon)
 }
 
 type UserBlocked struct {
@@ -151,7 +151,7 @@ func (c *Client) GetUsersBlocked(params *UsersBlockedParams) (*UsersBlockedRespo
 	users.Data.Users = resp.Data.(*ManyUsersBlocked).Users
 	users.Data.Pagination = resp.Data.(*ManyUsersBlocked).Pagination
 
-	return users, nil
+	return users, pullErrorFromResponse(users.ResponseCommon)
 }
 
 type BlockUserResponse struct {
@@ -176,7 +176,7 @@ func (c *Client) BlockUser(params *BlockUserParams) (*BlockUserResponse, error) 
 	block := &BlockUserResponse{}
 	resp.HydrateResponseCommon(&block.ResponseCommon)
 
-	return block, nil
+	return block, pullErrorFromResponse(block.ResponseCommon)
 }
 
 type UnblockUserParams struct {
@@ -195,5 +195,5 @@ func (c *Client) UnblockUser(params *UnblockUserParams) (*BlockUserResponse, err
 	block := &BlockUserResponse{}
 	resp.HydrateResponseCommon(&block.ResponseCommon)
 
-	return block, nil
+	return block, pullErrorFromResponse(block.ResponseCommon)
 }

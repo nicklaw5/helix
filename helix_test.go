@@ -534,7 +534,7 @@ func TestNoTokenRefreshOnMissingScope(t *testing.T) {
 	})
 
 	resp, err := client.GetChannelFollows(&GetChannelFollowsParams{})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrTwitchResponseError) {
 		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
 	}
 
@@ -579,7 +579,7 @@ func TestNoInfiniteLoopOnPersistent401(t *testing.T) {
 	})
 
 	resp, err := client.GetChannelFollows(&GetChannelFollowsParams{})
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrTwitchResponseError) {
 		t.Fatalf("Did not expect an error, got \"%s\"", err.Error())
 	}
 

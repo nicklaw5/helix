@@ -41,7 +41,7 @@ func TestGetStreamMarkers(t *testing.T) {
 			UserID: testCase.userID,
 			First:  testCase.first,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -120,7 +120,7 @@ func TestCreateStreamMarker(t *testing.T) {
 			UserID:      testCase.userID,
 			Description: testCase.description,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

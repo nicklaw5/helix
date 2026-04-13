@@ -93,7 +93,7 @@ func (c *Client) GetExtensionTransactions(params *ExtensionTransactionsParams) (
 	resp.HydrateResponseCommon(&extTxnResp.ResponseCommon)
 	extTxnResp.Data.ExtensionTransactions = resp.Data.(*ManyExtensionTransactions).ExtensionTransactions
 	extTxnResp.Data.Pagination = resp.Data.(*ManyExtensionTransactions).Pagination
-	return extTxnResp, nil
+	return extTxnResp, pullErrorFromResponse(extTxnResp.ResponseCommon)
 }
 
 // SendExtensionChatMessage  Sends a specified chat message to a specified channel.
@@ -119,7 +119,7 @@ func (c *Client) SendExtensionChatMessage(params *ExtensionSendChatMessageParams
 	sndExtMsgResp := &ExtensionSendChatMessageResponse{}
 	resp.HydrateResponseCommon(&sndExtMsgResp.ResponseCommon)
 
-	return sndExtMsgResp, nil
+	return sndExtMsgResp, pullErrorFromResponse(sndExtMsgResp.ResponseCommon)
 }
 
 func (c *Client) GetExtensionLiveChannels(params *ExtensionLiveChannelsParams) (*ExtensionLiveChannelsResponse, error) {
@@ -137,5 +137,5 @@ func (c *Client) GetExtensionLiveChannels(params *ExtensionLiveChannelsParams) (
 	resp.HydrateResponseCommon(&liveChannels.ResponseCommon)
 	liveChannels.Data.LiveChannels = resp.Data.(*ManyExtensionLiveChannels).LiveChannels
 	liveChannels.Data.Pagination = resp.Data.(*ManyExtensionLiveChannels).Pagination
-	return liveChannels, nil
+	return liveChannels, pullErrorFromResponse(liveChannels.ResponseCommon)
 }

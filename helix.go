@@ -112,6 +112,18 @@ type ResponseCommon struct {
 	ErrorMessage string `json:"message"`
 }
 
+// ErrTwitchResponseError is returned when the Twitch API responds with an error.
+var ErrTwitchResponseError = errors.New("twitch returned an error")
+
+// pullErrorFromResponse returns a wrapped ErrTwitchResponseError if the response
+// contains a non-zero ErrorStatus, otherwise returns nil.
+func pullErrorFromResponse(rc ResponseCommon) error {
+	if rc.ErrorStatus == 0 {
+		return nil
+	}
+	return fmt.Errorf("%w: %s (status %d, message %q)", ErrTwitchResponseError, rc.Error, rc.ErrorStatus, rc.ErrorMessage)
+}
+
 func (rc *ResponseCommon) convertHeaderToInt(str string) int {
 	i, _ := strconv.Atoi(str)
 
@@ -396,6 +408,12 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 	tokenRefreshed := false
 
 	for {
+		// Reset error fields so a previous failed attempt doesn't bleed into
+		// a successful retry (e.g. after a token refresh).
+		resp.Error = ""
+		resp.ErrorStatus = 0
+		resp.ErrorMessage = ""
+
 		if c.lastResponse != nil && rateLimitFunc != nil {
 			err := rateLimitFunc(c.lastResponse)
 			if err != nil {

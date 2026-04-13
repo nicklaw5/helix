@@ -67,7 +67,7 @@ func (c *Client) GetSchedule(params *GetScheduleParams) (*GetScheduleResponse, e
 	schedule.Data.Schedule = resp.Data.(*GetScheduleData).Schedule
 	schedule.Data.Pagination = resp.Data.(*GetScheduleData).Pagination
 
-	return schedule, nil
+	return schedule, pullErrorFromResponse(schedule.ResponseCommon)
 }
 
 type UpdateScheduleParams struct {
@@ -92,7 +92,7 @@ func (c *Client) UpdateSchedule(params *UpdateScheduleParams) (*UpdateScheduleRe
 	schedule := &UpdateScheduleResponse{}
 	resp.HydrateResponseCommon(&schedule.ResponseCommon)
 
-	return schedule, nil
+	return schedule, pullErrorFromResponse(schedule.ResponseCommon)
 }
 
 type CreateScheduleSegmentParams struct {
@@ -126,7 +126,7 @@ func (c *Client) CreateScheduleSegment(params *CreateScheduleSegmentParams) (*Cr
 	resp.HydrateResponseCommon(&schedule.ResponseCommon)
 	schedule.Data.Schedule = resp.Data.(*CreateScheduleSegmentData).Schedule
 
-	return schedule, nil
+	return schedule, pullErrorFromResponse(schedule.ResponseCommon)
 }
 
 type UpdateScheduleSegmentParams struct {
@@ -161,7 +161,7 @@ func (c *Client) UpdateScheduleSegment(params *UpdateScheduleSegmentParams) (*Up
 	resp.HydrateResponseCommon(&schedule.ResponseCommon)
 	schedule.Data.Schedule = resp.Data.(*UpdateScheduleSegmentData).Schedule
 
-	return schedule, nil
+	return schedule, pullErrorFromResponse(schedule.ResponseCommon)
 }
 
 type DeleteScheduleSegmentParams struct {
@@ -183,5 +183,5 @@ func (c *Client) DeleteScheduleSegment(params *DeleteScheduleSegmentParams) (*De
 	schedule := &DeleteScheduleSegmentResponse{}
 	resp.HydrateResponseCommon(&schedule.ResponseCommon)
 
-	return schedule, nil
+	return schedule, pullErrorFromResponse(schedule.ResponseCommon)
 }

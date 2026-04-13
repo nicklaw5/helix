@@ -37,7 +37,7 @@ func (c *Client) StartRaid(params *StartRaidParams) (*RaidResponse, error) {
 	raid := &RaidResponse{}
 	resp.HydrateResponseCommon(&raid.ResponseCommon)
 
-	return raid, nil
+	return raid, pullErrorFromResponse(raid.ResponseCommon)
 }
 
 // CancelRaidResponse is the response from StartRaid
@@ -62,5 +62,5 @@ func (c *Client) CancelRaid(params *CancelRaidParams) (*CancelRaidResponse, erro
 	canceledRaid := &CancelRaidResponse{}
 	resp.HydrateResponseCommon(&canceledRaid.ResponseCommon)
 
-	return canceledRaid, nil
+	return canceledRaid, pullErrorFromResponse(canceledRaid.ResponseCommon)
 }

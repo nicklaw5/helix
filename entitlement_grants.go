@@ -37,5 +37,5 @@ func (c *Client) CreateEntitlementsUploadURL(manifestID, entitlementType string)
 	resp.HydrateResponseCommon(&url.ResponseCommon)
 	url.Data.URLs = resp.Data.(*ManyEntitlementsUploadURLs).URLs
 
-	return url, nil
+	return url, pullErrorFromResponse(url.ResponseCommon)
 }

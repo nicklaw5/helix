@@ -45,5 +45,5 @@ func (c *Client) GetTeams(params *GetTeamsParams) (*GetTeamsResponse, error) {
 	resp.HydrateResponseCommon(&teams.ResponseCommon)
 	teams.Data.Teams = resp.Data.(*ManyTeams).Teams
 
-	return teams, nil
+	return teams, pullErrorFromResponse(teams.ResponseCommon)
 }

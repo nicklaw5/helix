@@ -20,5 +20,5 @@ func (c *Client) ModerateHeldMessage(params *HeldMessageModerationParams) (*Held
 	moderation := &HeldMessageModerationResponse{}
 	resp.HydrateResponseCommon(&moderation.ResponseCommon)
 
-	return moderation, nil
+	return moderation, pullErrorFromResponse(moderation.ResponseCommon)
 }

@@ -37,7 +37,7 @@ func TestGetWebhookSubscriptions(t *testing.T) {
 		resp, err := c.GetWebhookSubscriptions(&WebhookSubscriptionsParams{
 			First: testCase.First,
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 
@@ -119,7 +119,7 @@ func TestPostWebhookSubscriptions(t *testing.T) {
 			LeaseSeconds: 0,
 			Secret:       "53cr3t",
 		})
-		if err != nil {
+		if err != nil && resp.StatusCode < 400 {
 			t.Error(err)
 		}
 

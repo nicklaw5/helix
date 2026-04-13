@@ -30,7 +30,7 @@ func (c *Client) GetGames(params *GamesParams) (*GamesResponse, error) {
 	resp.HydrateResponseCommon(&games.ResponseCommon)
 	games.Data.Games = resp.Data.(*ManyGames).Games
 
-	return games, nil
+	return games, pullErrorFromResponse(games.ResponseCommon)
 }
 
 type ManyGamesWithPagination struct {
@@ -60,5 +60,5 @@ func (c *Client) GetTopGames(params *TopGamesParams) (*TopGamesResponse, error) 
 	games.Data.Games = resp.Data.(*ManyGamesWithPagination).Games
 	games.Data.Pagination = resp.Data.(*ManyGamesWithPagination).Pagination
 
-	return games, nil
+	return games, pullErrorFromResponse(games.ResponseCommon)
 }
