@@ -470,6 +470,11 @@ func (c *Client) doRequest(req *http.Request, resp *Response) error {
 					}
 					if refreshed {
 						tokenRefreshed = true
+						// Clear stale error state from the failed attempt so a
+						// successful retry does not appear to have failed.
+						resp.ErrorStatus = 0
+						resp.Error = ""
+						resp.ErrorMessage = ""
 						// Try again now that we have a new token
 						c.setRequestHeaders(req)
 						continue
